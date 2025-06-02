@@ -2,7 +2,7 @@ import { Application, Entity } from "@playcanvas/react";
 import { Camera, Render, Light } from "@playcanvas/react/components";
 import { OrbitControls } from "@playcanvas/react/scripts";
 
-const App = () => (
+const Page = () => (
     <Application>
         <Entity position={[0, 0, 4]}>
             <Camera clearColor="gray" />
@@ -16,4 +16,4 @@ const App = () => (
         </Entity>
     </Application>
 );
-export default App;
+export default Page;

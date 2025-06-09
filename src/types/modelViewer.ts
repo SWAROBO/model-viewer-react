@@ -3,6 +3,7 @@ export type ModelViewerProps = {
     fov?: number;
     distanceMin?: number;
     distanceMax?: number;
+    distance?: number;
     rotation?: [number, number, number];
     position?: [number, number, number];
     scale?: [number, number, number];
@@ -14,6 +15,7 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     fov: 60,
     distanceMin: 3,
     distanceMax: 6,
+    distance: 5,
     rotation: [0, 0, 0],
     position: [0, 0, 0],
     scale: [1, 1, 1],

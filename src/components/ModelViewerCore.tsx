@@ -116,7 +116,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     </div>
                     <RangeSlider
                         min={0.1}
-                        max={10}
+                        max={30}
                         step={0.1}
                         value={[minDistance, maxDistance]}
                         onInput={(value: number[]) => {

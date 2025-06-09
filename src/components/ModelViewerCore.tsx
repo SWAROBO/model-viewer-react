@@ -48,7 +48,6 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [minDistance, setMinDistance] = useState(distanceMin);
     const [maxDistance, setMaxDistance] = useState(distanceMax);
     const [currentDistance, setCurrentDistance] = useState(distance);
-    console.log("currentDistance:", currentDistance);
 
     const updateMinDistance = (value: number) => {
         if (value != minDistance) {

@@ -18,7 +18,7 @@ const Page = () => {
 
     useEffect(() => {
         if (modelData.length > 0) {
-            const selectedModel = modelData.find((row: any) => row.model === modelName);
+            const selectedModel = modelData.find((row: any) => row.model?.toLowerCase() === modelName?.toLowerCase());
             if (selectedModel) {
                 const { model, ...rest } = selectedModel;
                 setCurrentModelProps(rest);

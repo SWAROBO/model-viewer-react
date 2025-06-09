@@ -38,6 +38,14 @@ export const useModelData = (csvUrl: string) => {
                                     if (key.trim() === 'splatURL' && typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
                                         value = value.substring(1, value.length - 1);
                                     }
+
+                                    // Replace null or undefined values with defaults from defaultModelViewerProps
+                                    if (value === null || value === undefined) {
+                                        const trimmedKey = key.trim() as keyof ModelViewerProps;
+                                        if (defaultModelViewerProps.hasOwnProperty(trimmedKey)) {
+                                            value = defaultModelViewerProps[trimmedKey];
+                                        }
+                                    }
                                     newRow[key.trim()] = value;
                                 }
                             }

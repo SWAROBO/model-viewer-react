@@ -5,6 +5,9 @@ import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useSplat, useEnvAtlas } from "@playcanvas/react/hooks";
 import AutoRotate from "../components/AutoRotate";
+import React, { useEffect, useState } from "react";
+import Papa from "papaparse";
+import { useSearchParams } from "next/navigation";
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -29,6 +32,10 @@ type ModelViewerProps = {
     scale?: [number, number, number];
 };
 
+type CsvRow = ModelViewerProps & {
+    model: string; // Add the 'model' property from the CSV
+};
+
 const defaultModelViewerProps: Required<ModelViewerProps> = {
     splatURL:
         "https://artifact.swarobo.ai/250326_incheon_car_5drones/250326_realitycapture_splatfacto_mcmc/260325_incheon_car_only_processed.compressed.ply",
@@ -49,11 +56,12 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         rotation,
         position,
         scale,
-    } = { ...props, ...defaultModelViewerProps };
+    } = { ...defaultModelViewerProps, ...props };
     /**
      * Loading a Gaussian Splat ply
      */
 
+    
     const { asset: splat } = useSplat(splatURL);
 
     return (
@@ -82,16 +90,79 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
     );
 };
 
-<ModelViewer />;
+const Page = () => {
+    const [modelData, setModelData] = useState<CsvRow[]>([]);
+    const [currentModelProps, setCurrentModelProps] = useState<ModelViewerProps | undefined>(undefined);
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhgeGSlSB4Mcs_lxRjIgFBqOEv5n0gpMnP71-Ef_5ykDd_aIzTFA-khURX3-sE6OTFttJE56ZHOpZ/pub?gid=0&single=true&output=csv";
+    const searchParams = useSearchParams();
+    const modelName = searchParams.get('model');
 
-const Page = () => (
-    <Application>
-        <ModelViewer />
-        <div className="logo-container">
-            <a href="https://swarobo.ai/" target="_blank" rel="noopener noreferrer">
-                <img src="/logo-swarobo.png" alt="SWAROBO Logo" className="swarobo-logo" />
-            </a>
-        </div>
-    </Application>
-);
+    useEffect(() => {
+        const fetchCsvData = async () => {
+            try {
+                const response = await fetch(csvUrl);
+                const text = await response.text();
+                Papa.parse(text, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results: Papa.ParseResult<any>) => {
+                        const parsedData: CsvRow[] = results.data.map((row: any) => {
+                            const newRow: { [key: string]: any } = {};
+                            for (const key in row) {
+                                if (Object.prototype.hasOwnProperty.call(row, key)) {
+                                    let value = row[key];
+                                    // Custom parsing for comma-separated numbers (e.g., rotation, position, scale)
+                                    if (typeof value === 'string' && value.includes(',') && !isNaN(Number(value.split(',')[0].trim()))) {
+                                        value = value.split(',').map((num: string) => Number(num.trim()));
+                                    }
+                                    // Remove extra quotes from splatURL if present
+                                    if (key.trim() === 'splatURL' && typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+                                        value = value.substring(1, value.length - 1);
+                                    }
+                                    newRow[key.trim()] = value;
+                                }
+                            }
+                            return newRow as CsvRow;
+                        });
+                        setModelData(parsedData);
+                    },
+                    error: (error: any) => {
+                        console.error("PapaParse Error:", error);
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching CSV:", error);
+            }
+        };
+
+        fetchCsvData();
+    }, []);
+
+    useEffect(() => {
+        if (modelData.length > 0) {
+            const selectedModel = modelData.find((row: CsvRow) => row.model === modelName);
+            if (selectedModel) {
+                // Extract only ModelViewerProps from the CsvRow
+                const { model, ...rest } = selectedModel;
+                setCurrentModelProps(rest);
+            } else {
+                // If no modelName or no match, use the first model or default
+                const { model, ...rest } = modelData[0];
+                setCurrentModelProps(modelData[0] ? rest : defaultModelViewerProps);
+            }
+        }
+    }, [modelData, modelName]);
+
+    return (
+        <Application>
+            {currentModelProps && <ModelViewer {...currentModelProps} />}
+            <div className="logo-container">
+                <a href="https://swarobo.ai/" target="_blank" rel="noopener noreferrer">
+                    <img src="/logo-swarobo.png" alt="SWAROBO Logo" className="swarobo-logo" />
+                </a>
+            </div>
+        </Application>
+    );
+};
 export default Page;

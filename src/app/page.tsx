@@ -6,7 +6,7 @@ import { OrbitControls } from "../lib/@playcanvas/react";
 import { useSplat, useEnvAtlas } from "@playcanvas/react/hooks";
 
 // Load the environment atlas asset
-export const EnvAtlasComponent = ({ src }: { src: string }) => {
+const EnvAtlasComponent = ({ src }: { src: string }) => {
     const { asset } = useEnvAtlas(src);
 
     if (!asset) return null;
@@ -39,7 +39,7 @@ const defaultModelViewerProps: Required<ModelViewerProps> = {
     scale: [1, 1, 1],
 };
 
-export const ModelViewer = (
+const ModelViewer = (
     props: ModelViewerProps = defaultModelViewerProps
 ) => {
     const {

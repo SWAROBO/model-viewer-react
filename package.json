@@ -14,7 +14,8 @@
         "next": "15.3.3",
         "playcanvas": "^2.7.7",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "sync-ammo": "^0.1.2"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "^4",

@@ -2,7 +2,7 @@
 
 import { Application, Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
-import { OrbitControls } from "@playcanvas/react/scripts";
+import { OrbitControls } from "../lib/@playcanvas/react";
 import { useSplat, useEnvAtlas } from "@playcanvas/react/hooks";
 
 // Load the environment atlas asset
@@ -18,13 +18,43 @@ export const EnvAtlasComponent = ({ src }: { src: string }) => {
     );
 };
 
-export const Example = () => {
+type ModelViewerProps = {
+    splatURL?: string;
+    fov?: number;
+    distanceMin?: number;
+    distanceMax?: number;
+    rotation?: [number, number, number];
+    position?: [number, number, number];
+    scale?: [number, number, number];
+};
+
+const defaultModelViewerProps: Required<ModelViewerProps> = {
+    splatURL:
+        "https://artifact.swarobo.ai/250326_incheon_car_5drones/250326_realitycapture_splatfacto_mcmc/260325_incheon_car_only_processed.compressed.ply",
+    fov: 60,
+    distanceMin: 3,
+    distanceMax: 6,
+    rotation: [0, 0, 0],
+    position: [0, 0, 0],
+    scale: [1, 1, 1],
+};
+
+export const ModelViewer = (
+    props: ModelViewerProps = defaultModelViewerProps
+) => {
+    const {
+        splatURL,
+        fov,
+        distanceMin,
+        distanceMax,
+        rotation,
+        position,
+        scale,
+    } = { ...props, ...defaultModelViewerProps };
     /**
      * Loading a Gaussian Splat ply
      */
 
-    const splatURL =
-        "https://artifact.swarobo.ai/250326_incheon_car_5drones/250326_realitycapture_splatfacto_mcmc/260325_incheon_car_only_processed.compressed.ply";
     const { asset: splat } = useSplat(splatURL);
 
     return (
@@ -32,23 +62,26 @@ export const Example = () => {
             {/* Create a camera entity */}
             <EnvAtlasComponent src="/mirrored_hall_4k-envAtlas.png" />
 
-            <Entity>
-                <Camera fov={30} />
-                {splat && <OrbitControls distanceMin={3} distanceMax={6} />}
+            <Entity rotation={rotation} position={position} scale={scale}>
+                <Camera fov={fov} />
+                {splat && (
+                    <OrbitControls
+                        distanceMin={distanceMin}
+                        distanceMax={distanceMax}
+                    />
+                )}
             </Entity>
             {/* Create the splat entity */}
-            <Entity rotation={[0, -40, 0]} position={[0.2, -1.7, -6]}>
-                {splat && <GSplat asset={splat} />}
-            </Entity>
+            <Entity>{splat && <GSplat asset={splat} />}</Entity>
         </Entity>
     );
 };
 
-<Example />;
+<ModelViewer />;
 
 const Page = () => (
     <Application>
-        <Example />
+        <ModelViewer />
     </Application>
 );
 export default Page;

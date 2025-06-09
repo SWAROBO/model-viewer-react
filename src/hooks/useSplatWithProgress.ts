@@ -37,7 +37,6 @@ export const useSplatWithProgress = (
 
         // Listen for progress and load/error events on the asset
         const handleProgressEvent = (receivedLength: number, total: number) => {
-            console.log("useSplatWithProgress: Received progress - receivedLength:", receivedLength, "total:", total);
             let percentage = 0;
             if (total > 0) {
                 percentage = Math.round((receivedLength / total) * 100);
@@ -47,7 +46,6 @@ export const useSplatWithProgress = (
         };
 
         const handleLoad = () => {
-            console.log("useSplatWithProgress: Asset 'load' event fired. Asset:", newAsset);
             setAsset(newAsset);
             setProgress(100); // Ensure progress is 100%
             onProgress?.(100);
@@ -55,7 +53,6 @@ export const useSplatWithProgress = (
             // Add a small delay before setting loading to false to show 100%
             setTimeout(() => {
                 setLoading(false);
-                console.log("useSplatWithProgress: Final state - asset:", newAsset, "loading: false", "progress: 100");
             }, 500); // 500ms delay
         };
 
@@ -89,6 +86,5 @@ export const useSplatWithProgress = (
         fetchSplatData();
     }, [fetchSplatData]);
 
-    console.log("useSplatWithProgress: Current state - asset:", asset, "loading:", loading, "progress:", progress);
     return { asset, loading, error, progress };
 };

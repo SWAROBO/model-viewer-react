@@ -7,6 +7,8 @@ import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
 import { useSplatWithProgress } from "../hooks/useSplatWithProgress";
 import AutoRotate from "../components/AutoRotate";
 import React, { useEffect, useState, useCallback } from "react";
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css'; // Import the styles
 import { CustomSplatHandler } from "../lib/playcanvas/CustomSplatHandler"; // Import the custom handler
 import Papa from "papaparse";
 import { useSearchParams } from "next/navigation";
@@ -66,7 +68,6 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
 
     const handleProgress = useCallback((progress: number) => {
         setDownloadProgress(progress);
-        console.log("ModelViewer: downloadProgress updated to", progress); // Add this log
     }, []);
 
     const { asset: splat, loading } = useSplatWithProgress(splatURL, handleProgress);
@@ -78,7 +79,6 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
             // Check if it's already registered to avoid re-registering on hot reloads
             if (!(app.loader.getHandler('gsplat') instanceof CustomSplatHandler)) {
                 app.loader.addHandler('gsplat', new CustomSplatHandler(app));
-                console.log("CustomSplatHandler registered with PlayCanvas loader.");
             }
 
             const handleError = (error: any) => {
@@ -122,16 +122,33 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                         position: 'absolute',
                         top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        color: 'white',
-                        fontSize: '3em', // Increased font size
+                        transform: 'translate(-50%, -50%)', // Remove rotation from outer div
                         zIndex: 1000,
-                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)', // Stronger text shadow
-                        backgroundColor: 'rgba(0,0,0,0.7)', // Added background color
-                        padding: '20px', // Added padding
-                        borderRadius: '10px' // Added border radius
+                        width: '100px', // Smaller diameter of the circle
+                        height: '100px', // Smaller diameter of the circle
+                        // backgroundColor: 'rgba(0,0,0,0.7)', // Removed background color
+                        borderRadius: '50%', // Make it circular
+                        padding: '5px' // Reduced padding
                     }}>
-                        Downloading: {downloadProgress}%
+                        <CircularProgressbar
+                            value={downloadProgress}
+                            text={`${downloadProgress}%`}
+                            className="my-progressbar" // Add a class name
+                            styles={buildStyles({
+                                // Rotation of path and trail, in number of turns (0-1)
+
+                                // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
+                                strokeLinecap: 'butt',
+
+                                // Text size
+                                textSize: '1.5em', // Smaller text size
+
+                                // Colors
+                                pathColor: `white`,
+                                textColor: 'white',
+                                trailColor: 'gray',
+                            })}
+                        />
                     </div>
                 )}
                 {splat && <GSplat asset={splat} />}

@@ -9,13 +9,13 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
         // Cast to ResourceHandler as getHandler can return undefined
         this._defaultSplatHandler = app.loader.getHandler('gsplat') as ResourceHandler;
         if (!this._defaultSplatHandler) {
-            console.warn("Default gsplat asset handler not found. Custom loader might not work correctly.");
+            // console.warn("Default gsplat asset handler not found. Custom loader might not work correctly."); // Removed log
         }
     }
 
     // The load method is responsible for fetching the asset data
     load(url: string, callback: (err: string | null, asset: any) => void, asset: Asset) {
-        console.log("CustomSplatHandler: Loading asset:", url);
+        // console.log("CustomSplatHandler: Loading asset:", url); // Removed log
 
         fetch(url)
             .then(response => {
@@ -48,8 +48,8 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
                         receivedLength += value.length;
 
                         if (total > 0) {
-                            const progress = receivedLength / total;
-                            console.log("CustomSplatHandler: Firing asset progress: receivedLength:", receivedLength, "total:", total);
+                            // const progress = receivedLength / total; // Removed log
+                            // console.log("CustomSplatHandler: Firing asset progress: receivedLength:", receivedLength, "total:", total); // Removed log
                             // Fire progress event on the asset, passing both receivedLength and total
                             asset.fire('progress', receivedLength, total);
                         }
@@ -61,7 +61,7 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
             })
             .then(blob => blob.arrayBuffer()) // Convert blob to ArrayBuffer
             .then(arrayBuffer => {
-                console.log("CustomSplatHandler: Data fetched, delegating to default handler.");
+                // console.log("CustomSplatHandler: Data fetched, delegating to default handler."); // Removed log
                 // Delegate the actual parsing of the ArrayBuffer to the default gsplat handler
                 // This is the crucial part: how to make the default handler process an ArrayBuffer?
                 // The default handler's load method expects a URL.
@@ -76,10 +76,10 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
                 this._defaultSplatHandler.load(blobUrl, (err: string | null, resource: any) => {
                     URL.revokeObjectURL(blobUrl); // Clean up the blob URL
                     if (err) {
-                        console.error("CustomSplatHandler: Default handler error:", err);
+                        // console.error("CustomSplatHandler: Default handler error:", err); // Removed log
                         callback(err, null);
                     } else {
-                        console.log("CustomSplatHandler: Default handler loaded resource.");
+                        // console.log("CustomSplatHandler: Default handler loaded resource."); // Removed log
                         asset.resource = resource; // Set the resource on our original asset
                         callback(null, resource);
                     }
@@ -87,7 +87,7 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
 
             })
             .catch(err => {
-                console.error("CustomSplatHandler: Fetch or processing error:", err);
+                // console.error("CustomSplatHandler: Fetch or processing error:", err); // Removed log
                 callback(err.message || "Failed to load splat asset", null);
             });
     }

@@ -4,6 +4,7 @@ import { Application, Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useSplat, useEnvAtlas } from "@playcanvas/react/hooks";
+import AutoRotate from "../components/AutoRotate";
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -39,9 +40,7 @@ const defaultModelViewerProps: Required<ModelViewerProps> = {
     scale: [1, 1, 1],
 };
 
-const ModelViewer = (
-    props: ModelViewerProps = defaultModelViewerProps
-) => {
+const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
     const {
         splatURL,
         fov,
@@ -68,8 +67,14 @@ const ModelViewer = (
                     <OrbitControls
                         distanceMin={distanceMin}
                         distanceMax={distanceMax}
+                        mouse={{
+                            orbitSensitivity: 0.1,
+                            distanceSensitivity: 0.05,
+                        }}
+                        inertiaFactor={0.1}
                     />
                 )}
+                <AutoRotate startDelay={1} startFadeInTime={2} />
             </Entity>
             {/* Create the splat entity */}
             <Entity>{splat && <GSplat asset={splat} />}</Entity>

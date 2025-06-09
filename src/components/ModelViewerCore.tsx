@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas } from "@playcanvas/react/hooks";
 import AutoRotate from "./AutoRotate";
+import RangeSlider from "react-range-slider-input";
+import "react-range-slider-input/dist/style.css";
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -39,6 +42,26 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     position = [0, 0, 0],
     scale = [1, 1, 1],
 }) => {
+    const searchParams = useSearchParams();
+    const showSettings = searchParams.get("settings") === "true";
+
+    const [minDistance, setMinDistance] = useState(distanceMin);
+    const [maxDistance, setMaxDistance] = useState(distanceMax);
+    const [currentDistance, setCurrentDistance] = useState(distance);
+
+    useEffect(() => {
+        // Ensure minDistance <= maxDistance
+        if (minDistance > maxDistance) {
+            setMinDistance(maxDistance);
+        }
+        // Update currentDistance to be within the new min/max range
+        if (currentDistance < minDistance) {
+            setCurrentDistance(minDistance);
+        } else if (currentDistance > maxDistance) {
+            setCurrentDistance(maxDistance);
+        }
+    }, [minDistance, maxDistance]);
+
     return (
         <Entity>
             {/* Create a camera entity */}
@@ -48,10 +71,10 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 <Camera fov={fov} />
                 {splat && (
                     <OrbitControls
-                        distanceMin={distanceMin}
-                        distanceMax={distanceMax}
+                        distanceMin={minDistance}
+                        distanceMax={maxDistance}
                         inertiaFactor={0.1}
-                        distance={distance}
+                        distance={currentDistance}
                         mouse={{
                             distanceSensitivity: 0.05,
                             orbitSensitivity: 0.2,
@@ -62,6 +85,43 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             </Entity>
             {/* Create the splat entity */}
             <Entity>{splat && <GSplat asset={splat} />}</Entity>
+
+            {showSettings && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "10px",
+                        left: "10px",
+                        background: "rgba(0,0,0,0.7)",
+                        padding: "15px",
+                        borderRadius: "8px",
+                        color: "white",
+                        fontFamily: "Arial, sans-serif",
+                        zIndex: 1000,
+                    }}
+                >
+                    <h3>Camera Distance Settings</h3>
+                    <div style={{ marginBottom: "10px" }}>
+                        <label>
+                            Min Distance: {minDistance.toFixed(2)}
+                        </label>
+                        <br />
+                        <label>
+                            Max Distance: {maxDistance.toFixed(2)}
+                        </label>
+                    </div>
+                    <RangeSlider
+                        min={0.1}
+                        max={10}
+                        step={0.1}
+                        value={[minDistance, maxDistance]}
+                        onInput={(value: number[]) => {
+                            setMinDistance(value[0]);
+                            setMaxDistance(value[1]);
+                        }}
+                    />
+                </div>
+            )}
         </Entity>
     );
 };

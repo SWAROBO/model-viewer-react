@@ -17,6 +17,7 @@
         "react": "^19.0.0",
         "react-circular-progressbar": "^2.2.0",
         "react-dom": "^19.0.0",
+        "react-range-slider-input": "^3.2.1",
         "sync-ammo": "^0.1.2"
     },
     "devDependencies": {

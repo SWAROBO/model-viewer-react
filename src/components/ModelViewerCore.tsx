@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
@@ -44,17 +44,22 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     position = [0, 0, 0],
     scale = [1, 1, 1],
     pitchAngleMin = 0, // Default from types/modelViewer.ts
-    pitchAngleMax = 90,  // Default from types/modelViewer.ts
+    pitchAngleMax = 90, // Default from types/modelViewer.ts
 }) => {
     const searchParams = useSearchParams();
     const showSettings = searchParams.get("settings") === "true";
-    
+
     const [minDistance, setMinDistance] = useState(distanceMin);
     const [maxDistance, setMaxDistance] = useState(distanceMax);
     const [currentDistance, setCurrentDistance] = useState(distance);
 
     const [minPitchAngle, setMinPitchAngle] = useState(pitchAngleMin);
     const [maxPitchAngle, setMaxPitchAngle] = useState(pitchAngleMax);
+
+    const [currentPosition, setCurrentPosition] = useState(position);
+    const [currentRotation, setCurrentRotation] = useState(rotation);
+
+    const [isSliderActive, setIsSliderActive] = useState(false);
 
     const updateMinDistance = (value: number) => {
         if (value != minDistance) {
@@ -88,6 +93,29 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         }
     }, [minDistance, maxDistance]);
 
+    const updatePosition = (index: number, value: number) => {
+        setCurrentPosition((prev) => {
+            const newPos = [...prev];
+            newPos[index] = value;
+            return newPos as [number, number, number];
+        });
+    };
+
+    const updateRotation = (index: number, value: number) => {
+        setCurrentRotation((prev) => {
+            const newRot = [...prev];
+            newRot[index] = value;
+            return newRot as [number, number, number];
+        });
+    };
+
+    useEffect(() => {
+        // Ensure minDistance <= maxDistance
+        if (minDistance > maxDistance) {
+            setMinDistance(maxDistance);
+        }
+    }, [minDistance, maxDistance]);
+
     useEffect(() => {
         // Ensure minPitchAngle <= maxPitchAngle
         if (minPitchAngle > maxPitchAngle) {
@@ -100,7 +128,11 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             {/* Create a camera entity */}
             <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
 
-            <Entity rotation={rotation} position={position} scale={scale}>
+            <Entity
+                rotation={currentRotation}
+                position={currentPosition}
+                scale={scale}
+            >
                 <Camera fov={fov} />
                 {splat && (
                     <OrbitControls
@@ -110,10 +142,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         distance={currentDistance}
                         pitchAngleMin={minPitchAngle}
                         pitchAngleMax={maxPitchAngle}
-                        mouse={{
-                            distanceSensitivity: 0.05,
-                            orbitSensitivity: 0.2,
-                        }}
+                        mouse={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
+                        touch={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
                     />
                 )}
                 <AutoRotate startDelay={1} startFadeInTime={2} />
@@ -134,6 +164,10 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         fontFamily: "Arial, sans-serif",
                         zIndex: 1000,
                     }}
+                    onMouseDown={() => setIsSliderActive(true)}
+                    onMouseUp={() => setIsSliderActive(false)}
+                    onTouchStart={() => setIsSliderActive(true)}
+                    onTouchEnd={() => setIsSliderActive(false)}
                 >
                     <h3>Camera Distance Settings</h3>
                     <div style={{ marginBottom: "10px" }}>
@@ -152,11 +186,17 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         }}
                     />
 
-                    <h3 style={{ marginTop: "20px" }}>Camera Pitch Angle Settings</h3>
+                    <h3 style={{ marginTop: "20px" }}>
+                        Camera Pitch Angle Settings
+                    </h3>
                     <div style={{ marginBottom: "10px" }}>
-                        <label>Min Pitch Angle: {minPitchAngle.toFixed(2)}</label>
+                        <label>
+                            Min Pitch Angle: {minPitchAngle.toFixed(2)}
+                        </label>
                         <br />
-                        <label>Max Pitch Angle: {maxPitchAngle.toFixed(2)}</label>
+                        <label>
+                            Max Pitch Angle: {maxPitchAngle.toFixed(2)}
+                        </label>
                     </div>
                     <RangeSlider
                         min={-90}
@@ -168,6 +208,60 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                             updateMaxPitchAngle(value[1]);
                         }}
                     />
+
+                    <h3 style={{ marginTop: "20px" }}>
+                        Model Position Settings
+                    </h3>
+                    {["X", "Y", "Z"].map((axis, index) => (
+                        <div
+                            key={`position-${axis}`}
+                            style={{ marginBottom: "10px" }}
+                        >
+                            <label>
+                                Position {axis}:{" "}
+                                {currentPosition[index].toFixed(2)}
+                            </label>
+                            <RangeSlider
+                                min={-10}
+                                max={10}
+                                step={0.1}
+                                value={[
+                                    currentPosition[index],
+                                    currentPosition[index],
+                                ]}
+                                onInput={(value: number[]) =>
+                                    updatePosition(index, value[0])
+                                }
+                            />
+                        </div>
+                    ))}
+
+                    <h3 style={{ marginTop: "20px" }}>
+                        Model Rotation Settings
+                    </h3>
+                    {["X", "Y", "Z"].map((axis, index) => (
+                        <div
+                            key={`rotation-${axis}`}
+                            style={{ marginBottom: "10px" }}
+                        >
+                            <label>
+                                Rotation {axis}:{" "}
+                                {currentRotation[index].toFixed(2)}
+                            </label>
+                            <RangeSlider
+                                min={-180}
+                                max={180}
+                                step={0.1}
+                                value={[
+                                    currentRotation[index],
+                                    currentRotation[index],
+                                ]}
+                                onInput={(value: number[]) =>
+                                    updateRotation(index, value[0])
+                                }
+                            />
+                        </div>
+                    ))}
                 </div>
             )}
         </Entity>

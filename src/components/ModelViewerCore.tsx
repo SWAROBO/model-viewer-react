@@ -44,21 +44,29 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
 }) => {
     const searchParams = useSearchParams();
     const showSettings = searchParams.get("settings") === "true";
-
+    
     const [minDistance, setMinDistance] = useState(distanceMin);
     const [maxDistance, setMaxDistance] = useState(distanceMax);
     const [currentDistance, setCurrentDistance] = useState(distance);
+    console.log("currentDistance:", currentDistance);
+
+    const updateMinDistance = (value: number) => {
+        if (value != minDistance) {
+            setMinDistance(value);
+            setCurrentDistance(value);
+        }
+    };
+    const updateMaxDistance = (value: number) => {
+        if (value != maxDistance) {
+            setMaxDistance(value);
+            setCurrentDistance(value);
+        }
+    };
 
     useEffect(() => {
         // Ensure minDistance <= maxDistance
         if (minDistance > maxDistance) {
             setMinDistance(maxDistance);
-        }
-        // Update currentDistance to be within the new min/max range
-        if (currentDistance < minDistance) {
-            setCurrentDistance(minDistance);
-        } else if (currentDistance > maxDistance) {
-            setCurrentDistance(maxDistance);
         }
     }, [minDistance, maxDistance]);
 
@@ -102,13 +110,9 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 >
                     <h3>Camera Distance Settings</h3>
                     <div style={{ marginBottom: "10px" }}>
-                        <label>
-                            Min Distance: {minDistance.toFixed(2)}
-                        </label>
+                        <label>Min Distance: {minDistance.toFixed(2)}</label>
                         <br />
-                        <label>
-                            Max Distance: {maxDistance.toFixed(2)}
-                        </label>
+                        <label>Max Distance: {maxDistance.toFixed(2)}</label>
                     </div>
                     <RangeSlider
                         min={0.1}
@@ -116,8 +120,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         step={0.1}
                         value={[minDistance, maxDistance]}
                         onInput={(value: number[]) => {
-                            setMinDistance(value[0]);
-                            setMaxDistance(value[1]);
+                            updateMinDistance(value[0]);
+                            updateMaxDistance(value[1]);
                         }}
                     />
                 </div>

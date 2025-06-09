@@ -14,7 +14,7 @@ const EnvAtlasComponent = ({ src }: { src: string }) => {
 
     return (
         <Entity>
-            <EnvAtlas asset={asset} skyboxIntensity={0.1} />
+            <EnvAtlas asset={asset} skyboxIntensity={0.5} />
         </Entity>
     );
 };
@@ -59,7 +59,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
     return (
         <Entity>
             {/* Create a camera entity */}
-            <EnvAtlasComponent src="/mirrored_hall_4k-envAtlas.png" />
+            <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
 
             <Entity rotation={rotation} position={position} scale={scale}>
                 <Camera fov={fov} />
@@ -67,10 +67,10 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                     <OrbitControls
                         distanceMin={distanceMin}
                         distanceMax={distanceMax}
-                        mouse={{
-                            orbitSensitivity: 0.1,
-                            distanceSensitivity: 0.05,
-                        }}
+                        // mouse={{
+                        //     orbitSensitivity: 0.1,
+                        //     distanceSensitivity: 0.05,
+                        // }}
                         inertiaFactor={0.1}
                     />
                 )}

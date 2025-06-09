@@ -23,6 +23,7 @@ type ModelViewerCoreProps = {
     fov?: number;
     distanceMin?: number;
     distanceMax?: number;
+    distance?: number;
     rotation?: [number, number, number];
     position?: [number, number, number];
     scale?: [number, number, number];
@@ -33,6 +34,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     fov = 60,
     distanceMin = 3,
     distanceMax = 6,
+    distance = 5,
     rotation = [0, 0, 0],
     position = [0, 0, 0],
     scale = [1, 1, 1],
@@ -49,14 +51,17 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         distanceMin={distanceMin}
                         distanceMax={distanceMax}
                         inertiaFactor={0.1}
+                        distance={distance}
+                        mouse={{
+                            distanceSensitivity: 0.05,
+                            orbitSensitivity: 0.2,
+                        }}
                     />
                 )}
                 <AutoRotate startDelay={1} startFadeInTime={2} />
             </Entity>
             {/* Create the splat entity */}
-            <Entity>
-                {splat && <GSplat asset={splat} />}
-            </Entity>
+            <Entity>{splat && <GSplat asset={splat} />}</Entity>
         </Entity>
     );
 };

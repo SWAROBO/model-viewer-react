@@ -117,33 +117,27 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
             </Entity>
             {/* Create the splat entity */}
             <Entity>
-                {loading && ( // Simplify condition: just check if loading
+                {loading && (
                     <div style={{
                         position: 'absolute',
                         top: '50%',
                         left: '50%',
-                        transform: 'translate(-50%, -50%)', // Remove rotation from outer div
+                        transform: 'translate(-50%, -50%)',
                         zIndex: 1000,
-                        width: '100px', // Smaller diameter of the circle
-                        height: '100px', // Smaller diameter of the circle
-                        // backgroundColor: 'rgba(0,0,0,0.7)', // Removed background color
-                        borderRadius: '50%', // Make it circular
-                        padding: '5px' // Reduced padding
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '50%',
+                        padding: '5px',
+                        opacity: downloadProgress < 100 ? 1 : 0, // Fully visible until 100%, then fades
+                        transition: 'opacity 0.5s ease-out' // Smooth transition for opacity
                     }}>
                         <CircularProgressbar
                             value={downloadProgress}
                             text={`${downloadProgress}%`}
-                            className="my-progressbar" // Add a class name
+                            className="my-progressbar"
                             styles={buildStyles({
-                                // Rotation of path and trail, in number of turns (0-1)
-
-                                // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
                                 strokeLinecap: 'butt',
-
-                                // Text size
-                                textSize: '1.5em', // Smaller text size
-
-                                // Colors
+                                textSize: '1.5em',
                                 pathColor: `white`,
                                 textColor: 'white',
                                 trailColor: 'gray',

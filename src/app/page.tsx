@@ -3,9 +3,11 @@
 import { Application, Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
-import { useSplat, useEnvAtlas } from "@playcanvas/react/hooks";
+import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
+import { useSplatWithProgress } from "../hooks/useSplatWithProgress";
 import AutoRotate from "../components/AutoRotate";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { CustomSplatHandler } from "../lib/playcanvas/CustomSplatHandler"; // Import the custom handler
 import Papa from "papaparse";
 import { useSearchParams } from "next/navigation";
 
@@ -60,9 +62,38 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
     /**
      * Loading a Gaussian Splat ply
      */
+    const [downloadProgress, setDownloadProgress] = useState(0);
 
-    
-    const { asset: splat } = useSplat(splatURL);
+    const handleProgress = useCallback((progress: number) => {
+        setDownloadProgress(progress);
+        console.log("ModelViewer: downloadProgress updated to", progress); // Add this log
+    }, []);
+
+    const { asset: splat, loading } = useSplatWithProgress(splatURL, handleProgress);
+    const app = useApp(); // Get the PlayCanvas app instance
+
+    useEffect(() => {
+        if (app) {
+            // Register the custom gsplat asset handler
+            // Check if it's already registered to avoid re-registering on hot reloads
+            if (!(app.loader.getHandler('gsplat') instanceof CustomSplatHandler)) {
+                app.loader.addHandler('gsplat', new CustomSplatHandler(app));
+                console.log("CustomSplatHandler registered with PlayCanvas loader.");
+            }
+
+            const handleError = (error: any) => {
+                console.error("PlayCanvas App Error:", error);
+                // Log more details if available
+                if (error.message) console.error("PlayCanvas App Error Message:", error.message);
+                if (error.stack) console.error("PlayCanvas App Error Stack:", error.stack);
+                if (error.asset) console.error("PlayCanvas App Error Asset:", error.asset);
+            };
+            app.on('error', handleError);
+            return () => {
+                app.off('error', handleError);
+            };
+        }
+    }, [app]);
 
     return (
         <Entity>
@@ -85,7 +116,26 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 <AutoRotate startDelay={1} startFadeInTime={2} />
             </Entity>
             {/* Create the splat entity */}
-            <Entity>{splat && <GSplat asset={splat} />}</Entity>
+            <Entity>
+                {loading && ( // Simplify condition: just check if loading
+                    <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        color: 'white',
+                        fontSize: '3em', // Increased font size
+                        zIndex: 1000,
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.8)', // Stronger text shadow
+                        backgroundColor: 'rgba(0,0,0,0.7)', // Added background color
+                        padding: '20px', // Added padding
+                        borderRadius: '10px' // Added border radius
+                    }}>
+                        Downloading: {downloadProgress}%
+                    </div>
+                )}
+                {splat && <GSplat asset={splat} />}
+            </Entity>
         </Entity>
     );
 };

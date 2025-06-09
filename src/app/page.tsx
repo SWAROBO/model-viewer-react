@@ -87,6 +87,11 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
 const Page = () => (
     <Application>
         <ModelViewer />
+        <div className="logo-container">
+            <a href="https://swarobo.ai/" target="_blank" rel="noopener noreferrer">
+                <img src="/logo-swarobo.png" alt="SWAROBO Logo" className="swarobo-logo" />
+            </a>
+        </div>
     </Application>
 );
 export default Page;

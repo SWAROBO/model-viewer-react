@@ -35,3 +35,21 @@ body {
 #__next {
   height: 100%;
 }
+
+.logo-container {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.swarobo-logo {
+  width: 200px; /* Increased size */
+  height: auto;
+  opacity: 0.8; /* Optional: make it slightly transparent */
+  transition: opacity 0.3s ease-in-out;
+}
+
+.swarobo-logo:hover {
+  opacity: 1;
+}

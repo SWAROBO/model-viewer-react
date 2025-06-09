@@ -146,10 +146,10 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         touch={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
                     />
                 )}
-                <AutoRotate startDelay={1} startFadeInTime={2} />
+                {!showSettings && <AutoRotate startDelay={1} startFadeInTime={2} />}
             </Entity>
             {/* Create the splat entity */}
-            <Entity>{splat && <GSplat asset={splat} />}</Entity>
+            <Entity position={currentPosition} rotation={currentRotation}>{splat && <GSplat asset={splat} />}</Entity>
 
             {showSettings && (
                 <div
@@ -230,7 +230,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                                     currentPosition[index],
                                 ]}
                                 onInput={(value: number[]) =>
-                                    updatePosition(index, value[0])
+                                    updatePosition(index, (value[0] + value[1]) / 2)
                                 }
                             />
                         </div>
@@ -257,7 +257,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                                     currentRotation[index],
                                 ]}
                                 onInput={(value: number[]) =>
-                                    updateRotation(index, value[0])
+                                    updateRotation(index, (value[0] + value[1]) / 2)
                                 }
                             />
                         </div>

@@ -7,6 +7,7 @@ import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
 import { useSplatWithProgress } from "../hooks/useSplatWithProgress";
 import AutoRotate from "../components/AutoRotate";
 import React, { useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css'; // Import the styles
 import { CustomSplatHandler } from "../lib/playcanvas/CustomSplatHandler"; // Import the custom handler
@@ -226,4 +227,7 @@ const Page = () => {
         </Application>
     );
 };
-export default Page;
+
+const DynamicPage = dynamic(() => Promise.resolve(Page), { ssr: false });
+
+export default DynamicPage;

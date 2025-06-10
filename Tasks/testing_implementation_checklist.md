@@ -234,19 +234,9 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         });
         ```
         - Targets
-            -   [ ] a. `src/components/AutoRotate.tsx`
-            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
-            -   [ ] c. `src/components/Grid.tsx`
-            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
-            -   [ ] e. `src/components/ModelViewer.tsx`
-            -   [ ] f. `src/components/ModelViewerCore.tsx`
-            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
-            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
-            -   [ ] i. `src/components/SwaroboLogo.tsx`
-            -   [ ] j. `src/hooks/useModelData.ts`
-            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
-            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
-            -   [ ] m. `src/app/page.tsx`
+            -   [x] j. `src/hooks/useModelData.ts`
+            -   [x] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [x] l. `src/hooks/useSplatWithProgress.ts`
     f.  **Mocking:**
         -   [ ] i. Use `vi.mock` for mocking modules (e.g., PlayCanvas, external libraries).
         -   [ ] ii. Mock child components if testing a parent in isolation.

@@ -5,6 +5,7 @@ import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas } from "@playcanvas/react/hooks";
 import AutoRotate from "./AutoRotate";
+import Grid from "./Grid";
 import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 
@@ -43,8 +44,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     rotation = [0, 0, 0],
     position = [0, 0, 0],
     scale = [1, 1, 1],
-    pitchAngleMin = 0, 
-    pitchAngleMax = 90, 
+    pitchAngleMin = 0,
+    pitchAngleMax = 90,
 }) => {
     const searchParams = useSearchParams();
     const showSettings = searchParams.get("settings") === "true";
@@ -125,15 +126,13 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
 
     return (
         <Entity>
+            <Grid />
+            {!showSettings && (
+                <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
+            )}
             {/* Create a camera entity */}
-            <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
-
-            <Entity
-                rotation={currentRotation}
-                position={currentPosition}
-                scale={scale}
-            >
-                <Camera fov={fov} />
+            <Entity>
+                <Camera clearColor="#090707" fov={fov} />
                 {splat && (
                     <OrbitControls
                         distanceMin={distanceMinState}
@@ -142,14 +141,43 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         distance={currentDistance}
                         pitchAngleMin={pitchAngleMinState}
                         pitchAngleMax={pitchAngleMaxState}
-                        mouse={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
-                        touch={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
+                        mouse={
+                            isSliderActive
+                                ? {
+                                      distanceSensitivity: 0,
+                                      orbitSensitivity: 0,
+                                  }
+                                : {
+                                      distanceSensitivity: 0.05,
+                                      orbitSensitivity: 0.2,
+                                  }
+                        }
+                        touch={
+                            isSliderActive
+                                ? {
+                                      distanceSensitivity: 0,
+                                      orbitSensitivity: 0,
+                                  }
+                                : {
+                                      distanceSensitivity: 0.05,
+                                      orbitSensitivity: 0.2,
+                                  }
+                        }
                     />
                 )}
-                {!showSettings && <AutoRotate startDelay={1} startFadeInTime={2} />}
+                {!showSettings && (
+                    <AutoRotate startDelay={1} startFadeInTime={2} />
+                )}
             </Entity>
             {/* Create the splat entity */}
-            <Entity position={currentPosition} rotation={currentRotation}>{splat && <GSplat asset={splat} />}</Entity>
+            <Entity
+                position={currentPosition}
+                rotation={currentRotation}
+                // scale={scale}
+                scale={[5, 5, 5]} // Fixed scale for consistency
+            >
+                {splat && <GSplat asset={splat} />}
+            </Entity>
 
             {showSettings && (
                 <div
@@ -171,9 +199,13 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 >
                     <h3>Camera Distance Settings</h3>
                     <div style={{ marginBottom: "10px" }}>
-                        <label>Min Distance: {distanceMinState.toFixed(2)}</label>
+                        <label>
+                            Min Distance: {distanceMinState.toFixed(2)}
+                        </label>
                         <br />
-                        <label>Max Distance: {distanceMaxState.toFixed(2)}</label>
+                        <label>
+                            Max Distance: {distanceMaxState.toFixed(2)}
+                        </label>
                     </div>
                     <RangeSlider
                         min={0.1}
@@ -230,7 +262,10 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                                     currentPosition[index],
                                 ]}
                                 onInput={(value: number[]) =>
-                                    updatePosition(index, (value[0] + value[1]) / 2)
+                                    updatePosition(
+                                        index,
+                                        (value[0] + value[1]) / 2
+                                    )
                                 }
                             />
                         </div>
@@ -257,7 +292,10 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                                     currentRotation[index],
                                 ]}
                                 onInput={(value: number[]) =>
-                                    updateRotation(index, (value[0] + value[1]) / 2)
+                                    updateRotation(
+                                        index,
+                                        (value[0] + value[1]) / 2
+                                    )
                                 }
                             />
                         </div>

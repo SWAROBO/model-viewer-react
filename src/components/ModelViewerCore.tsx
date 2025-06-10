@@ -6,8 +6,8 @@ import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas } from "@playcanvas/react/hooks";
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
-import RangeSlider from "react-range-slider-input";
-import "react-range-slider-input/dist/style.css";
+import DualRangeSliderControl from "./DualRangeSliderControl";
+import SingleValueSliderControl from "./SingleValueSliderControl";
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -50,12 +50,16 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const searchParams = useSearchParams();
     const showSettings = searchParams.get("settings") === "true";
 
-    const [distanceMinState, setDistanceMin] = useState(distanceMin);
-    const [distanceMaxState, setDistanceMax] = useState(distanceMax);
+    const [distanceRange, setDistanceRange] = useState<[number, number]>([
+        distanceMin,
+        distanceMax,
+    ]);
     const [currentDistance, setCurrentDistance] = useState(distance);
 
-    const [pitchAngleMinState, setPitchAngleMin] = useState(pitchAngleMin);
-    const [pitchAngleMaxState, setPitchAngleMax] = useState(pitchAngleMax);
+    const [pitchAngleRange, setPitchAngleRange] = useState<[number, number]>([
+        pitchAngleMin,
+        pitchAngleMax,
+    ]);
 
     // State for UI controls and for eventual application to entity
     // Initialized from props, and kept in sync with props
@@ -64,8 +68,12 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
 
     // State for actual props passed to the GSplat Entity
     // Starts at a default, then updates from controlPosition/Rotation once splat is ready
-    const [gSplatEntityPosition, setGSplatEntityPosition] = useState<[number, number, number]>([0, 0, 0]);
-    const [gSplatEntityRotation, setGSplatEntityRotation] = useState<[number, number, number]>([0, 0, 0]);
+    const [gSplatEntityPosition, setGSplatEntityPosition] = useState<
+        [number, number, number]
+    >([0, 0, 0]);
+    const [gSplatEntityRotation, setGSplatEntityRotation] = useState<
+        [number, number, number]
+    >([0, 0, 0]);
 
     const [isSliderActive, setIsSliderActive] = useState(false);
 
@@ -83,44 +91,37 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             setGSplatEntityPosition(controlPosition);
             setGSplatEntityRotation(controlRotation);
         }
-        // Optional: if splat becomes null, reset to [0,0,0]
-        // else {
-        //     setGSplatEntityPosition([0,0,0]);
-        //     setGSplatEntityRotation([0,0,0]);
-        // }
     }, [splat, controlPosition, controlRotation]);
 
-    const updateDistanceMinInternal = (value: number) => {
-        if (value != distanceMinState) {
-            setDistanceMin(value);
-            setCurrentDistance(value);
-        }
-    };
-    const updateDistanceMaxInternal = (value: number) => {
-        if (value != distanceMaxState) {
-            setDistanceMax(value);
-            setCurrentDistance(value);
-        }
-    };
-
-    const updatePitchAngleMinInternal = (value: number) => {
-        if (value != pitchAngleMinState) {
-            setPitchAngleMin(value);
-        }
-    };
-
-    const updatePitchAngleMaxInternal = (value: number) => {
-        if (value != pitchAngleMaxState) {
-            setPitchAngleMax(value);
+    const updateDistanceRangeInternal = ([newMin, newMax]: [
+        number,
+        number
+    ]) => {
+        newMin = Math.min(newMin, newMax);
+        if (newMin !== distanceRange[0] || newMax !== distanceRange[1]) {
+            setDistanceRange([newMin, newMax]);
+            // Optionally, adjust currentDistance if it falls outside the new range
+            // For now, we'll keep its update logic separate or tied to min change
+            if (newMin !== distanceRange[0]) {
+                setCurrentDistance(newMin);
+            } else if (
+                newMax !== distanceRange[1] &&
+                currentDistance > newMax
+            ) {
+                setCurrentDistance(newMax);
+            }
         }
     };
 
-    useEffect(() => {
-        // Ensure distanceMinState <= distanceMaxState
-        if (distanceMinState > distanceMaxState) {
-            setDistanceMin(distanceMaxState);
+    const updatePitchAngleRangeInternal = ([newMin, newMax]: [
+        number,
+        number
+    ]) => {
+        newMin = Math.min(newMin, newMax);
+        if (newMin !== pitchAngleRange[0] || newMax !== pitchAngleRange[1]) {
+            setPitchAngleRange([newMin, newMax]);
         }
-    }, [distanceMinState, distanceMaxState]);
+    };
 
     const updatePosition = (index: number, value: number) => {
         setControlPosition((prev) => {
@@ -138,19 +139,9 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         });
     };
 
-    useEffect(() => {
-        // Ensure distanceMinState <= distanceMaxState
-        if (distanceMinState > distanceMaxState) {
-            setDistanceMin(distanceMaxState);
-        }
-    }, [distanceMinState, distanceMaxState]);
-
-    useEffect(() => {
-        // Ensure pitchAngleMinState <= pitchAngleMaxState
-        if (pitchAngleMinState > pitchAngleMaxState) {
-            setPitchAngleMin(pitchAngleMaxState);
-        }
-    }, [pitchAngleMinState, pitchAngleMaxState]);
+    const orbitControlSensitivity = isSliderActive
+        ? { distanceSensitivity: 0, orbitSensitivity: 0 }
+        : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 };
 
     return (
         <Entity>
@@ -163,34 +154,14 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 <Camera clearColor="#090707" fov={fov} />
                 {splat && (
                     <OrbitControls
-                        distanceMin={distanceMinState}
-                        distanceMax={distanceMaxState}
+                        distanceMin={distanceRange[0]}
+                        distanceMax={distanceRange[1]}
                         inertiaFactor={0.1}
                         distance={currentDistance}
-                        pitchAngleMin={pitchAngleMinState}
-                        pitchAngleMax={pitchAngleMaxState}
-                        mouse={
-                            isSliderActive
-                                ? {
-                                      distanceSensitivity: 0,
-                                      orbitSensitivity: 0,
-                                  }
-                                : {
-                                      distanceSensitivity: 0.05,
-                                      orbitSensitivity: 0.2,
-                                  }
-                        }
-                        touch={
-                            isSliderActive
-                                ? {
-                                      distanceSensitivity: 0,
-                                      orbitSensitivity: 0,
-                                  }
-                                : {
-                                      distanceSensitivity: 0.05,
-                                      orbitSensitivity: 0.2,
-                                  }
-                        }
+                        pitchAngleMin={pitchAngleRange[0]}
+                        pitchAngleMax={pitchAngleRange[1]}
+                        mouse={orbitControlSensitivity}
+                        touch={orbitControlSensitivity}
                     />
                 )}
                 {!showSettings && (
@@ -224,47 +195,31 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     onTouchStart={() => setIsSliderActive(true)}
                     onTouchEnd={() => setIsSliderActive(false)}
                 >
-                    <h3>Camera Distance Settings</h3>
-                    <div style={{ marginBottom: "10px" }}>
-                        <label>
-                            Min Distance: {distanceMinState.toFixed(2)}
-                        </label>
-                        <br />
-                        <label>
-                            Max Distance: {distanceMaxState.toFixed(2)}
-                        </label>
-                    </div>
-                    <RangeSlider
-                        min={0.1}
-                        max={30}
+                    <DualRangeSliderControl
+                        title="Camera Distance Settings"
+                        minLabel="Min Distance"
+                        maxLabel="Max Distance"
+                        minValue={distanceRange[0]}
+                        maxValue={distanceRange[1]}
+                        sliderMin={0.1}
+                        sliderMax={30}
                         step={0.1}
-                        value={[distanceMinState, distanceMaxState]}
                         onInput={(value: number[]) => {
-                            updateDistanceMinInternal(value[0]);
-                            updateDistanceMaxInternal(value[1]);
+                            updateDistanceRangeInternal([value[0], value[1]]);
                         }}
                     />
 
-                    <h3 style={{ marginTop: "20px" }}>
-                        Camera Pitch Angle Settings
-                    </h3>
-                    <div style={{ marginBottom: "10px" }}>
-                        <label>
-                            Min Pitch Angle: {pitchAngleMinState.toFixed(2)}
-                        </label>
-                        <br />
-                        <label>
-                            Max Pitch Angle: {pitchAngleMaxState.toFixed(2)}
-                        </label>
-                    </div>
-                    <RangeSlider
-                        min={-90}
-                        max={90}
+                    <DualRangeSliderControl
+                        title="Camera Pitch Angle Settings"
+                        minLabel="Min Pitch Angle"
+                        maxLabel="Max Pitch Angle"
+                        minValue={pitchAngleRange[0]}
+                        maxValue={pitchAngleRange[1]}
+                        sliderMin={-90}
+                        sliderMax={90}
                         step={1}
-                        value={[pitchAngleMinState, pitchAngleMaxState]}
                         onInput={(value: number[]) => {
-                            updatePitchAngleMinInternal(value[0]);
-                            updatePitchAngleMaxInternal(value[1]);
+                            updatePitchAngleRangeInternal([value[0], value[1]]);
                         }}
                     />
 
@@ -272,60 +227,34 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         Model Position Settings
                     </h3>
                     {["X", "Y", "Z"].map((axis, index) => (
-                        <div
+                        <SingleValueSliderControl
                             key={`position-${axis}`}
-                            style={{ marginBottom: "10px" }}
-                        >
-                            <label>
-                                Position {axis}:{" "}
-                                {controlPosition[index].toFixed(2)}
-                            </label>
-                            <RangeSlider
-                                min={-10}
-                                max={10}
-                                step={0.1}
-                                value={[
-                                    controlPosition[index],
-                                    controlPosition[index],
-                                ]}
-                                onInput={(value: number[]) =>
-                                    updatePosition(
-                                        index,
-                                        (value[0] + value[1]) / 2
-                                    )
-                                }
-                            />
-                        </div>
+                            label={`Position ${axis}`}
+                            value={controlPosition[index]}
+                            sliderMin={-10}
+                            sliderMax={10}
+                            step={0.1}
+                            onInput={(value: number) =>
+                                updatePosition(index, value)
+                            }
+                        />
                     ))}
 
                     <h3 style={{ marginTop: "20px" }}>
                         Model Rotation Settings
                     </h3>
                     {["X", "Y", "Z"].map((axis, index) => (
-                        <div
+                        <SingleValueSliderControl
                             key={`rotation-${axis}`}
-                            style={{ marginBottom: "10px" }}
-                        >
-                            <label>
-                                Rotation {axis}:{" "}
-                                {controlRotation[index].toFixed(2)}
-                            </label>
-                            <RangeSlider
-                                min={-180}
-                                max={180}
-                                step={0.1}
-                                value={[
-                                    controlRotation[index],
-                                    controlRotation[index],
-                                ]}
-                                onInput={(value: number[]) =>
-                                    updateRotation(
-                                        index,
-                                        (value[0] + value[1]) / 2
-                                    )
-                                }
-                            />
-                        </div>
+                            label={`Rotation ${axis}`}
+                            value={controlRotation[index]}
+                            sliderMin={-180}
+                            sliderMax={180}
+                            step={0.1}
+                            onInput={(value: number) =>
+                                updateRotation(index, value)
+                            }
+                        />
                     ))}
                 </div>
             )}

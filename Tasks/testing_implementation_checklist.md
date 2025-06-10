@@ -150,51 +150,10 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
             -   [x] k. `src/hooks/usePlayCanvasSetup.ts`
             -   [x] l. `src/hooks/useSplatWithProgress.ts`
             -   [x] m. `src/app/page.tsx`
-    d.  **State & Interaction Testing (for interactive components):**
-        -   [x] i. Simulate user events (clicks, input changes) using `fireEvent` or `userEvent` from React Testing Library.
-        -   [x] ii. Assert that the component's state changes correctly or callbacks are fired.
-        ```typescript
-        // Example: SingleValueSliderControl.test.tsx (simplified)
-        import { render, screen, fireEvent } from '@testing-library/react';
-        import SingleValueSliderControl from './SingleValueSliderControl';
-
-        describe('SingleValueSliderControl', () => {
-          it('calls onChange with the new value when slider is moved', () => {
-            const handleChange = vi.fn();
-            render(
-              <SingleValueSliderControl
-                label="Brightness"
-                min={0}
-                max={100}
-                step={1}
-                value={50}
-                onChange={handleChange}
-              />
-            );
-            const slider = screen.getByRole('slider', { name: /brightness/i });
-            fireEvent.change(slider, { target: { value: '75' } });
-            expect(handleChange).toHaveBeenCalledWith(75);
-          });
-        });
-        ```
-        - Targets
-            -   [x] a. `src/components/AutoRotate.tsx`
-            -   [x] b. `src/components/DualRangeSliderControl.tsx`
-            -   [x] c. `src/components/Grid.tsx`
-            -   [x] d. `src/components/ModelLoadingProgress.tsx`
-            -   [x] e. `src/components/ModelViewer.tsx`
-            -   [x] f. `src/components/ModelViewerCore.tsx`
-            -   [x] g. `src/components/ServiceWorkerRegistrar.tsx`
-            -   [x] h. `src/components/SingleValueSliderControl.tsx`
-            -   [x] i. `src/components/SwaroboLogo.tsx`
-            -   [x] j. `src/hooks/useModelData.ts`
-            -   [x] k. `src/hooks/usePlayCanvasSetup.ts`
-            -   [x] l. `src/hooks/useSplatWithProgress.ts`
-            -   [x] m. `src/app/page.tsx`
     e.  **Hook Testing:**
-        -   [ ] i. Use `renderHook` from React Testing Library.
-        -   [ ] ii. Test initial state, updates, and returned values/functions.
-        -   [ ] iii. Mock dependencies heavily.
+        -   [x] i. Use `renderHook` from React Testing Library.
+        -   [x] ii. Test initial state, updates, and returned values/functions.
+        -   [x] iii. Mock dependencies heavily.
         ```typescript
         // Example: useModelData.test.ts (conceptual)
         import { renderHook, act } from '@testing-library/react';
@@ -238,22 +197,22 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
             -   [x] k. `src/hooks/usePlayCanvasSetup.ts`
             -   [x] l. `src/hooks/useSplatWithProgress.ts`
     f.  **Mocking:**
-        -   [ ] i. Use `vi.mock` for mocking modules (e.g., PlayCanvas, external libraries).
-        -   [ ] ii. Mock child components if testing a parent in isolation.
+        -   [x] i. Use `vi.mock` for mocking modules (e.g., PlayCanvas, external libraries).
+        -   [x] ii. Mock child components if testing a parent in isolation.
         - Targets
-            -   [ ] a. `src/components/AutoRotate.tsx`
-            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
-            -   [ ] c. `src/components/Grid.tsx`
-            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
-            -   [ ] e. `src/components/ModelViewer.tsx`
-            -   [ ] f. `src/components/ModelViewerCore.tsx`
-            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
-            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
-            -   [ ] i. `src/components/SwaroboLogo.tsx`
-            -   [ ] j. `src/hooks/useModelData.ts`
-            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
-            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
-            -   [ ] m. `src/app/page.tsx`
+            -   [x] a. `src/components/AutoRotate.tsx`
+            -   [x] b. `src/components/DualRangeSliderControl.tsx`
+            -   [x] c. `src/components/Grid.tsx`
+            -   [x] d. `src/components/ModelLoadingProgress.tsx`
+            -   [x] e. `src/components/ModelViewer.tsx`
+            -   [x] f. `src/components/ModelViewerCore.tsx`
+            -   [x] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [x] h. `src/components/SingleValueSliderControl.tsx`
+            -   [x] i. `src/components/SwaroboLogo.tsx`
+            -   [x] j. `src/hooks/useModelData.ts`
+            -   [x] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [x] l. `src/hooks/useSplatWithProgress.ts`
+            -   [x] m. `src/app/page.tsx`
 
 ## Phase 3: Writing Integration Tests (Vitest & React Testing Library)
 

@@ -1,6 +1,15 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ModelLoadingProgress from './ModelLoadingProgress';
+import { vi } from 'vitest';
+
+// Mock the react-circular-progressbar component
+vi.mock('react-circular-progressbar', () => ({
+  CircularProgressbar: vi.fn(({ text }) => (
+    <div data-testid="mock-circular-progressbar">{text}</div>
+  )),
+  buildStyles: vi.fn(() => ({})),
+}));
 
 describe('ModelLoadingProgress Component', () => {
   it('should render null if loading is false', () => {
@@ -12,22 +21,14 @@ describe('ModelLoadingProgress Component', () => {
     const progress = 60;
     render(<ModelLoadingProgress loading={true} downloadProgress={progress} />);
 
-    // Check for the CircularProgressbar SVG element by its data-test-id
-    const progressBarSvg = screen.getByTestId('CircularProgressbar');
-    expect(progressBarSvg).toBeInTheDocument();
+    // Find the mocked CircularProgressbar element directly by its text content
+    // This element *is* the one with data-testid="mock-circular-progressbar"
+    const progressBar = screen.getByText(`${progress}%`);
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar).toHaveAttribute('data-testid', 'mock-circular-progressbar');
 
-    // Check for the text content (e.g., "60%") within the SVG
-    // The text is a <text> element inside the SVG.
-    expect(screen.getByText(`${progress}%`)).toBeInTheDocument();
-    
-    // The CircularProgressbar component itself doesn't add aria-valuenow to the root SVG.
-    // Verifying the text content serves a similar purpose for a basic rendering test.
-
-    // The wrapper div contains the CircularProgressbar.
-    // Its opacity is determined by `downloadProgress < 100 ? 1 : 0`.
-    // For progress = 60, opacity should be 1.
-    // The progressbar is the first child of the styled div.
-    const wrapperDiv = progressBarSvg.parentElement; 
+    // The wrapper div is its parent
+    const wrapperDiv = progressBar.parentElement;
     expect(wrapperDiv).toHaveStyle('opacity: 1');
   });
 
@@ -35,15 +36,11 @@ describe('ModelLoadingProgress Component', () => {
     const progress = 100;
     render(<ModelLoadingProgress loading={true} downloadProgress={progress} />);
 
-    // Check for the CircularProgressbar SVG element by its data-test-id
-    const progressBarSvg = screen.getByTestId('CircularProgressbar');
-    expect(progressBarSvg).toBeInTheDocument();
+    const progressBar = screen.getByText(`${progress}%`);
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar).toHaveAttribute('data-testid', 'mock-circular-progressbar');
 
-    // Check for the text content
-    expect(screen.getByText(`${progress}%`)).toBeInTheDocument();
-
-    // For progress = 100, opacity should be 0.
-    const wrapperDiv = progressBarSvg.parentElement;
+    const wrapperDiv = progressBar.parentElement;
     expect(wrapperDiv).toHaveStyle('opacity: 0');
   });
 });

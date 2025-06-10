@@ -57,10 +57,38 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [pitchAngleMinState, setPitchAngleMin] = useState(pitchAngleMin);
     const [pitchAngleMaxState, setPitchAngleMax] = useState(pitchAngleMax);
 
-    const [currentPosition, setCurrentPosition] = useState(position);
-    const [currentRotation, setCurrentRotation] = useState(rotation);
+    // State for UI controls and for eventual application to entity
+    // Initialized from props, and kept in sync with props
+    const [controlPosition, setControlPosition] = useState(position);
+    const [controlRotation, setControlRotation] = useState(rotation);
+
+    // State for actual props passed to the GSplat Entity
+    // Starts at a default, then updates from controlPosition/Rotation once splat is ready
+    const [gSplatEntityPosition, setGSplatEntityPosition] = useState<[number, number, number]>([0, 0, 0]);
+    const [gSplatEntityRotation, setGSplatEntityRotation] = useState<[number, number, number]>([0, 0, 0]);
 
     const [isSliderActive, setIsSliderActive] = useState(false);
+
+    useEffect(() => {
+        setControlPosition(position);
+    }, [position]);
+
+    useEffect(() => {
+        setControlRotation(rotation);
+    }, [rotation]);
+
+    useEffect(() => {
+        if (splat) {
+            // Splat is ready, apply the control/prop values to the entity's transform state
+            setGSplatEntityPosition(controlPosition);
+            setGSplatEntityRotation(controlRotation);
+        }
+        // Optional: if splat becomes null, reset to [0,0,0]
+        // else {
+        //     setGSplatEntityPosition([0,0,0]);
+        //     setGSplatEntityRotation([0,0,0]);
+        // }
+    }, [splat, controlPosition, controlRotation]);
 
     const updateDistanceMinInternal = (value: number) => {
         if (value != distanceMinState) {
@@ -95,7 +123,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     }, [distanceMinState, distanceMaxState]);
 
     const updatePosition = (index: number, value: number) => {
-        setCurrentPosition((prev) => {
+        setControlPosition((prev) => {
             const newPos = [...prev];
             newPos[index] = value;
             return newPos as [number, number, number];
@@ -103,7 +131,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     };
 
     const updateRotation = (index: number, value: number) => {
-        setCurrentRotation((prev) => {
+        setControlRotation((prev) => {
             const newRot = [...prev];
             newRot[index] = value;
             return newRot as [number, number, number];
@@ -171,8 +199,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             </Entity>
             {/* Create the splat entity */}
             <Entity
-                position={currentPosition}
-                rotation={currentRotation}
+                position={gSplatEntityPosition}
+                rotation={gSplatEntityRotation}
                 scale={scale}
             >
                 {splat && <GSplat asset={splat} />}
@@ -250,15 +278,15 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         >
                             <label>
                                 Position {axis}:{" "}
-                                {currentPosition[index].toFixed(2)}
+                                {controlPosition[index].toFixed(2)}
                             </label>
                             <RangeSlider
                                 min={-10}
                                 max={10}
                                 step={0.1}
                                 value={[
-                                    currentPosition[index],
-                                    currentPosition[index],
+                                    controlPosition[index],
+                                    controlPosition[index],
                                 ]}
                                 onInput={(value: number[]) =>
                                     updatePosition(
@@ -280,15 +308,15 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         >
                             <label>
                                 Rotation {axis}:{" "}
-                                {currentRotation[index].toFixed(2)}
+                                {controlRotation[index].toFixed(2)}
                             </label>
                             <RangeSlider
                                 min={-180}
                                 max={180}
                                 step={0.1}
                                 value={[
-                                    currentRotation[index],
-                                    currentRotation[index],
+                                    controlRotation[index],
+                                    controlRotation[index],
                                 ]}
                                 onInput={(value: number[]) =>
                                     updateRotation(

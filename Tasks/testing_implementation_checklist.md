@@ -39,15 +39,15 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 
 ### 1.2. End-to-End Testing (Playwright)
 1.  **Install Playwright:**
-    -   [ ] a. Run `npm install --save-dev @playwright/test` or `yarn add --dev @playwright/test`.
-    -   [ ] b. Run `npx playwright install` to install browser binaries.
+    -   [x] a. Run `npm install --save-dev @playwright/test` or `yarn add --dev @playwright/test`.
+    -   [x] b. Run `npx playwright install` to install browser binaries.
 2.  **Initialize Playwright Configuration:**
-    -   [ ] a. Run `npx playwright init` (or manually create `playwright.config.ts`).
-    -   [ ] b. Configure `playwright.config.ts`:
-        -   [ ] i. Set `testDir` to something like `./e2e` or `./tests/e2e`.
-        -   [ ] ii. Configure `baseURL` (e.g., `http://localhost:3000` for Next.js dev server).
-        -   [ ] iii. Configure browsers (e.g., Chromium, Firefox, WebKit).
-        -   [ ] iv. Consider reporters (e.g., `html`).
+    -   [x] a. Run `npx playwright init` (or manually create `playwright.config.ts`).
+    -   [x] b. Configure `playwright.config.ts`:
+        -   [x] i. Set `testDir` to something like `./e2e` or `./tests/e2e`.
+        -   [x] ii. Configure `baseURL` (e.g., `http://localhost:3000` for Next.js dev server).
+        -   [x] iii. Configure browsers (e.g., Chromium, Firefox, WebKit).
+        -   [x] iv. Consider reporters (e.g., `html`).
         ```typescript
         // playwright.config.ts
         import { defineConfig, devices } from '@playwright/test';
@@ -84,7 +84,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
           },
         });
         ```
-3.  **Add Playwright Test Scripts to `package.json`:**
+3.  **Add Playwright Test Scripts to `package.json`:** **[x]**
     ```json
     "scripts": {
       // ... existing scripts
@@ -94,7 +94,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     }
     ```
 4.  **Create E2E Test Directory:**
-    -   [ ] a. Create `e2e/` (or the directory specified in `playwright.config.ts`).
+    -   [x] a. Create `e2e/` (or the directory specified in `playwright.config.ts`).
 
 ## Phase 2: Writing Unit Tests (Vitest & React Testing Library)
 

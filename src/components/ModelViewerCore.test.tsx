@@ -1,10 +1,19 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react'; // Import act and fireEvent
 import { vi } from 'vitest';
 import type ModelViewerCoreType from './ModelViewerCore';
 
 // --- Mocks for PlayCanvas components ---
-const mockEntity = vi.fn(({ children }) => <div data-test-id="mock-entity">{children}</div>);
+let latestGSplatEntityPosition: [number, number, number] = [0, 0, 0];
+let latestGSplatEntityRotation: [number, number, number] = [0, 0, 0];
+
+const mockEntity = vi.fn(({ children, position, rotation, ...props }) => {
+  // If this Entity is wrapping a GSplat, capture its position and rotation
+  if (children && children.type === mockGSplat) {
+    latestGSplatEntityPosition = position;
+    latestGSplatEntityRotation = rotation;
+  }
+  return <div data-test-id="mock-entity">{children}</div>;
+});
 const mockCamera = vi.fn((props) => <div data-test-id="mock-camera" data-fov={props.fov}>Mock Camera</div>);
 const mockGSplat = vi.fn((props) => <div data-test-id="mock-gsplat" data-splat-present={!!props.asset}>Mock GSplat</div>);
 const mockEnvAtlas = vi.fn((props) => <div data-test-id="mock-env-atlas" data-src={props.asset?.src}>Mock EnvAtlas</div>);
@@ -43,10 +52,18 @@ vi.doMock('./AutoRotate', () => ({ default: mockAutoRotate }));
 const mockGrid = vi.fn((props) => <div data-test-id="mock-grid">Mock Grid</div>);
 vi.doMock('./Grid', () => ({ default: mockGrid }));
 
-const mockDualRangeSliderControl = vi.fn((props) => <div data-test-id="mock-dual-range-slider">Mock DualRangeSliderControl: {props.title}</div>);
+const dualRangeSliderControlMocks: { [key: string]: (values: number[]) => void } = {};
+const mockDualRangeSliderControl = vi.fn((props) => {
+  dualRangeSliderControlMocks[props.title] = props.onInput; // Store by title
+  return <div data-test-id={`mock-dual-range-slider-${props.title.replace(/\s/g, '-')}`}>Mock DualRangeSliderControl: {props.title}</div>;
+});
 vi.doMock('./DualRangeSliderControl', () => ({ default: mockDualRangeSliderControl }));
 
-const mockSingleValueSliderControl = vi.fn((props) => <div data-test-id="mock-single-value-slider">Mock SingleValueSliderControl: {props.label}</div>);
+const singleValueSliderControlMocks: { [key: string]: (value: number) => void } = {};
+const mockSingleValueSliderControl = vi.fn((props) => {
+  singleValueSliderControlMocks[props.label] = props.onInput; // Store by label
+  return <div data-test-id={`mock-single-value-slider-${props.label.replace(/\s/g, '-')}`}>Mock SingleValueSliderControl: {props.label}</div>;
+});
 vi.doMock('./SingleValueSliderControl', () => ({ default: mockSingleValueSliderControl }));
 
 
@@ -71,6 +88,17 @@ describe('ModelViewerCore Component', () => {
     mockGrid.mockClear();
     mockDualRangeSliderControl.mockClear();
     mockSingleValueSliderControl.mockClear();
+    // Clear the stored callbacks
+    for (const key in dualRangeSliderControlMocks) {
+      delete dualRangeSliderControlMocks[key];
+    }
+    for (const key in singleValueSliderControlMocks) {
+      delete singleValueSliderControlMocks[key];
+    }
+
+    // Reset captured GSplat entity transform
+    latestGSplatEntityPosition = [0, 0, 0];
+    latestGSplatEntityRotation = [0, 0, 0];
 
     // Reset useSearchParams to default (no settings)
     mockUseSearchParams.mockReturnValue(new URLSearchParams());
@@ -129,7 +157,7 @@ describe('ModelViewerCore Component', () => {
 
   it('should render the settings panel and controls when searchParams has "settings=true"', () => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams('settings=true'));
-    render(<ModelViewerCore splat={null} />); // splat can be null for settings test
+    render(<ModelViewerCore splat={{}} />); // splat can be null for settings test
 
     // Verify settings panel is rendered
     const settingsPanel = screen.getByTestId('settings-panel');
@@ -182,5 +210,123 @@ describe('ModelViewerCore Component', () => {
       undefined
     );
 
+  });
+
+  it('should update camera distance settings when DualRangeSliderControl is interacted with', () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('settings=true'));
+    render(<ModelViewerCore splat={{}} />); // Need splat for OrbitControls to render
+
+    act(() => {
+      dualRangeSliderControlMocks['Camera Distance Settings']([1.0, 10.0]);
+    });
+
+    // Assert that OrbitControls received the updated distanceMin and distanceMax
+    expect(mockOrbitControls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        distanceMin: 1.0,
+        distanceMax: 10.0,
+      }),
+      undefined
+    );
+  });
+
+  it('should update camera pitch angle settings when DualRangeSliderControl is interacted with', () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('settings=true'));
+    render(<ModelViewerCore splat={{}} />);
+
+    act(() => {
+      dualRangeSliderControlMocks['Camera Pitch Angle Settings']([-30, 60]);
+    });
+
+    expect(mockOrbitControls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pitchAngleMin: -30,
+        pitchAngleMax: 60,
+      }),
+      undefined
+    );
+  });
+
+  it('should update model position settings when SingleValueSliderControl is interacted with', () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('settings=true'));
+    render(<ModelViewerCore splat={{}} />);
+
+    act(() => {
+      singleValueSliderControlMocks['Position X'](5.0);
+    });
+    expect(latestGSplatEntityPosition[0]).toBe(5.0);
+
+    act(() => {
+      singleValueSliderControlMocks['Position Y'](2.0);
+    });
+    expect(latestGSplatEntityPosition[1]).toBe(2.0);
+
+    act(() => {
+      singleValueSliderControlMocks['Position Z'](-1.0);
+    });
+    expect(latestGSplatEntityPosition[2]).toBe(-1.0);
+  });
+
+  it('should update model rotation settings when SingleValueSliderControl is interacted with', () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('settings=true'));
+    render(<ModelViewerCore splat={{}} />);
+
+    act(() => {
+      singleValueSliderControlMocks['Rotation X'](90.0);
+    });
+    expect(latestGSplatEntityRotation[0]).toBe(90.0);
+
+    act(() => {
+      singleValueSliderControlMocks['Rotation Y'](45.0);
+    });
+    expect(latestGSplatEntityRotation[1]).toBe(45.0);
+
+    act(() => {
+      singleValueSliderControlMocks['Rotation Z'](180.0);
+    });
+    expect(latestGSplatEntityRotation[2]).toBe(180.0);
+  });
+
+  it('should update orbit control sensitivity based on isSliderActive state', () => {
+    mockUseSearchParams.mockReturnValue(new URLSearchParams('settings=true'));
+    render(<ModelViewerCore splat={{}} />);
+
+    // Initial state: OrbitControls should have default sensitivity
+    expect(mockOrbitControls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mouse: { distanceSensitivity: 0.05, orbitSensitivity: 0.2 },
+        touch: { distanceSensitivity: 0.05, orbitSensitivity: 0.2 },
+      }),
+      undefined
+    );
+
+    // Simulate mouse down on settings panel
+    const settingsPanel = screen.getByTestId('settings-panel');
+    act(() => {
+      fireEvent.mouseDown(settingsPanel);
+    });
+
+    // Assert OrbitControls sensitivity is 0
+    expect(mockOrbitControls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mouse: { distanceSensitivity: 0, orbitSensitivity: 0 },
+        touch: { distanceSensitivity: 0, orbitSensitivity: 0 },
+      }),
+      undefined
+    );
+
+    // Simulate mouse up on settings panel
+    act(() => {
+      fireEvent.mouseUp(settingsPanel);
+    });
+
+    // Assert OrbitControls sensitivity is back to default
+    expect(mockOrbitControls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mouse: { distanceSensitivity: 0.05, orbitSensitivity: 0.2 },
+        touch: { distanceSensitivity: 0.05, orbitSensitivity: 0.2 },
+      }),
+      undefined
+    );
   });
 });

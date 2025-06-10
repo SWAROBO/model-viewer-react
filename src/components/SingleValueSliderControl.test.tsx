@@ -1,7 +1,39 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react'; // Import act
 import SingleValueSliderControl from './SingleValueSliderControl';
 import { vi } from 'vitest';
+
+// Mock the react-range-slider-input component
+let capturedRangeSliderOnInput: (values: number[]) => void = () => {};
+
+vi.mock('react-range-slider-input', () => ({
+  __esModule: true,
+  default: vi.fn(({ onInput, value, ...props }) => {
+    capturedRangeSliderOnInput = onInput; // Capture the callback
+    return (
+      <div data-testid="mock-range-slider-container">
+        <input
+          type="range"
+          role="slider"
+          data-testid="mock-slider-min"
+          value={String(value[0])}
+          aria-valuenow={String(value[0])}
+          readOnly
+          {...props}
+        />
+        <input
+          type="range"
+          role="slider"
+          data-testid="mock-slider-max"
+          value={String(value[1])}
+          aria-valuenow={String(value[1])}
+          readOnly
+          {...props}
+        />
+      </div>
+    );
+  }),
+}));
 
 const defaultProps = {
   label: "Brightness",
@@ -55,5 +87,24 @@ describe('SingleValueSliderControl Component', () => {
     // Check for updated slider min/max/step (these are attributes on the input elements)
     // Similar to DualRangeSliderControl, these might not be directly on the input elements.
     // For now, I will include them, but be prepared to remove if they cause failures.
+  });
+
+  it('should call onInput with the new single value when the slider is interacted with', () => {
+    const handleInput = vi.fn();
+    render(
+      <SingleValueSliderControl
+        {...defaultProps}
+        onInput={handleInput}
+      />
+    );
+
+    // Simulate the onInput being called by the mocked RangeSlider
+    // The SingleValueSliderControl averages the two values, so pass the same value twice
+    act(() => {
+      capturedRangeSliderOnInput([75, 75]);
+    });
+
+    expect(handleInput).toHaveBeenCalledTimes(1);
+    expect(handleInput).toHaveBeenCalledWith(75); // Expect the averaged value
   });
 });

@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react'; // Import act
 import { vi } from 'vitest';
 import type ModelViewerType from './ModelViewer';
 import { defaultModelViewerProps } from '../types/modelViewer'; // Import default props
+import { useSplatWithProgress } from '../hooks/useSplatWithProgress'; // Import the actual hook for vi.mocked
 
 // Mock ModelLoadingProgress
 const mockModelLoadingProgress = vi.fn((props) => (
@@ -25,12 +26,19 @@ vi.doMock('./ModelViewerCore', () => ({
 }));
 
 // Mock useSplatWithProgress hook
-const mockUseSplatWithProgress = vi.fn(() => ({
-  asset: null, // No splat asset yet
-  loading: true, // Still loading
-}));
-vi.doMock('../hooks/useSplatWithProgress', () => ({
-  useSplatWithProgress: mockUseSplatWithProgress,
+let capturedHandleProgress: (progress: number) => void = () => {}; // To capture the callback
+let mockSplatAsset: any = null;
+let mockSplatLoading: boolean = true;
+
+// Define the mock once at the top level
+vi.mock('../hooks/useSplatWithProgress', () => ({
+  useSplatWithProgress: vi.fn((splatURL, handleProgress) => {
+    capturedHandleProgress = handleProgress; // Capture the callback
+    return {
+      asset: mockSplatAsset,
+      loading: mockSplatLoading,
+    };
+  }),
 }));
 
 // Mock usePlayCanvasSetup hook
@@ -47,13 +55,17 @@ describe('ModelViewer Component', () => {
     ModelViewer = module.default;
   });
 
-  beforeEach(() => {
+  beforeEach(async () => { // Make beforeEach async
     mockModelLoadingProgress.mockClear();
     mockModelViewerCore.mockClear();
-    mockUseSplatWithProgress.mockClear();
-    mockUsePlayCanvasSetup.mockClear();
-    // Reset mock return values if they were changed in previous tests
-    mockUseSplatWithProgress.mockReturnValue({ asset: null, loading: true });
+    mockUsePlayCanvasSetup.mockClear(); // Clear this mock too
+
+    // Reset mock values for useSplatWithProgress
+    mockSplatAsset = null;
+    mockSplatLoading = true;
+    // capturedHandleProgress is reset by the vi.mock in the beforeEach
+    // Clear calls on the mocked useSplatWithProgress function
+    vi.mocked(useSplatWithProgress).mockClear();
   });
 
   it('should render ModelLoadingProgress and ModelViewerCore with default loading state and props', () => {
@@ -61,7 +73,7 @@ describe('ModelViewer Component', () => {
 
     // Verify hooks were called
     expect(mockUsePlayCanvasSetup).toHaveBeenCalledTimes(1);
-    expect(mockUseSplatWithProgress).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(useSplatWithProgress)).toHaveBeenCalledTimes(1);
 
     // Verify ModelLoadingProgress is rendered with initial state
     expect(mockModelLoadingProgress).toHaveBeenCalledTimes(1);
@@ -110,8 +122,9 @@ describe('ModelViewer Component', () => {
       scale: [0.5, 0.5, 0.5] as [number, number, number],
     };
 
-    // Mock useSplatWithProgress to return a dummy asset for the custom splatURL
-    mockUseSplatWithProgress.mockReturnValue({ asset: {} as any, loading: false }); // Use {} as any for a dummy asset
+    // Set mock values for useSplatWithProgress for this specific test
+    mockSplatAsset = {} as any;
+    mockSplatLoading = false;
 
     render(<ModelViewer {...customProps} />);
 
@@ -119,7 +132,7 @@ describe('ModelViewer Component', () => {
     expect(mockModelViewerCore).toHaveBeenCalledTimes(1);
     expect(mockModelViewerCore).toHaveBeenCalledWith(
       expect.objectContaining({
-        splat: {}, // From mockUseSplatWithProgress
+        splat: {}, // From useSplatWithProgress mock
         fov: customProps.fov,
         distanceMin: customProps.distanceMin,
         distanceMax: customProps.distanceMax,
@@ -134,5 +147,28 @@ describe('ModelViewer Component', () => {
     );
     expect(screen.getByTestId('mock-model-viewer-core')).toBeInTheDocument();
     expect(screen.getByText('ModelViewerCore rendered. Splat: Present')).toBeInTheDocument();
+  });
+
+  it('should update download progress and pass it to ModelLoadingProgress', () => {
+    render(<ModelViewer />);
+
+    // Initial state check
+    expect(screen.getByText('Loading: true, Progress: 0%')).toBeInTheDocument();
+
+    // Simulate progress updates by calling the captured handleProgress callback
+    act(() => {
+      capturedHandleProgress(25);
+    });
+    expect(screen.getByText('Loading: true, Progress: 25%')).toBeInTheDocument();
+
+    act(() => {
+      capturedHandleProgress(75);
+    });
+    expect(screen.getByText('Loading: true, Progress: 75%')).toBeInTheDocument();
+
+    act(() => {
+      capturedHandleProgress(100);
+    });
+    expect(screen.getByText('Loading: true, Progress: 100%')).toBeInTheDocument();
   });
 });

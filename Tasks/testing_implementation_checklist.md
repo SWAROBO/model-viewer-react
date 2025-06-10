@@ -135,6 +135,21 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     c.  **Props Testing:**
         -   [ ] i. Test how the component behaves with different props.
         -   [ ] ii. Assert that props are correctly passed and affect rendering/behavior.
+
+        - Targets
+            -   [x] a. `src/components/AutoRotate.tsx`
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx`
+            -   [ ] f. `src/components/ModelViewerCore.tsx`
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
+            -   [ ] m. `src/app/page.tsx`
     d.  **State & Interaction Testing (for interactive components):**
         -   [ ] i. Simulate user events (clicks, input changes) using `fireEvent` or `userEvent` from React Testing Library.
         -   [ ] ii. Assert that the component's state changes correctly or callbacks are fired.
@@ -162,6 +177,20 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
           });
         });
         ```
+        - Targets
+            -   [ ] a. `src/components/AutoRotate.tsx`
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx`
+            -   [ ] f. `src/components/ModelViewerCore.tsx`
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
+            -   [ ] m. `src/app/page.tsx`
     e.  **Hook Testing:**
         -   [ ] i. Use `renderHook` from React Testing Library.
         -   [ ] ii. Test initial state, updates, and returned values/functions.
@@ -204,9 +233,37 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
           });
         });
         ```
+        - Targets
+            -   [ ] a. `src/components/AutoRotate.tsx`
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx`
+            -   [ ] f. `src/components/ModelViewerCore.tsx`
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
+            -   [ ] m. `src/app/page.tsx`
     f.  **Mocking:**
         -   [ ] i. Use `vi.mock` for mocking modules (e.g., PlayCanvas, external libraries).
         -   [ ] ii. Mock child components if testing a parent in isolation.
+        - Targets
+            -   [ ] a. `src/components/AutoRotate.tsx`
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx`
+            -   [ ] f. `src/components/ModelViewerCore.tsx`
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
+            -   [ ] m. `src/app/page.tsx`
 
 ## Phase 3: Writing Integration Tests (Vitest & React Testing Library)
 

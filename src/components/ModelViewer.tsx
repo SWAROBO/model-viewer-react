@@ -13,6 +13,8 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         fov,
         distanceMin,
         distanceMax,
+        pitchAngleMin,
+        pitchAngleMax,
         distance,
         rotation,
         position,
@@ -38,6 +40,8 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 distanceMin={distanceMin}
                 distanceMax={distanceMax}
                 distance={distance}
+                pitchAngleMin={pitchAngleMin}
+                pitchAngleMax={pitchAngleMax}
                 rotation={rotation}
                 position={position}
                 scale={scale}

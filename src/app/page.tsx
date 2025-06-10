@@ -16,6 +16,8 @@ const Page = () => {
     const searchParams = useSearchParams();
     const modelName = searchParams.get('model');
 
+    console.log("Model Data:", modelData);
+
     useEffect(() => {
         if (modelData.length > 0) {
             const selectedModel = modelData.find((row: any) => row.model?.toLowerCase() === modelName?.toLowerCase());

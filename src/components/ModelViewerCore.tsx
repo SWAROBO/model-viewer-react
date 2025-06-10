@@ -43,55 +43,55 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     rotation = [0, 0, 0],
     position = [0, 0, 0],
     scale = [1, 1, 1],
-    pitchAngleMin = 0, // Default from types/modelViewer.ts
-    pitchAngleMax = 90, // Default from types/modelViewer.ts
+    pitchAngleMin = 0, 
+    pitchAngleMax = 90, 
 }) => {
     const searchParams = useSearchParams();
     const showSettings = searchParams.get("settings") === "true";
 
-    const [minDistance, setMinDistance] = useState(distanceMin);
-    const [maxDistance, setMaxDistance] = useState(distanceMax);
+    const [distanceMinState, setDistanceMin] = useState(distanceMin);
+    const [distanceMaxState, setDistanceMax] = useState(distanceMax);
     const [currentDistance, setCurrentDistance] = useState(distance);
 
-    const [minPitchAngle, setMinPitchAngle] = useState(pitchAngleMin);
-    const [maxPitchAngle, setMaxPitchAngle] = useState(pitchAngleMax);
+    const [pitchAngleMinState, setPitchAngleMin] = useState(pitchAngleMin);
+    const [pitchAngleMaxState, setPitchAngleMax] = useState(pitchAngleMax);
 
     const [currentPosition, setCurrentPosition] = useState(position);
     const [currentRotation, setCurrentRotation] = useState(rotation);
 
     const [isSliderActive, setIsSliderActive] = useState(false);
 
-    const updateMinDistance = (value: number) => {
-        if (value != minDistance) {
-            setMinDistance(value);
+    const updateDistanceMinInternal = (value: number) => {
+        if (value != distanceMinState) {
+            setDistanceMin(value);
             setCurrentDistance(value);
         }
     };
-    const updateMaxDistance = (value: number) => {
-        if (value != maxDistance) {
-            setMaxDistance(value);
+    const updateDistanceMaxInternal = (value: number) => {
+        if (value != distanceMaxState) {
+            setDistanceMax(value);
             setCurrentDistance(value);
         }
     };
 
-    const updateMinPitchAngle = (value: number) => {
-        if (value != minPitchAngle) {
-            setMinPitchAngle(value);
+    const updatePitchAngleMinInternal = (value: number) => {
+        if (value != pitchAngleMinState) {
+            setPitchAngleMin(value);
         }
     };
 
-    const updateMaxPitchAngle = (value: number) => {
-        if (value != maxPitchAngle) {
-            setMaxPitchAngle(value);
+    const updatePitchAngleMaxInternal = (value: number) => {
+        if (value != pitchAngleMaxState) {
+            setPitchAngleMax(value);
         }
     };
 
     useEffect(() => {
-        // Ensure minDistance <= maxDistance
-        if (minDistance > maxDistance) {
-            setMinDistance(maxDistance);
+        // Ensure distanceMinState <= distanceMaxState
+        if (distanceMinState > distanceMaxState) {
+            setDistanceMin(distanceMaxState);
         }
-    }, [minDistance, maxDistance]);
+    }, [distanceMinState, distanceMaxState]);
 
     const updatePosition = (index: number, value: number) => {
         setCurrentPosition((prev) => {
@@ -110,18 +110,18 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     };
 
     useEffect(() => {
-        // Ensure minDistance <= maxDistance
-        if (minDistance > maxDistance) {
-            setMinDistance(maxDistance);
+        // Ensure distanceMinState <= distanceMaxState
+        if (distanceMinState > distanceMaxState) {
+            setDistanceMin(distanceMaxState);
         }
-    }, [minDistance, maxDistance]);
+    }, [distanceMinState, distanceMaxState]);
 
     useEffect(() => {
-        // Ensure minPitchAngle <= maxPitchAngle
-        if (minPitchAngle > maxPitchAngle) {
-            setMinPitchAngle(maxPitchAngle);
+        // Ensure pitchAngleMinState <= pitchAngleMaxState
+        if (pitchAngleMinState > pitchAngleMaxState) {
+            setPitchAngleMin(pitchAngleMaxState);
         }
-    }, [minPitchAngle, maxPitchAngle]);
+    }, [pitchAngleMinState, pitchAngleMaxState]);
 
     return (
         <Entity>
@@ -136,12 +136,12 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 <Camera fov={fov} />
                 {splat && (
                     <OrbitControls
-                        distanceMin={minDistance}
-                        distanceMax={maxDistance}
+                        distanceMin={distanceMinState}
+                        distanceMax={distanceMaxState}
                         inertiaFactor={0.1}
                         distance={currentDistance}
-                        pitchAngleMin={minPitchAngle}
-                        pitchAngleMax={maxPitchAngle}
+                        pitchAngleMin={pitchAngleMinState}
+                        pitchAngleMax={pitchAngleMaxState}
                         mouse={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
                         touch={isSliderActive ? { distanceSensitivity: 0, orbitSensitivity: 0 } : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 }}
                     />
@@ -171,18 +171,18 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 >
                     <h3>Camera Distance Settings</h3>
                     <div style={{ marginBottom: "10px" }}>
-                        <label>Min Distance: {minDistance.toFixed(2)}</label>
+                        <label>Min Distance: {distanceMinState.toFixed(2)}</label>
                         <br />
-                        <label>Max Distance: {maxDistance.toFixed(2)}</label>
+                        <label>Max Distance: {distanceMaxState.toFixed(2)}</label>
                     </div>
                     <RangeSlider
                         min={0.1}
                         max={30}
                         step={0.1}
-                        value={[minDistance, maxDistance]}
+                        value={[distanceMinState, distanceMaxState]}
                         onInput={(value: number[]) => {
-                            updateMinDistance(value[0]);
-                            updateMaxDistance(value[1]);
+                            updateDistanceMinInternal(value[0]);
+                            updateDistanceMaxInternal(value[1]);
                         }}
                     />
 
@@ -191,21 +191,21 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     </h3>
                     <div style={{ marginBottom: "10px" }}>
                         <label>
-                            Min Pitch Angle: {minPitchAngle.toFixed(2)}
+                            Min Pitch Angle: {pitchAngleMinState.toFixed(2)}
                         </label>
                         <br />
                         <label>
-                            Max Pitch Angle: {maxPitchAngle.toFixed(2)}
+                            Max Pitch Angle: {pitchAngleMaxState.toFixed(2)}
                         </label>
                     </div>
                     <RangeSlider
                         min={-90}
                         max={90}
                         step={1}
-                        value={[minPitchAngle, maxPitchAngle]}
+                        value={[pitchAngleMinState, pitchAngleMaxState]}
                         onInput={(value: number[]) => {
-                            updateMinPitchAngle(value[0]);
-                            updateMaxPitchAngle(value[1]);
+                            updatePitchAngleMinInternal(value[0]);
+                            updatePitchAngleMaxInternal(value[1]);
                         }}
                     />
 

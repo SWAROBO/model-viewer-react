@@ -99,7 +99,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 ## Phase 2: Writing Unit Tests (Vitest & React Testing Library)
 
 1.  **Target Components & Hooks:**
-    -   [ ] a. `src/components/AutoRotate.tsx`
+    -   [x] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
     -   [ ] b. `src/components/DualRangeSliderControl.tsx`
     -   [ ] c. `src/components/Grid.tsx`
     -   [ ] d. `src/components/ModelLoadingProgress.tsx`

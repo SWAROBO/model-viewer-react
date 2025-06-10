@@ -173,8 +173,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             <Entity
                 position={currentPosition}
                 rotation={currentRotation}
-                // scale={scale}
-                scale={[5, 5, 5]} // Fixed scale for consistency
+                scale={scale}
             >
                 {splat && <GSplat asset={splat} />}
             </Entity>

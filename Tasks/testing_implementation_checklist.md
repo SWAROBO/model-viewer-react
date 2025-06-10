@@ -6,11 +6,11 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 
 ### 1.1. Unit & Integration Testing (Vitest)
 1.  **Verify Vitest Configuration:**
-    -   [ ] a. Check `vite.config.mts` (or `vitest.config.ts` if separate) for existing Vitest setup.
-    -   [ ] b. Ensure `jsdom` environment is configured for React component testing.
-    -   [ ] c. Confirm `@testing-library/react` and related dependencies are correctly installed and configured.
-    -   [ ] d. Ensure `tsconfig.json` includes types for Vitest (`"vitest/globals"`).
-    e.  Example `vite.config.mts` or `vitest.config.ts` for testing:
+    -   [x] a. Check `vite.config.mts` (or `vitest.config.ts` if separate) for existing Vitest setup.
+    -   [x] b. Ensure `jsdom` environment is configured for React component testing.
+    -   [x] c. Confirm `@testing-library/react` and related dependencies are correctly installed and configured.
+    -   [x] d. Ensure `tsconfig.json` includes types for Vitest (`"vitest/globals"`).
+    -   [x] e.  Example `vite.config.mts` or `vitest.config.ts` for testing:
         ```typescript
         /// <reference types="vitest" />
         import { defineConfig } from 'vite';
@@ -28,14 +28,14 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         });
         ```
 2.  **Create Test Setup File (Optional but Recommended):**
-    -   [ ] a. Create `src/test-setup.ts` (or similar).
-    -   [ ] b. Import `@testing-library/jest-dom/extend-expect` for additional matchers.
+    -   [x] a. Create `src/test-setup.ts` (or similar).
+    -   [x] b. Import `@testing-library/jest-dom/extend-expect` for additional matchers.
         ```typescript
         // src/test-setup.ts
         import '@testing-library/jest-dom';
         // Add any other global setup for tests here
         ```
-    -   [ ] c. Update Vitest config to use this `setupFiles`.
+    -   [x] c. Update Vitest config to use this `setupFiles`.
 
 ### 1.2. End-to-End Testing (Playwright)
 1.  **Install Playwright:**

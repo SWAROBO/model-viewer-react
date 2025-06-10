@@ -44,4 +44,35 @@ describe('DualRangeSliderControl Component', () => {
     expect(sliderValues).toContain(String(defaultProps.minValue));
     expect(sliderValues).toContain(String(defaultProps.maxValue));
   });
+
+  it('should render with updated props', () => {
+    const updatedProps = {
+      title: "Updated Range",
+      minLabel: "New Min",
+      maxLabel: "New Max",
+      minValue: 10,
+      maxValue: 90,
+      sliderMin: 5,
+      sliderMax: 95,
+      step: 5,
+      onInput: vi.fn(),
+    };
+
+    render(<DualRangeSliderControl {...updatedProps} />);
+
+    // Check for the updated title
+    expect(screen.getByRole('heading', { name: updatedProps.title, level: 3 })).toBeInTheDocument();
+
+    // Check for updated labels and their values
+    expect(screen.getByText((content, element) => content.startsWith(updatedProps.minLabel) && content.includes(updatedProps.minValue.toFixed(2)))).toBeInTheDocument();
+    expect(screen.getByText((content, element) => content.startsWith(updatedProps.maxLabel) && content.includes(updatedProps.maxValue.toFixed(2)))).toBeInTheDocument();
+
+    // Check for updated slider values
+    const sliders = screen.getAllByRole('slider');
+    const sliderValues = sliders.map(s => s.getAttribute('aria-valuenow'));
+    expect(sliderValues).toContain(String(updatedProps.minValue));
+    expect(sliderValues).toContain(String(updatedProps.maxValue));
+
+    // Check for updated slider min/max/step (these are attributes on the input elements)
+  });
 });

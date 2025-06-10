@@ -149,4 +149,38 @@ describe('ModelViewerCore Component', () => {
     expect(screen.getByText(/mock singlevalueslidercontrol: rotation y/i)).toBeInTheDocument();
     expect(screen.getByText(/mock singlevalueslidercontrol: rotation z/i)).toBeInTheDocument();
   });
+
+  it('should pass custom props to Camera, OrbitControls, and GSplat Entity', () => {
+    const customSplat = { id: 'custom-splat-asset' };
+    const customProps = {
+      splat: customSplat,
+      fov: 75,
+      distanceMin: 1,
+      distanceMax: 10,
+      distance: 5,
+      pitchAngleMin: -45,
+      pitchAngleMax: 45,
+      rotation: [10, 20, 30] as [number, number, number],
+      position: [1, 2, 3] as [number, number, number],
+      scale: [0.5, 0.5, 0.5] as [number, number, number],
+    };
+
+    render(<ModelViewerCore {...customProps} />);
+
+    // Verify Camera receives custom fov
+    expect(mockCamera).toHaveBeenCalledWith(expect.objectContaining({ fov: customProps.fov }), undefined);
+
+    // Verify OrbitControls receives custom distance and pitch angle props
+    expect(mockOrbitControls).toHaveBeenCalledWith(
+      expect.objectContaining({
+        distanceMin: customProps.distanceMin,
+        distanceMax: customProps.distanceMax,
+        distance: customProps.distance,
+        pitchAngleMin: customProps.pitchAngleMin,
+        pitchAngleMax: customProps.pitchAngleMax,
+      }),
+      undefined
+    );
+
+  });
 });

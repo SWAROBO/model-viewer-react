@@ -48,4 +48,15 @@ describe('Grid Component', () => {
     expect(mockScriptElement).toBeInTheDocument();
     expect(mockScriptElement).toHaveAttribute('data-script-name', 'Grid');
   });
+
+  it('should pass additional props to the Script component', () => {
+    const testProps = { size: 100, divisions: 10 };
+    render(<Grid {...testProps} />);
+
+    expect(mockScriptComponent).toHaveBeenCalledTimes(1);
+    expect(mockScriptComponent).toHaveBeenCalledWith(
+      { script: MockGridScript, ...testProps },
+      undefined
+    );
+  });
 });

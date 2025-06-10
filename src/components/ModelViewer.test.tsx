@@ -95,4 +95,44 @@ describe('ModelViewer Component', () => {
     expect(screen.getByTestId('mock-model-viewer-core')).toBeInTheDocument();
     expect(screen.getByText('ModelViewerCore rendered. Splat: Absent')).toBeInTheDocument();
   });
+
+  it('should pass custom props to ModelViewerCore', () => {
+    const customProps = {
+      splatURL: 'http://example.com/custom.splat',
+      fov: 60,
+      distanceMin: 0.5,
+      distanceMax: 50,
+      distance: 10,
+      pitchAngleMin: -45,
+      pitchAngleMax: 45,
+      rotation: [10, 20, 30] as [number, number, number],
+      position: [1, 2, 3] as [number, number, number],
+      scale: [0.5, 0.5, 0.5] as [number, number, number],
+    };
+
+    // Mock useSplatWithProgress to return a dummy asset for the custom splatURL
+    mockUseSplatWithProgress.mockReturnValue({ asset: {} as any, loading: false }); // Use {} as any for a dummy asset
+
+    render(<ModelViewer {...customProps} />);
+
+    // Verify ModelViewerCore is rendered with custom props
+    expect(mockModelViewerCore).toHaveBeenCalledTimes(1);
+    expect(mockModelViewerCore).toHaveBeenCalledWith(
+      expect.objectContaining({
+        splat: {}, // From mockUseSplatWithProgress
+        fov: customProps.fov,
+        distanceMin: customProps.distanceMin,
+        distanceMax: customProps.distanceMax,
+        distance: customProps.distance,
+        pitchAngleMin: customProps.pitchAngleMin,
+        pitchAngleMax: customProps.pitchAngleMax,
+        rotation: customProps.rotation,
+        position: customProps.position,
+        scale: customProps.scale,
+      }),
+      undefined
+    );
+    expect(screen.getByTestId('mock-model-viewer-core')).toBeInTheDocument();
+    expect(screen.getByText('ModelViewerCore rendered. Splat: Present')).toBeInTheDocument();
+  });
 });

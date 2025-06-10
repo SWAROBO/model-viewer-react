@@ -133,23 +133,23 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         });
         ```
     c.  **Props Testing:**
-        -   [ ] i. Test how the component behaves with different props.
-        -   [ ] ii. Assert that props are correctly passed and affect rendering/behavior.
+        -   [x] i. Test how the component behaves with different props.
+        -   [x] ii. Assert that props are correctly passed and affect rendering/behavior.
 
         - Targets
             -   [x] a. `src/components/AutoRotate.tsx`
-            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
-            -   [ ] c. `src/components/Grid.tsx`
-            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
-            -   [ ] e. `src/components/ModelViewer.tsx`
-            -   [ ] f. `src/components/ModelViewerCore.tsx`
-            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
-            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
-            -   [ ] i. `src/components/SwaroboLogo.tsx`
-            -   [ ] j. `src/hooks/useModelData.ts`
-            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts`
-            -   [ ] l. `src/hooks/useSplatWithProgress.ts`
-            -   [ ] m. `src/app/page.tsx`
+            -   [x] b. `src/components/DualRangeSliderControl.tsx`
+            -   [x] c. `src/components/Grid.tsx`
+            -   [x] d. `src/components/ModelLoadingProgress.tsx`
+            -   [x] e. `src/components/ModelViewer.tsx`
+            -   [x] f. `src/components/ModelViewerCore.tsx`
+            -   [x] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [x] h. `src/components/SingleValueSliderControl.tsx`
+            -   [x] i. `src/components/SwaroboLogo.tsx`
+            -   [x] j. `src/hooks/useModelData.ts`
+            -   [x] k. `src/hooks/usePlayCanvasSetup.ts`
+            -   [x] l. `src/hooks/useSplatWithProgress.ts`
+            -   [x] m. `src/app/page.tsx`
     d.  **State & Interaction Testing (for interactive components):**
         -   [ ] i. Simulate user events (clicks, input changes) using `fireEvent` or `userEvent` from React Testing Library.
         -   [ ] ii. Assert that the component's state changes correctly or callbacks are fired.

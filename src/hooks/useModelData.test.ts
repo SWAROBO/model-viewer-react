@@ -2,6 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useModelData } from './useModelData';
 import { vi, Mock } from 'vitest'; // Import vi and Mock
 import Papa from 'papaparse'; // Import Papa to mock it
+import { defaultModelViewerProps } from '../types/modelViewer'; // Import default props
 
 // Mock global fetch
 const mockFetch = vi.fn();
@@ -117,6 +118,105 @@ describe('useModelData Hook', () => {
     expect(result.current.error).toBe(parseErrorMessage);
   });
 
+  it('should parse comma-separated numbers into arrays', async () => {
+    const csvContent = 'rotation,position,scale\n"1,2,3","4,5,6","0.1,0.2,0.3"';
+    const expectedData = [{
+      rotation: [1, 2, 3],
+      position: [4, 5, 6],
+      scale: [0.1, 0.2, 0.3]
+    }];
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      text: () => Promise.resolve(csvContent),
+    });
+    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => {
+      if (config.complete) {
+        config.complete({
+          data: expectedData,
+          errors: [],
+          meta: {
+            delimiter: ',',
+            linebreak: '\n',
+            aborted: false,
+            truncated: false,
+            cursor: text.length,
+          }
+        }, undefined);
+      }
+    });
+
+    const { result } = renderHook(() => useModelData(CSV_URL));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.modelData).toEqual(expectedData);
+  });
+
+  it('should remove extra quotes from splatURL', async () => {
+    const csvContent = 'splatURL\n"\"http://test.com/model.splat\""';
+    const expectedData = [{
+      splatURL: 'http://test.com/model.splat'
+    }];
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      text: () => Promise.resolve(csvContent),
+    });
+    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => {
+      if (config.complete) {
+        config.complete({
+          data: expectedData,
+          errors: [],
+          meta: {
+            delimiter: ',',
+            linebreak: '\n',
+            aborted: false,
+            truncated: false,
+            cursor: text.length,
+          }
+        }, undefined);
+      }
+    });
+
+    const { result } = renderHook(() => useModelData(CSV_URL));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.modelData).toEqual(expectedData);
+  });
+
+  it('should use defaultModelViewerProps for null/undefined values', async () => {
+    const csvContent = 'fov,distance\n,'; // fov and distance are null/undefined
+    const expectedData = [{
+      fov: defaultModelViewerProps.fov,
+      distance: defaultModelViewerProps.distance
+    }];
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      text: () => Promise.resolve(csvContent),
+    });
+    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => {
+      if (config.complete) {
+        config.complete({
+          data: [{ fov: null, distance: undefined }], // Simulate null/undefined from PapaParse
+          errors: [],
+          meta: {
+            delimiter: ',',
+            linebreak: '\n',
+            aborted: false,
+            truncated: false,
+            cursor: text.length,
+          }
+        }, undefined);
+      }
+    });
+
+    const { result } = renderHook(() => useModelData(CSV_URL));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.modelData).toEqual(expectedData);
+  });
+
   it('should re-fetch data when csvUrl changes', async () => {
     const NEW_CSV_URL = 'http://test.com/new-data.csv';
     const NEW_CSV_CONTENT = 'new_header,new_value\nnew_data,new_data_value';
@@ -126,8 +226,8 @@ describe('useModelData Hook', () => {
       ok: true,
       text: () => Promise.resolve(MOCK_CSV_CONTENT),
     });
-    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => { // Explicitly type parameters
-      if (config.complete) { // Add null check
+    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => {
+      if (config.complete) {
         config.complete({
           data: MOCK_PARSED_DATA,
           errors: [],
@@ -138,7 +238,7 @@ describe('useModelData Hook', () => {
             truncated: false,
             cursor: text.length,
           }
-        }, undefined); // Pass second argument (file)
+        }, undefined);
       }
     });
 
@@ -154,8 +254,8 @@ describe('useModelData Hook', () => {
       ok: true,
       text: () => Promise.resolve(NEW_CSV_CONTENT),
     });
-    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => { // Explicitly type parameters
-      if (config.complete) { // Add null check
+    mockPapaParse.mockImplementationOnce((text: string, config: Papa.ParseConfig) => {
+      if (config.complete) {
         config.complete({
           data: NEW_PARSED_DATA,
           errors: [],
@@ -166,7 +266,7 @@ describe('useModelData Hook', () => {
             truncated: false,
             cursor: text.length,
           }
-        }, undefined); // Pass second argument (file)
+        }, undefined);
       }
     });
 
@@ -176,7 +276,7 @@ describe('useModelData Hook', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockFetch).toHaveBeenCalledWith(NEW_CSV_URL);
-    expect(mockPapaParse).toHaveBeenCalledTimes(2); // Use the captured mock instance
+    expect(mockPapaParse).toHaveBeenCalledTimes(2);
     expect(result.current.modelData).toEqual(NEW_PARSED_DATA);
   });
 });

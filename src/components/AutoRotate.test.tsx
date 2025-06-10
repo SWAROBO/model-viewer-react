@@ -5,7 +5,7 @@ import type AutoRotateType from './AutoRotate'; // Import type for dynamic impor
 
 // Define the mock function instance for the Script component
 const mockScriptComponent = vi.fn((props: { script?: { name?: string }, [key: string]: any }) => (
-  <div data-testid="mock-script" data-script-name={props.script?.name} />
+  <div data-test-id="mock-script" data-script-name={props.script?.name} />
 ));
 
 // Define the mock for AutoRotator script

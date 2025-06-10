@@ -100,24 +100,24 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 
 1.  **Target Components & Hooks:**
     -   [x] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
-    -   [ ] b. `src/components/DualRangeSliderControl.tsx`
-    -   [ ] c. `src/components/Grid.tsx`
-    -   [ ] d. `src/components/ModelLoadingProgress.tsx`
-    -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
-    -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
-    -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
-    -   [ ] h. `src/components/SingleValueSliderControl.tsx`
-    -   [ ] i. `src/components/SwaroboLogo.tsx`
-    -   [ ] j. `src/hooks/useModelData.ts`
-    -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
-    -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
-    -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
+    -   [x] b. `src/components/DualRangeSliderControl.tsx` (Basic rendering test implemented)
+    -   [x] c. `src/components/Grid.tsx` (Basic rendering test implemented)
+    -   [x] d. `src/components/ModelLoadingProgress.tsx` (Basic rendering test implemented)
+    -   [x] e. `src/components/ModelViewer.tsx` (Basic rendering test implemented)
+    -   [x] f. `src/components/ModelViewerCore.tsx` (Basic rendering test implemented)
+    -   [x] g. `src/components/ServiceWorkerRegistrar.tsx` (Basic rendering test implemented)
+    -   [x] h. `src/components/SingleValueSliderControl.tsx` (Basic rendering test implemented)
+    -   [x] i. `src/components/SwaroboLogo.tsx` (Basic rendering test implemented)
+    -   [x] j. `src/hooks/useModelData.ts` (Basic rendering test implemented)
+    -   [x] k. `src/hooks/usePlayCanvasSetup.ts` (Basic rendering test implemented, PlayCanvas mocked)
+    -   [x] l. `src/hooks/useSplatWithProgress.ts` (Basic rendering test implemented, PlayCanvas and file loading mocked)
+    -   [x] m. `src/app/page.tsx` (Basic rendering test implemented, key components mocked)
 
 2.  **For each component/hook:**
-    -   [ ] a. Create a corresponding `*.test.tsx` or `*.test.ts` file (e.g., `AutoRotate.test.tsx`).
+    -   [x] a. Create a corresponding `*.test.tsx` or `*.test.ts` file (e.g., `AutoRotate.test.tsx`).
     b.  **Basic Rendering Test:**
-        -   [ ] i. Render the component with default props.
-        -   [ ] ii. Assert that it doesn't crash and renders expected basic elements.
+        -   [x] i. Render the component with default props.
+        -   [x] ii. Assert that it doesn't crash and renders expected basic elements.
         ```typescript
         // Example: SwaroboLogo.test.tsx
         import { render, screen } from '@testing-library/react';

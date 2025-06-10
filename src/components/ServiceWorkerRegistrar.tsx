@@ -4,9 +4,9 @@ import { useEffect } from 'react';
 
 const ServiceWorkerRegistrar = () => {
   useEffect(() => {
-    if ('serviceWorker' in navigator && window.self === window.top) {
+    // Check if serviceWorker is available and if not in an iframe
+    if (navigator.serviceWorker && window.self === window.top) {
       // Register the service worker directly, not waiting for 'load'
-      // Added window.self === window.top to prevent registration in iframes if any
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
           // console.log('Service Worker registered with scope:', registration.scope);

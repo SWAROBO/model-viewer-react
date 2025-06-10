@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react"; // Added useMemo
 import { useSplatWithProgress } from "../hooks/useSplatWithProgress";
 import ModelLoadingProgress from "./ModelLoadingProgress";
 import ModelViewerCore from "./ModelViewerCore";
@@ -16,10 +16,15 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         pitchAngleMin,
         pitchAngleMax,
         distance,
-        rotation,
-        position,
-        scale,
+        rotation: propRotation, // Renamed to avoid conflict with memoized variable
+        position: propPosition, // Renamed
+        scale: propScale,       // Renamed
     } = { ...defaultModelViewerProps, ...props };
+
+    // Memoize array props to ensure stable references if their values don't change
+    const rotation = useMemo(() => propRotation, [propRotation[0], propRotation[1], propRotation[2]]);
+    const position = useMemo(() => propPosition, [propPosition[0], propPosition[1], propPosition[2]]);
+    const scale = useMemo(() => propScale, [propScale[0], propScale[1], propScale[2]]);
 
     const [downloadProgress, setDownloadProgress] = useState(0);
 
@@ -42,9 +47,9 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 distance={distance}
                 pitchAngleMin={pitchAngleMin}
                 pitchAngleMax={pitchAngleMax}
-                rotation={rotation}
-                position={position}
-                scale={scale}
+                rotation={rotation} // Use memoized rotation
+                position={position} // Use memoized position
+                scale={scale}       // Use memoized scale
             />
         </>
     );

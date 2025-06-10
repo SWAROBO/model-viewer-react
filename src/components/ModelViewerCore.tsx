@@ -70,20 +70,12 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     // Starts at a default, then updates from controlPosition/Rotation once splat is ready
     const [gSplatEntityPosition, setGSplatEntityPosition] = useState<
         [number, number, number]
-    >([0, 0, 0]);
+    >(position); // Initialize directly from prop
     const [gSplatEntityRotation, setGSplatEntityRotation] = useState<
         [number, number, number]
-    >([0, 0, 0]);
+    >(rotation); // Initialize directly from prop
 
     const [isSliderActive, setIsSliderActive] = useState(false);
-
-    useEffect(() => {
-        setControlPosition(position);
-    }, [position]);
-
-    useEffect(() => {
-        setControlRotation(rotation);
-    }, [rotation]);
 
     useEffect(() => {
         if (splat) {
@@ -179,6 +171,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
 
             {showSettings && (
                 <div
+                    data-test-id="settings-panel" // Added for testing
                     style={{
                         position: "absolute",
                         top: "10px",

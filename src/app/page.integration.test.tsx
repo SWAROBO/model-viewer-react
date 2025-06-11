@@ -33,7 +33,7 @@ vi.mock('@/components/ModelViewerCore', () => ({
     // or a spy to capture calls. For now, we'll just render a div with data-testid
     // and potentially some data attributes for simple checks.
     return (
-      <div data-testid="mock-model-viewer-core" data-splat={props.splat} data-fov={props.fov}>
+      <div data-test-id="mock-model-viewer-core" data-splat={props.splat} data-fov={props.fov}>
         Mock ModelViewerCore
       </div>
     );
@@ -258,5 +258,46 @@ describe('Page Integration: Data flow from useModelData to ModelViewerCore', () 
         undefined // Explicitly expect undefined as the second argument
       );
     });
+  });
+
+  it('should render ModelViewer and SwaroboLogo components', async () => {
+    // Mock useModelData to return some data so ModelViewer renders
+    (useModelData as vi.Mock).mockReturnValue({
+      modelData: [{
+        model: 'test',
+        splatURL: 'test.splat',
+        fov: 50,
+        distance: 5,
+        rotation: [0, 0, 0],
+        position: [0, 0, 0],
+        scale: [1, 1, 1],
+        distanceMin: 1,
+        distanceMax: 10,
+        pitchAngleMin: -90,
+        pitchAngleMax: 90,
+      }],
+      loading: false,
+      error: null,
+      defaultModelViewerProps: mockDefaultProps,
+    });
+
+    // Temporarily mock useSplatWithProgress to return loading: true for this test
+    (useSplatWithProgress as vi.Mock).mockReturnValue({
+      asset: null, // No asset yet
+      loading: true, // Simulate loading state
+    });
+
+    render(<Page />);
+
+    // Wait for ModelViewerCore to be rendered (it's a child of ModelViewer)
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-model-viewer-core')).toBeInTheDocument();
+    });
+
+    // Check for SwaroboLogo
+    expect(screen.getByRole('img', { name: /swarobo logo/i })).toBeInTheDocument();
+
+    // Check for ModelLoadingProgress (it's also a child of ModelViewer)
+    expect(screen.getByTestId('CircularProgressbar')).toBeInTheDocument();
   });
 });

@@ -217,15 +217,15 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 ## Phase 3: Writing Integration Tests (Vitest & React Testing Library)
 
 1.  **Identify Key Integration Points:**
-    -   [ ] a. `ModelViewer.tsx` with its controls (`AutoRotate`, `DualRangeSliderControl`, `SingleValueSliderControl`) and `ModelViewerCore.tsx`.
+    -   [x] a. `ModelViewer.tsx` with its controls (`AutoRotate`, `DualRangeSliderControl`, `SingleValueSliderControl`) and `ModelViewerCore.tsx`. (AutoRotate, DualRangeSliderControl, and SingleValueSliderControl integration tested)
     -   [ ] b. Data flow from `useModelData` through `ModelViewer` to `ModelViewerCore`.
     -   [ ] c. `page.tsx` rendering `ModelViewer` and ensuring basic setup.
 
 2.  **For each integration scenario:**
-    -   [ ] a. Render the parent component with its relevant children.
-    -   [ ] b. Simulate user interactions that span multiple components.
-    -   [ ] c. Assert that the integrated system behaves as expected.
-    -   [ ] d. Mock less critical parts or external dependencies (e.g., actual PlayCanvas rendering).
+    -   [x] a. Render the parent component with its relevant children.
+    -   [x] b. Simulate user interactions that span multiple components. (Via mocking useSearchParams)
+    -   [x] c. Assert that the integrated system behaves as expected.
+    -   [x] d. Mock less critical parts or external dependencies (e.g., actual PlayCanvas rendering).
     ```typescript
     // Example: ModelViewer integration with a control (simplified)
     // src/components/ModelViewer.integration.test.tsx

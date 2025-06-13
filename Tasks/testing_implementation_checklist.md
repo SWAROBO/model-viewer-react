@@ -273,7 +273,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 
 1.  **Identify Key Integration Points:**
     -   [x] a. `ModelViewer.tsx` with its controls (`AutoRotate`, `DualRangeSliderControl`, `SingleValueSliderControl`) and `ModelViewerCore.tsx`. (Implemented `ModelViewer` with `AutoRotate` presence check)
-    -   [ ] b. Data flow from `useModelData` through `ModelViewer` to `ModelViewerCore`.
+    -   [x] b. Data flow from `useModelData` through `ModelViewer` to `ModelViewerCore`.
     -   [ ] c. `page.tsx` rendering `ModelViewer` and ensuring basic setup.
 
 2.  **For each integration scenario:**

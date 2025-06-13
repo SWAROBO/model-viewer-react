@@ -11,7 +11,7 @@ const ModelLoadingProgress: React.FC<ModelLoadingProgressProps> = ({ downloadPro
     if (!loading) return null;
 
     return (
-        <div style={{
+        <div data-testid="model-loading-progress-container" style={{
             position: 'absolute',
             top: '50%',
             left: '50%',

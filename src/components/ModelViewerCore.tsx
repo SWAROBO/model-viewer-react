@@ -8,6 +8,7 @@ import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
 import SingleValueSliderControl from "./SingleValueSliderControl";
+import { useSyncedState } from '../hooks/useSyncedState'; // New import
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -61,30 +62,16 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         pitchAngleMax,
     ]);
 
-    // State for UI controls
-    // Initialized from props, and kept in sync with props
-    const [controlPosition, setControlPosition] = useState(position);
-    const [controlRotation, setControlRotation] = useState(rotation);
+    // State for UI controls, now using useSyncedState
+    const [controlPosition, setControlPosition] = useSyncedState(position);
+    const [controlRotation, setControlRotation] = useSyncedState(rotation);
 
     // Removed gSplatEntityPosition and gSplatEntityRotation states
-    // Removed useEffect that updates gSplatEntityPosition and gSplatEntityRotation
+    // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
 
     const [isSliderActive, setIsSliderActive] = useState(false);
 
-    useEffect(() => {
-        // Only update if the content of the position array has changed
-        if (JSON.stringify(controlPosition) !== JSON.stringify(position)) {
-            setControlPosition(position);
-        }
-    }, [position, controlPosition]); // Include controlPosition in dependency array to ensure latest state is used for comparison
-
-    useEffect(() => {
-        // Only update if the content of the rotation array has changed
-        if (JSON.stringify(controlRotation) !== JSON.stringify(rotation)) {
-            setControlRotation(rotation);
-        }
-    }, [rotation, controlRotation]); // Include controlRotation in dependency array
-
+    // The useEffects for syncing controlPosition and controlRotation are now handled by useSyncedState
     // Removed the useEffect that applied controlPosition/Rotation to entity transform
 
     const updateDistanceRangeInternal = ([newMin, newMax]: [

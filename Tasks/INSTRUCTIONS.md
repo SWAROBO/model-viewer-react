@@ -12,7 +12,7 @@ The procedure is:
 Make sure by the end, check that both 2 and 3 pass.
 
 4. Update the checklist.
-5. Generate the next task using new_task tool by copying the template from @/Tasks\INSTRUCTIONS.md and updating the task number.
+5. Generate the next task using new_task tool by copying the template from @/Tasks\INSTRUCTIONS.md and updating the task number. The task should be exactly the same as the template. Do not add any additional information or change the format.
 
 # Task: Implement [TASK_NUMBER]
 

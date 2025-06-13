@@ -100,7 +100,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 
 1.  **Target Components & Hooks:**
     -   [x] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
-    -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+    -   [x] b. `src/components/DualRangeSliderControl.tsx`
     -   [ ] c. `src/components/Grid.tsx`
     -   [ ] d. `src/components/ModelLoadingProgress.tsx`
     -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)

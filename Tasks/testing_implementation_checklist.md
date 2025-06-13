@@ -318,9 +318,14 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         -   [x] ii. (If a default model loads) Verify the model appears (e.g., canvas element is present and has some content, or a loading indicator disappears and a success message/state appears).
         -   [x] iii. Verify loading progress indicator works if applicable.
         -   [x] iv. **Fix Implemented**: Resolved issue where "should display an error message when a model fails to load" E2E test was failing due to `useModelData` mock not being applied correctly. Modified `src/hooks/useModelData.ts` to check for `window.__MOCKED_USE_MODEL_DATA__` for E2E testing. All unit and E2E tests now pass, and browser check confirms functionality.
-    c.  **Interact with Auto-Rotate Control:**
-        -   [ ] i. Find and click the auto-rotate button.
-        -   [ ] ii. Visually (if possible via screenshot diffing, or by checking some state exposed to DOM) or programmatically verify rotation starts/stops.
+    c.  **Interact with Auto-Rotate Control (Programmatic):**
+        -   [x] i. **Clarification**: There is no explicit UI button for auto-rotate. Auto-rotation is controlled programmatically via the `AutoRotate` component, which is rendered conditionally based on the `settings` URL parameter (`!showSettings`).
+        -   [x] ii. **Test Auto-Rotate Presence/Absence**:
+            -   Navigate to the page without the `settings=true` parameter (or with `settings=false`).
+            -   Assert that the `AutoRotate` script component (`data-testid="auto-rotate-indicator"`) is present in the DOM and has `data-auto-rotate-active="true"`.
+            -   Navigate to the page with `settings=true`.
+            -   Assert that the `AutoRotate` script component (`data-testid="auto-rotate-indicator"`) is *not* present in the DOM.
+        -   [x] iii. **Visual Verification (Confirmed)**: Visually verified that the model rotates when `AutoRotate` is present and stops when it's absent by comparing screenshots taken after a delay.
     d.  **Interact with Slider Controls (e.g., Camera FOV, Exposure):**
         -   [ ] i. Find a slider control.
         -   [ ] ii. Change its value.

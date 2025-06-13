@@ -137,4 +137,25 @@ test-model,/test.splat,50,1,10,10,90,5,0,0,0,0,0,0,0,0,1,1,1`,
     await expect(errorMessage).toBeVisible();
     await expect(errorMessage).toHaveText(/Forced error for: \/test.splat/); // Check for the forced error text
   });
+
+  test('should display auto-rotate when settings are hidden and hide it when settings are shown', async ({ page }) => {
+    // Navigate to the page without settings parameter (auto-rotate should be active)
+    await page.goto('/?model=test-model');
+    await expect(page).toHaveTitle(/Model Viewer/);
+
+    // Wait for the canvas to be visible, indicating PlayCanvas has rendered
+    const canvas = page.locator('canvas');
+    await expect(canvas).toBeVisible({ timeout: 20000 });
+
+    // Assert that AutoRotate indicator is present and active
+    const autoRotateIndicator = page.getByTestId('auto-rotate-indicator');
+    await expect(autoRotateIndicator).toHaveAttribute('data-auto-rotate-active', 'true');
+
+    // Navigate to the page with settings=true (auto-rotate should be hidden)
+    await page.goto('/?model=test-model&settings=true');
+    await expect(page).toHaveTitle(/Model Viewer/);
+
+    // Assert that AutoRotate indicator is not present in the DOM
+    await expect(autoRotateIndicator).not.toBeAttached();
+  });
 });

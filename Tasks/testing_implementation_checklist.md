@@ -103,7 +103,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     -   [x] b. `src/components/DualRangeSliderControl.tsx`
     -   [x] c. `src/components/Grid.tsx`
     -   [x] d. `src/components/ModelLoadingProgress.tsx`
-    -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
+    -   [x] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
     -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
     -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
     -   [ ] h. `src/components/SingleValueSliderControl.tsx`

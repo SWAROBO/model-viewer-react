@@ -83,7 +83,17 @@ export const useSplatWithProgress = (
     }, [src, app, onProgress]);
 
     useEffect(() => {
-        fetchSplatData();
+        let cleanupFn: (() => void) | undefined;
+
+        const setup = async () => {
+            cleanupFn = await fetchSplatData();
+        };
+
+        setup();
+
+        return () => {
+            cleanupFn?.();
+        };
     }, [fetchSplatData]);
 
     return { asset, loading, error, progress };

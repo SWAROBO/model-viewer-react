@@ -110,7 +110,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     -   [x] i. `src/components/SwaroboLogo.tsx`
     -   [x] j. `src/hooks/useModelData.ts`
     -   [x] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
-    -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
+    -   [x] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
     -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
 
 2.  **For each component/hook:**

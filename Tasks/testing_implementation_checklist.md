@@ -111,13 +111,13 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     -   [x] j. `src/hooks/useModelData.ts`
     -   [x] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
     -   [x] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
-    -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
+    -   [x] m. `src/app/page.tsx` (Basic rendering and presence of key components)
 
 2.  **For each component/hook:**
-    -   [ ] a. Create a corresponding `*.test.tsx` or `*.test.ts` file (e.g., `AutoRotate.test.tsx`).
+    -   [x] a. Create a corresponding `*.test.tsx` or `*.test.ts` file (e.g., `AutoRotate.test.tsx`).
     b.  **Basic Rendering Test:**
-        -   [ ] i. Render the component with default props.
-        -   [ ] ii. Assert that it doesn't crash and renders expected basic elements.
+        -   [x] i. Render the component with default props.
+        -   [x] ii. Assert that it doesn't crash and renders expected basic elements.
         ```typescript
         // Example: SwaroboLogo.test.tsx
         import { render, screen } from '@testing-library/react';
@@ -135,6 +135,21 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     c.  **Props Testing:**
         -   [ ] i. Test how the component behaves with different props.
         -   [ ] ii. Assert that props are correctly passed and affect rendering/behavior.
+        -   Target components
+            -   [ ] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
+            -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
+            -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
+
     d.  **State & Interaction Testing (for interactive components):**
         -   [ ] i. Simulate user events (clicks, input changes) using `fireEvent` or `userEvent` from React Testing Library.
         -   [ ] ii. Assert that the component's state changes correctly or callbacks are fired.
@@ -162,6 +177,22 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
           });
         });
         ```
+        -   Target components
+            -   [ ] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
+            -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
+            -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
+
+
     e.  **Hook Testing:**
         -   [ ] i. Use `renderHook` from React Testing Library.
         -   [ ] ii. Test initial state, updates, and returned values/functions.
@@ -204,9 +235,39 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
           });
         });
         ```
+        -   Target components
+            -   [ ] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
+            -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
+            -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
+
+
     f.  **Mocking:**
         -   [ ] i. Use `vi.mock` for mocking modules (e.g., PlayCanvas, external libraries).
         -   [ ] ii. Mock child components if testing a parent in isolation.
+        -   Target components
+            -   [ ] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
+            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
+            -   [ ] c. `src/components/Grid.tsx`
+            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
+            -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
+            -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
+            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
+            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [ ] j. `src/hooks/useModelData.ts`
+            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
+            -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
+            -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
 
 ## Phase 3: Writing Integration Tests (Vitest & React Testing Library)
 

@@ -71,4 +71,8 @@ This note summarizes key challenges and solutions encountered while implementing
 -   For custom hooks (e.g., `useModelData.ts`, `usePlayCanvasSetup.ts`, `useSplatWithProgress.ts`), "State & Interaction Testing" should be interpreted as "Hook Testing" (checklist section 2.e). This involves testing their initial state, how they update, and the values/functions they return, often requiring heavy mocking of their dependencies.
 -   For page components (e.g., `src/app/page.tsx`), "State & Interaction Testing" should be interpreted as ensuring "Basic rendering and presence of key components" (checklist section 2.m) and how the page reacts to URL parameters or other external inputs that influence its state and the props passed to its children. Direct user interaction simulation (clicks, input changes) is typically less relevant for page-level tests unless the page itself contains interactive elements not covered by child component tests.
 
+## 14. Always Verify Existing Tests First
+
+-   Before implementing new tests for a component or hook, always check its corresponding `*.test.tsx` or `*.test.ts` file. As demonstrated in the "Hook Testing" task, many required tests might already be implemented. Verifying existing tests by running `npm run test` and checking the application in the browser (if applicable) is crucial to avoid redundant work and ensure correctness.
+
 By keeping these points in mind, the next agent should have a smoother experience when working on similar tasks.

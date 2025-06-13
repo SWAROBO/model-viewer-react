@@ -80,3 +80,10 @@ This note summarizes key challenges and solutions encountered while implementing
 -   Before implementing new tests for a component or hook, always check its corresponding `*.test.tsx` or `*.test.ts` file. As demonstrated in the "Hook Testing" task, many required tests might already be implemented. Verifying existing tests by running `npm run test` and checking the application in the browser (if applicable) is crucial to avoid redundant work and ensure correctness.
 
 By keeping these points in mind, the next agent should have a smoother experience when working on similar tasks.
+
+## 15. Playwright E2E Testing for 3D Applications
+
+-   **Playwright `webServer` and headless browser issues with 3D rendering**: Playwright's `webServer` might not always fully emulate a real browser environment for complex 3D rendering libraries like PlayCanvas, leading to elements being reported as "hidden" even when they are visually present in a non-headless browser.
+-   **Robust E2E assertions for 3D viewers**: Instead of relying on `toBeVisible()` for the main container of a 3D viewer, it's more reliable to assert on the presence and dimensions of the `canvas` element that the 3D engine renders, with an increased timeout to account for initialization time.
+-   **Separating Vitest and Playwright test runs**: It's crucial to configure `vite.config.mts` to exclude Playwright test files (`*.spec.ts`) from Vitest runs (`npm run test`) and run Playwright tests separately using `npm run test:e2e`.
+-   **Installing Playwright browsers**: Remember to run `npx playwright install` if browser executables are not found.

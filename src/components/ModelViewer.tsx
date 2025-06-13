@@ -32,7 +32,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
     usePlayCanvasSetup(); // Use the custom hook for PlayCanvas setup
 
     return (
-        <>
+        <div data-testid="model-viewer-container">
             <ModelLoadingProgress downloadProgress={downloadProgress} loading={loading} />
             <ModelViewerCore
                 splat={splat}
@@ -46,7 +46,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 position={position}
                 scale={scale}
             />
-        </>
+        </div>
     );
 };
 

@@ -310,9 +310,9 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
 
 1.  **Define Key User Flows:**
     a.  **Load Application:**
-        -   [ ] i. Navigate to the base URL.
-        -   [ ] ii. Verify the main page loads, title is correct.
-        -   [ ] iii. Verify `ModelViewer` component is present.
+        -   [x] i. Navigate to the base URL.
+        -   [x] ii. Verify the main page loads, title is correct.
+        -   [x] iii. Verify `ModelViewer` component is present.
     b.  **Load a Model:**
         -   [ ] i. (If there's a file input or selection mechanism) Interact with it to load a model.
         -   [ ] ii. (If a default model loads) Verify the model appears (e.g., canvas element is present and has some content, or a loading indicator disappears and a success message/state appears).

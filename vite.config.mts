@@ -10,5 +10,7 @@ export default defineConfig({
         environment: "jsdom",
         setupFiles: "./src/test-setup.tsx", // Updated to .tsx
         css: true,
+        include: ["**/*.test.{ts,tsx}"], // Only include files ending with .test.ts or .test.tsx
+        exclude: ["**/node_modules/**", "**/dist/**", "**/e2e/**"], // Exclude e2e directory
     },
 });

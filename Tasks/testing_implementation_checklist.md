@@ -151,8 +151,8 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
             -   [x] m. `src/app/page.tsx` (Basic rendering and presence of key components)
 
     d.  **State & Interaction Testing (for interactive components):**
-        -   [ ] i. Simulate user events (clicks, input changes) using `fireEvent` or `userEvent` from React Testing Library.
-        -   [ ] ii. Assert that the component's state changes correctly or callbacks are fired.
+        -   [x] i. Simulate user events (clicks, input changes) using `fireEvent` or `userEvent` from React Testing Library.
+        -   [x] ii. Assert that the component's state changes correctly or callbacks are fired.
         ```typescript
         // Example: SingleValueSliderControl.test.tsx (simplified)
         import { render, screen, fireEvent } from '@testing-library/react';
@@ -187,10 +187,10 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
             -   [x] g. `src/components/ServiceWorkerRegistrar.tsx`
             -   [x] h. `src/components/SingleValueSliderControl.tsx`
             -   [x] i. `src/components/SwaroboLogo.tsx`
-            -   [ ] j. `src/hooks/useModelData.ts`
-            -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
-            -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
-            -   [ ] m. `src/app/page.tsx` (Basic rendering and presence of key components)
+            -   [x] j. `src/hooks/useModelData.ts`
+            -   [x] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
+            -   [x] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)
+            -   [x] m. `src/app/page.tsx` (Basic rendering and presence of key components)
 
 
     e.  **Hook Testing:**

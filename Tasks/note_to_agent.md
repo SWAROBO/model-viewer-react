@@ -66,4 +66,9 @@ This note summarizes key challenges and solutions encountered while implementing
 
 -   For components that do not render any UI elements and whose primary function is to perform side effects (e.g., `ServiceWorkerRegistrar.tsx`), "State & Interaction Testing" as defined in the checklist is not applicable. Testing should focus on verifying that their intended side effects occur under the correct conditions, which typically involves mocking global APIs (like `navigator.serviceWorker`) and asserting their invocation.
 
+## 13. Interpreting "State & Interaction Testing" for Hooks and Page Components
+
+-   For custom hooks (e.g., `useModelData.ts`, `usePlayCanvasSetup.ts`, `useSplatWithProgress.ts`), "State & Interaction Testing" should be interpreted as "Hook Testing" (checklist section 2.e). This involves testing their initial state, how they update, and the values/functions they return, often requiring heavy mocking of their dependencies.
+-   For page components (e.g., `src/app/page.tsx`), "State & Interaction Testing" should be interpreted as ensuring "Basic rendering and presence of key components" (checklist section 2.m) and how the page reacts to URL parameters or other external inputs that influence its state and the props passed to its children. Direct user interaction simulation (clicks, input changes) is typically less relevant for page-level tests unless the page itself contains interactive elements not covered by child component tests.
+
 By keeping these points in mind, the next agent should have a smoother experience when working on similar tasks.

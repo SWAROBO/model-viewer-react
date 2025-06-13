@@ -25,6 +25,7 @@ const SingleValueSliderControl: React.FC<SingleValueSliderControlProps> = ({
                 {label}: {value.toFixed(2)}
             </label>
             <RangeSlider
+                aria-label={label} /* Add aria-label for accessibility */
                 min={sliderMin}
                 max={sliderMax}
                 step={step}

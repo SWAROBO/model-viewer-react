@@ -1,25 +1,32 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { vi, Mock } from 'vitest'; // Import Mock
 import ModelViewerCore from './ModelViewerCore';
 import { useSearchParams } from 'next/navigation'; // Import the hook to mock it directly
+import { Entity } from '@playcanvas/react'; // Import Entity to use vi.mocked
+import { Camera, GSplat, EnvAtlas } from '@playcanvas/react/components'; // Import components for mocking
+import { OrbitControls } from '../lib/@playcanvas/react'; // Import OrbitControls for mocking
 
 // Mock PlayCanvas components and hooks
+// Mock the main @playcanvas/react package for Entity
 vi.mock('@playcanvas/react', () => ({
-  Entity: vi.fn(({ children }) => <>{children}</>), // Render children directly without a div
+  Entity: vi.fn(({ children, position, rotation, scale }) => <>{children}</>), // Capture specific props
 }));
 
+// Mock @playcanvas/react/components
 vi.mock('@playcanvas/react/components', () => ({
-  Camera: vi.fn(() => null), // Render null
-  GSplat: vi.fn(() => null), // Render null
-  EnvAtlas: vi.fn(() => null), // Render null
+  Camera: vi.fn(() => null),
+  GSplat: vi.fn(() => null),
+  EnvAtlas: vi.fn(() => null),
 }));
 
+// Mock @playcanvas/react/hooks
 vi.mock('@playcanvas/react/hooks', () => ({
-  useEnvAtlas: vi.fn(() => ({ asset: {} })), // Return a dummy asset
+  useEnvAtlas: vi.fn(() => ({ asset: {} })),
 }));
 
+// Mock ../lib/@playcanvas/react (for OrbitControls)
 vi.mock('../lib/@playcanvas/react', () => ({
-  OrbitControls: vi.fn(() => null), // Render null
+  OrbitControls: vi.fn(() => null),
 }));
 
 // Mock Next.js useSearchParams at the top level
@@ -31,13 +38,30 @@ vi.mock('next/navigation', () => ({
 vi.mock('./AutoRotate', () => ({ default: vi.fn(() => <div data-testid="mock-auto-rotate"></div>) }));
 vi.mock('./Grid', () => ({ default: vi.fn(() => <div data-testid="mock-grid"></div>) }));
 vi.mock('./DualRangeSliderControl', () => ({
-  default: vi.fn(({ onInput, ...props }) => (
-    <div data-testid="mock-dual-range-slider" {...props}></div> // Simplified, no button
+  default: vi.fn(({ onInput, title, minLabel, maxLabel, minValue, maxValue, sliderMin, sliderMax, step }) => (
+    <div
+      data-testid="mock-dual-range-slider"
+      data-title={title}
+      data-min-label={minLabel}
+      data-max-label={maxLabel}
+      data-min-value={minValue}
+      data-max-value={maxValue}
+      data-slider-min={sliderMin}
+      data-slider-max={sliderMax}
+      data-step={step}
+    ></div>
   )),
 }));
 vi.mock('./SingleValueSliderControl', () => ({
-  default: vi.fn(({ onInput, ...props }) => (
-    <div data-testid="mock-single-value-slider" {...props}></div> // Simplified, no button
+  default: vi.fn(({ onInput, label, value, sliderMin, sliderMax, step }) => (
+    <div
+      data-testid="mock-single-value-slider"
+      data-label={label}
+      data-value={value}
+      data-slider-min={sliderMin}
+      data-slider-max={sliderMax}
+      data-step={step}
+    ></div>
   )),
 }));
 
@@ -92,5 +116,153 @@ describe('ModelViewerCore', () => {
     render(<ModelViewerCore splat={null} />);
     expect(screen.queryByTestId('mock-dual-range-slider')).not.toBeInTheDocument();
     expect(screen.queryByTestId('mock-single-value-slider')).not.toBeInTheDocument();
+  });
+
+  it('renders GSplat and OrbitControls when splat prop is provided', () => {
+    const mockSplat = {};
+    render(<ModelViewerCore splat={mockSplat} />);
+    // Since GSplat is mocked to return null, we check if it was called
+    const GSplatMock = vi.mocked(GSplat);
+    expect(GSplatMock).toHaveBeenCalledWith(expect.objectContaining({ asset: mockSplat }), undefined);
+    
+    const OrbitControlsMock = vi.mocked(OrbitControls);
+    expect(OrbitControlsMock).toHaveBeenCalledWith(expect.any(Object), undefined); // Expect any object for props, and undefined for the second arg
+  });
+
+  it('does not render GSplat and OrbitControls when splat prop is null', () => {
+    render(<ModelViewerCore splat={null} />);
+    const GSplatMock = vi.mocked(GSplat);
+    expect(GSplatMock).not.toHaveBeenCalled();
+    
+    const OrbitControlsMock = vi.mocked(OrbitControls);
+    expect(OrbitControlsMock).not.toHaveBeenCalled();
+  });
+
+  it('passes fov prop to Camera component', () => {
+    render(<ModelViewerCore splat={null} fov={90} />);
+    const CameraMock = vi.mocked(Camera);
+    expect(CameraMock).toHaveBeenCalledWith(expect.objectContaining({ fov: 90 }), undefined);
+  });
+
+  it('uses default fov when not provided', () => {
+    render(<ModelViewerCore splat={null} />);
+    const CameraMock = vi.mocked(Camera);
+    expect(CameraMock).toHaveBeenCalledWith(expect.objectContaining({ fov: 60 }), undefined);
+  });
+
+  it('passes distance props to OrbitControls component', () => {
+    render(<ModelViewerCore splat={{}} distanceMin={1} distanceMax={10} distance={5} />);
+    const OrbitControlsMock = vi.mocked(OrbitControls);
+    expect(OrbitControlsMock).toHaveBeenCalledWith(expect.objectContaining({
+      distanceMin: 1,
+      distanceMax: 10,
+      distance: 5,
+    }), undefined);
+  });
+
+  it('passes pitch angle props to OrbitControls component', () => {
+    render(<ModelViewerCore splat={{}} pitchAngleMin={-45} pitchAngleMax={45} />);
+    const OrbitControlsMock = vi.mocked(OrbitControls);
+    expect(OrbitControlsMock).toHaveBeenCalledWith(expect.objectContaining({
+      pitchAngleMin: -45,
+      pitchAngleMax: 45,
+    }), undefined);
+  });
+
+  it('passes position prop to GSplat Entity', async () => { // Added async
+    const mockSplat = {};
+    const testPosition: [number, number, number] = [1, 2, 3];
+    await act(async () => { // Added await and async
+      render(<ModelViewerCore splat={mockSplat} position={testPosition} />);
+    });
+    const mockedEntity = vi.mocked(Entity);
+    const splatEntityCall = mockedEntity.mock.calls.find(call => call[0].position && call[0].rotation && call[0].scale);
+    expect(splatEntityCall?.[0].position).toEqual(testPosition);
+  });
+
+  it('passes rotation prop to GSplat Entity', async () => { // Added async
+    const mockSplat = {};
+    const testRotation: [number, number, number] = [90, 180, 270];
+    await act(async () => { // Added await and async
+      render(<ModelViewerCore splat={mockSplat} rotation={testRotation} />);
+    });
+    const mockedEntity = vi.mocked(Entity);
+    const splatEntityCall = mockedEntity.mock.calls.find(call => call[0].position && call[0].rotation && call[0].scale);
+    expect(splatEntityCall?.[0].rotation).toEqual(testRotation);
+  });
+
+  it('passes scale prop to GSplat Entity', async () => { // Added async
+    const mockSplat = {};
+    const testScale: [number, number, number] = [2, 2, 2];
+    await act(async () => { // Added await and async
+      render(<ModelViewerCore splat={mockSplat} scale={testScale} />);
+    });
+    const mockedEntity = vi.mocked(Entity);
+    const splatEntityCall = mockedEntity.mock.calls.find(call => call[0].position && call[0].rotation && call[0].scale);
+    expect(splatEntityCall?.[0].scale).toEqual(testScale);
+  });
+
+  it('initializes DualRangeSliderControl for camera distance with correct props when settings are true', () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+    act(() => {
+      render(<ModelViewerCore splat={null} distanceMin={0.5} distanceMax={15} />);
+    });
+    const distanceSlider = screen.getAllByTestId('mock-dual-range-slider')[0];
+    expect(distanceSlider).toHaveAttribute('data-min-value', '0.5');
+    expect(distanceSlider).toHaveAttribute('data-max-value', '15');
+  });
+
+  it('initializes DualRangeSliderControl for camera pitch angle with correct props when settings are true', () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+    act(() => {
+      render(<ModelViewerCore splat={null} pitchAngleMin={-30} pitchAngleMax={60} />);
+    });
+    const pitchAngleSlider = screen.getAllByTestId('mock-dual-range-slider')[1];
+    expect(pitchAngleSlider).toHaveAttribute('data-min-value', '-30');
+    expect(pitchAngleSlider).toHaveAttribute('data-max-value', '60');
+  });
+
+  it('initializes SingleValueSliderControl for model position with correct props when settings are true', () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+    const testPosition: [number, number, number] = [1.1, 2.2, 3.3];
+    act(() => {
+      render(<ModelViewerCore splat={null} position={testPosition} />);
+    });
+    const positionSliders = screen.getAllByTestId('mock-single-value-slider').slice(0, 3);
+    expect(positionSliders[0]).toHaveAttribute('data-value', '1.1');
+    expect(positionSliders[1]).toHaveAttribute('data-value', '2.2');
+    expect(positionSliders[2]).toHaveAttribute('data-value', '3.3');
+  });
+
+  it('initializes SingleValueSliderControl for model rotation with correct props when settings are true', () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+    const testRotation: [number, number, number] = [10, 20, 30];
+    act(() => {
+      render(<ModelViewerCore splat={null} rotation={testRotation} />);
+    });
+    const rotationSliders = screen.getAllByTestId('mock-single-value-slider').slice(3, 6);
+    expect(rotationSliders[0]).toHaveAttribute('data-value', '10');
+    expect(rotationSliders[1]).toHaveAttribute('data-value', '20');
+    expect(rotationSliders[2]).toHaveAttribute('data-value', '30');
   });
 });

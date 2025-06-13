@@ -179,14 +179,14 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         ```
         -   Target components
         -   [x] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
-            -   [ ] b. `src/components/DualRangeSliderControl.tsx`
-            -   [ ] c. `src/components/Grid.tsx`
-            -   [ ] d. `src/components/ModelLoadingProgress.tsx`
-            -   [ ] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
-            -   [ ] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
-            -   [ ] g. `src/components/ServiceWorkerRegistrar.tsx`
-            -   [ ] h. `src/components/SingleValueSliderControl.tsx`
-            -   [ ] i. `src/components/SwaroboLogo.tsx`
+            -   [x] b. `src/components/DualRangeSliderControl.tsx`
+            -   [x] c. `src/components/Grid.tsx`
+            -   [x] d. `src/components/ModelLoadingProgress.tsx`
+            -   [x] e. `src/components/ModelViewer.tsx` (Focus on props and rendering children, mock `ModelViewerCore`)
+            -   [x] f. `src/components/ModelViewerCore.tsx` (This will be complex. Focus on prop handling and basic setup. Mock PlayCanvas interactions heavily or test only what's feasible without a full 3D context in JSDOM).
+            -   [x] g. `src/components/ServiceWorkerRegistrar.tsx`
+            -   [x] h. `src/components/SingleValueSliderControl.tsx`
+            -   [x] i. `src/components/SwaroboLogo.tsx`
             -   [ ] j. `src/hooks/useModelData.ts`
             -   [ ] k. `src/hooks/usePlayCanvasSetup.ts` (Mock PlayCanvas extensively)
             -   [ ] l. `src/hooks/useSplatWithProgress.ts` (Mock PlayCanvas and file loading)

@@ -151,8 +151,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             </Entity>
             {/* Create the splat entity - now directly uses props */}
             <Entity
-                position={position} // Use prop directly
-                rotation={rotation} // Use prop directly
+                position={controlPosition} // Use controlPosition state
+                rotation={controlRotation} // Use controlRotation state
                 scale={scale}
             >
                 {splat && <GSplat asset={splat} />}

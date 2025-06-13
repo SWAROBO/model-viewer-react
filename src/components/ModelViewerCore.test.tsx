@@ -5,11 +5,17 @@ import { useSearchParams } from 'next/navigation'; // Import the hook to mock it
 import { Entity } from '@playcanvas/react'; // Import Entity to use vi.mocked
 import { Camera, GSplat, EnvAtlas } from '@playcanvas/react/components'; // Import components for mocking
 import { OrbitControls } from '../lib/@playcanvas/react'; // Import OrbitControls for mocking
+import DualRangeSliderControl from './DualRangeSliderControl'; // Import as value
+import SingleValueSliderControl from './SingleValueSliderControl'; // Import as value
+
+// Store onInput functions from mocked components
+const dualRangeOnInputs = new Map<string, (values: number[]) => void>();
+const singleValueOnInputs = new Map<string, (value: number) => void>();
 
 // Mock PlayCanvas components and hooks
 // Mock the main @playcanvas/react package for Entity
 vi.mock('@playcanvas/react', () => ({
-  Entity: vi.fn(({ children, position, rotation, scale }) => <>{children}</>), // Capture specific props
+  Entity: vi.fn(({ children, position, rotation, scale }) => <>{children}</>),
 }));
 
 // Mock @playcanvas/react/components
@@ -38,37 +44,47 @@ vi.mock('next/navigation', () => ({
 vi.mock('./AutoRotate', () => ({ default: vi.fn(() => <div data-testid="mock-auto-rotate"></div>) }));
 vi.mock('./Grid', () => ({ default: vi.fn(() => <div data-testid="mock-grid"></div>) }));
 vi.mock('./DualRangeSliderControl', () => ({
-  default: vi.fn(({ onInput, title, minLabel, maxLabel, minValue, maxValue, sliderMin, sliderMax, step }) => (
-    <div
-      data-testid="mock-dual-range-slider"
-      data-title={title}
-      data-min-label={minLabel}
-      data-max-label={maxLabel}
-      data-min-value={minValue}
-      data-max-value={maxValue}
-      data-slider-min={sliderMin}
-      data-slider-max={sliderMax}
-      data-step={step}
-    ></div>
-  )),
+  default: vi.fn(({ onInput, title, minLabel, maxLabel, minValue, maxValue, sliderMin, sliderMax, step }) => {
+    dualRangeOnInputs.set(title, onInput); // Store the onInput function
+    return (
+      <div
+        data-testid="mock-dual-range-slider"
+        data-title={title}
+        data-min-label={minLabel}
+        data-max-label={maxLabel}
+        data-min-value={minValue}
+        data-max-value={maxValue}
+        data-slider-min={sliderMin}
+        data-slider-max={sliderMax}
+        data-step={step}
+      ></div>
+    )
+  }),
 }));
 vi.mock('./SingleValueSliderControl', () => ({
-  default: vi.fn(({ onInput, label, value, sliderMin, sliderMax, step }) => (
-    <div
-      data-testid="mock-single-value-slider"
-      data-label={label}
-      data-value={value}
-      data-slider-min={sliderMin}
-      data-slider-max={sliderMax}
-      data-step={step}
-    ></div>
-  )),
+  default: vi.fn(({ onInput, label, value, sliderMin, sliderMax, step }) => {
+    singleValueOnInputs.set(label, onInput); // Store the onInput function
+    return (
+      <div
+        data-testid="mock-single-value-slider"
+        data-label={label}
+        data-value={value}
+        data-slider-min={sliderMin}
+        data-slider-max={sliderMax}
+        data-step={step}
+      ></div>
+    )
+  }),
 }));
 
 
 describe('ModelViewerCore', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Clear the stored onInput functions before each test
+    dualRangeOnInputs.clear();
+    singleValueOnInputs.clear();
+
     (useSearchParams as any).mockReturnValue({
       get: vi.fn((param) => {
         if (param === 'settings') return 'false';
@@ -264,5 +280,155 @@ describe('ModelViewerCore', () => {
     expect(rotationSliders[0]).toHaveAttribute('data-value', '10');
     expect(rotationSliders[1]).toHaveAttribute('data-value', '20');
     expect(rotationSliders[2]).toHaveAttribute('data-value', '30');
+  });
+
+  it('updates camera distance range and passes to OrbitControls when DualRangeSliderControl is interacted with', async () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+
+    const initialDistanceMin = 0.1;
+    const initialDistanceMax = 30;
+    const newDistanceMin = 5;
+    const newDistanceMax = 20;
+
+    await act(async () => { // Wrap render in act
+      render(<ModelViewerCore splat={{}} distanceMin={initialDistanceMin} distanceMax={initialDistanceMax} />);
+    });
+
+    const onInputDistance = dualRangeOnInputs.get('Camera Distance Settings');
+
+    expect(onInputDistance).toBeDefined();
+
+    await act(async () => {
+      onInputDistance!([newDistanceMin, newDistanceMax]);
+    });
+
+    // Verify OrbitControls received the updated distance range
+    const OrbitControlsMock = vi.mocked(OrbitControls);
+    expect(OrbitControlsMock).toHaveBeenCalledWith(expect.objectContaining({
+      distanceMin: newDistanceMin,
+      distanceMax: newDistanceMax,
+    }), undefined);
+  });
+
+  it('updates camera pitch angle range and passes to OrbitControls when DualRangeSliderControl is interacted with', async () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+
+    const initialPitchMin = -90;
+    const initialPitchMax = 90;
+    const newPitchMin = -45;
+    const newPitchMax = 45;
+
+    await act(async () => { // Wrap render in act
+      render(<ModelViewerCore splat={{}} pitchAngleMin={initialPitchMin} pitchAngleMax={initialPitchMax} />);
+    });
+
+    const onInputPitchAngle = dualRangeOnInputs.get('Camera Pitch Angle Settings');
+
+    expect(onInputPitchAngle).toBeDefined();
+
+    await act(async () => {
+      onInputPitchAngle!([newPitchMin, newPitchMax]);
+    });
+
+    // Verify OrbitControls received the updated pitch angle range
+    const OrbitControlsMock = vi.mocked(OrbitControls);
+    expect(OrbitControlsMock).toHaveBeenCalledWith(expect.objectContaining({
+      pitchAngleMin: newPitchMin,
+      pitchAngleMax: newPitchMax,
+    }), undefined);
+  });
+
+  it('updates model position and passes to GSplat Entity when SingleValueSliderControl is interacted with', async () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+
+    const initialPosition: [number, number, number] = [0, 0, 0];
+    const newX = 1.5;
+    const newY = -0.5;
+    const newZ = 2.0;
+
+    await act(async () => { // Wrap render in act
+      render(<ModelViewerCore splat={{}} position={initialPosition} />);
+    });
+
+    // Find the onInput for Position X
+    const onInputPositionX = singleValueOnInputs.get('Position X');
+    expect(onInputPositionX).toBeDefined();
+
+    // Find the onInput for Position Y
+    const onInputPositionY = singleValueOnInputs.get('Position Y');
+    expect(onInputPositionY).toBeDefined();
+
+    // Find the onInput for Position Z
+    const onInputPositionZ = singleValueOnInputs.get('Position Z');
+    expect(onInputPositionZ).toBeDefined();
+
+    await act(async () => {
+      onInputPositionX!(newX);
+      onInputPositionY!(newY);
+      onInputPositionZ!(newZ);
+    });
+
+    // Verify the Entity received the updated position
+    const mockedEntity = vi.mocked(Entity);
+    // Check the last call to Entity to get the most recent props
+    const splatEntityCall = mockedEntity.mock.lastCall;
+    expect(splatEntityCall?.[0].position).toEqual([newX, newY, newZ]);
+  });
+
+  it('updates model rotation and passes to GSplat Entity when SingleValueSliderControl is interacted with', async () => {
+    (useSearchParams as any).mockReturnValue({
+      get: vi.fn((param) => {
+        if (param === 'settings') return 'true';
+        return null;
+      }),
+    });
+
+    const initialRotation: [number, number, number] = [0, 0, 0];
+    const newX = 45;
+    const newY = 90;
+    const newZ = -30;
+
+    await act(async () => { // Wrap render in act
+      render(<ModelViewerCore splat={{}} rotation={initialRotation} />);
+    });
+
+    // Find the onInput for Rotation X
+    const onInputRotationX = singleValueOnInputs.get('Rotation X');
+    expect(onInputRotationX).toBeDefined();
+
+    // Find the onInput for Rotation Y
+    const onInputRotationY = singleValueOnInputs.get('Rotation Y');
+    expect(onInputRotationY).toBeDefined();
+
+    // Find the onInput for Rotation Z
+    const onInputRotationZ = singleValueOnInputs.get('Rotation Z');
+    expect(onInputRotationZ).toBeDefined();
+
+    await act(async () => {
+      onInputRotationX!(newX);
+      onInputRotationY!(newY);
+      onInputRotationZ!(newZ);
+    });
+
+    // Verify the Entity received the updated rotation
+    const mockedEntity = vi.mocked(Entity);
+    // Check the last call to Entity to get the most recent props
+    const splatEntityCall = mockedEntity.mock.lastCall;
+    expect(splatEntityCall?.[0].rotation).toEqual([newX, newY, newZ]);
   });
 });

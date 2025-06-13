@@ -41,7 +41,10 @@ describe('AutoRotate Component', () => {
     
     expect(mockScriptComponent).toHaveBeenCalledTimes(1);
     expect(mockScriptComponent).toHaveBeenCalledWith(
-      { script: MockAutoRotatorScriptFn }, // The props object
+      expect.objectContaining({
+        script: MockAutoRotatorScriptFn,
+        'data-testid': 'auto-rotate-script', // Expect the data-testid prop
+      }),
       undefined // The second argument (context/ref) for a simple functional component
     );
 
@@ -59,6 +62,29 @@ describe('AutoRotate Component', () => {
       expect.objectContaining({
         script: MockAutoRotatorScriptFn,
         speed: testPropValue,
+      }),
+      undefined
+    );
+  });
+
+  it('should correctly pass the enabled prop to the Script component', () => {
+    // Test with enabled = false
+    render(<AutoRotate enabled={false} />);
+    expect(mockScriptComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        script: MockAutoRotatorScriptFn,
+        enabled: false,
+      }),
+      undefined
+    );
+    mockScriptComponent.mockClear(); // Clear calls for the next render
+
+    // Test with enabled = true
+    render(<AutoRotate enabled={true} />);
+    expect(mockScriptComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        script: MockAutoRotatorScriptFn,
+        enabled: true,
       }),
       undefined
     );

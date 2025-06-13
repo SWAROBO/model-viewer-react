@@ -178,7 +178,7 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         });
         ```
         -   Target components
-            -   [ ] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
+        -   [x] a. `src/components/AutoRotate.tsx` (Basic rendering test implemented)
             -   [ ] b. `src/components/DualRangeSliderControl.tsx`
             -   [ ] c. `src/components/Grid.tsx`
             -   [ ] d. `src/components/ModelLoadingProgress.tsx`

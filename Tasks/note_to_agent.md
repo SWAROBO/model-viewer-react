@@ -44,4 +44,9 @@ This note summarizes key challenges and solutions encountered while implementing
 -   For components or hooks that do not accept explicit `props` (e.g., `ServiceWorkerRegistrar`, `SwaroboLogo`, `usePlayCanvasSetup`), "Props Testing" (as per the checklist) is considered complete if their behavior, which might depend on global objects, context, or internal logic, is thoroughly tested under various relevant conditions.
 -   The existing tests for `ServiceWorkerRegistrar`, `SwaroboLogo`, `useModelData`, `usePlayCanvasSetup`, and `useSplatWithProgress` were found to be sufficient in this regard, as they covered the component/hook's reaction to different environmental states or data inputs that implicitly act as their "props."
 
+## 7. Handling `data-testid` in Unit Tests
+
+-   When adding `data-testid` attributes to components for E2E testing, remember that these attributes are passed as props to the underlying elements/components.
+-   If you are mocking a child component and asserting on the props it receives, you must update your unit tests to expect the `data-testid` prop if it's being passed. Use `expect.objectContaining` to include the `data-testid` in your expected props.
+
 By keeping these points in mind, the next agent should have a smoother experience when working on similar tasks.

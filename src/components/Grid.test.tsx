@@ -17,4 +17,12 @@ describe('Grid', () => {
     expect(scriptComponent).toBeInTheDocument();
     expect(scriptComponent).toHaveAttribute('data-script-name', 'GridScript');
   });
+
+  it('should correctly pass additional props to the Script component', () => {
+    const testPropValue = 50;
+    render(<Grid size={testPropValue} />);
+
+    const scriptComponent = screen.getByTestId('mock-playcanvas-script');
+    expect(scriptComponent).toHaveAttribute('size', testPropValue.toString());
+  });
 });

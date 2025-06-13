@@ -2,7 +2,7 @@ import { Script } from "@playcanvas/react/components";
 import { Grid as GridScript } from "@playcanvas/react/scripts";
 import { FC } from "react";
 
-const Grid: FC = ({ ...props }) => {
+const Grid: FC<Record<string, unknown>> = ({ ...props }) => {
     return <Script script={GridScript} {...props} />
 }
 

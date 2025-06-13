@@ -22,7 +22,7 @@ const EnvAtlasComponent = ({ src }: { src: string }) => {
     );
 };
 
-type ModelViewerCoreProps = {
+export type ModelViewerCoreProps = { // Added export keyword
     splat: any | null; // Using 'any' temporarily for PlayCanvas Asset type
     fov?: number;
     distanceMin?: number;

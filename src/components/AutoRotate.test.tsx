@@ -49,4 +49,18 @@ describe('AutoRotate Component', () => {
     expect(mockScriptElement).toBeInTheDocument();
     expect(mockScriptElement).toHaveAttribute('data-script-name', 'AutoRotator');
   });
+
+  it('should correctly pass additional props to the Script component', () => {
+    const testPropValue = 10;
+    render(<AutoRotate speed={testPropValue} />);
+
+    expect(mockScriptComponent).toHaveBeenCalledTimes(1);
+    expect(mockScriptComponent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        script: MockAutoRotatorScriptFn,
+        speed: testPropValue,
+      }),
+      undefined
+    );
+  });
 });

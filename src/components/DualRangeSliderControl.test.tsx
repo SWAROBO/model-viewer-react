@@ -1,8 +1,41 @@
-import { render, screen } from '@testing-library/react';
-import DualRangeSliderControl from './DualRangeSliderControl';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
+import type DualRangeSliderControlType from './DualRangeSliderControl'; // Import type for dynamic import
+
+// Mock the react-range-slider-input library
+const MockRangeSlider = vi.fn((props) => {
+  // Render a simple div or input that reflects the props for testing purposes
+  return (
+    <div data-testid="mock-range-slider"
+      data-min={props.min}
+      data-max={props.max}
+      data-step={props.step}
+      data-value={JSON.stringify(props.value)}
+      onClick={() => props.onInput && props.onInput([props.min + 10, props.max - 10])} // Simulate input
+    >
+      Mock Range Slider
+    </div>
+  );
+});
+
+vi.doMock('react-range-slider-input', () => ({
+  __esModule: true,
+  default: MockRangeSlider,
+}));
 
 describe('DualRangeSliderControl', () => {
+  let DualRangeSliderControl: typeof DualRangeSliderControlType;
+
+  beforeAll(async () => {
+    // Dynamically import the component *after* mocks are set up
+    const module = await import('./DualRangeSliderControl');
+    DualRangeSliderControl = module.default;
+  });
+
+  beforeEach(() => {
+    // Clear mock call history before each test
+    MockRangeSlider.mockClear();
+  });
   const defaultProps = {
     title: 'Test Slider',
     minLabel: 'Min',
@@ -23,11 +56,51 @@ describe('DualRangeSliderControl', () => {
     expect(screen.getByText(/Max: 80.00/)).toBeInTheDocument();
   });
 
-  it('renders the range slider with correct values', () => {
+  it('passes correct props to the RangeSlider component', () => {
     render(<DualRangeSliderControl {...defaultProps} />);
-    const sliders = screen.getAllByRole('slider');
-    expect(sliders.length).toBe(2)
-    expect(sliders[0]).toHaveAttribute('aria-valuenow', '20');
-    expect(sliders[1]).toHaveAttribute('aria-valuenow', '80');
+
+    expect(MockRangeSlider).toHaveBeenCalledTimes(1);
+    expect(MockRangeSlider).toHaveBeenCalledWith(
+      expect.objectContaining({
+        min: defaultProps.sliderMin,
+        max: defaultProps.sliderMax,
+        step: defaultProps.step,
+        value: [defaultProps.minValue, defaultProps.maxValue],
+        onInput: expect.anything(), // We'll test the function call separately
+      }),
+      undefined // Second argument is context/ref, usually undefined for functional components
+    );
+
+    const mockSlider = screen.getByTestId('mock-range-slider');
+    expect(mockSlider).toHaveAttribute('data-min', defaultProps.sliderMin.toString());
+    expect(mockSlider).toHaveAttribute('data-max', defaultProps.sliderMax.toString());
+    expect(mockSlider).toHaveAttribute('data-step', defaultProps.step.toString());
+    expect(mockSlider).toHaveAttribute('data-value', JSON.stringify([defaultProps.minValue, defaultProps.maxValue]));
+  });
+
+  it('calls onInput when the mocked RangeSlider triggers input', () => {
+    const handleInput = vi.fn();
+    render(<DualRangeSliderControl {...defaultProps} onInput={handleInput} />);
+
+    const mockSlider = screen.getByTestId('mock-range-slider');
+    fireEvent.click(mockSlider); // Simulate an interaction that triggers onInput
+
+    expect(handleInput).toHaveBeenCalledTimes(1);
+    // The mock's onClick passes [min + 10, max - 10]
+    expect(handleInput).toHaveBeenCalledWith([defaultProps.sliderMin + 10, defaultProps.sliderMax - 10]);
+  });
+
+  it('updates displayed min/max labels when props change', () => {
+    const { rerender } = render(<DualRangeSliderControl {...defaultProps} />);
+
+    expect(screen.getByText(/Min: 20.00/)).toBeInTheDocument();
+    expect(screen.getByText(/Max: 80.00/)).toBeInTheDocument();
+
+    const newMinValue = 25;
+    const newMaxValue = 75;
+    rerender(<DualRangeSliderControl {...defaultProps} minValue={newMinValue} maxValue={newMaxValue} />);
+
+    expect(screen.getByText(`Min: ${newMinValue.toFixed(2)}`)).toBeInTheDocument();
+    expect(screen.getByText(`Max: ${newMaxValue.toFixed(2)}`)).toBeInTheDocument();
   });
 });

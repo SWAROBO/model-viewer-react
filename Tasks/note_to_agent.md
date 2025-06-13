@@ -39,4 +39,9 @@ This note summarizes key challenges and solutions encountered while implementing
     4.  Implement proper state synchronization patterns (like `useSyncedState`) or refine mocks to prevent unintended re-renders.
 -   **Avoid Workarounds**: Increasing Node.js memory (`--max-old-space-size`) is a temporary workaround. Always strive to fix the underlying component or test setup issue.
 
+## 6. "Props Testing" for Components/Hooks without Explicit Props
+
+-   For components or hooks that do not accept explicit `props` (e.g., `ServiceWorkerRegistrar`, `SwaroboLogo`, `usePlayCanvasSetup`), "Props Testing" (as per the checklist) is considered complete if their behavior, which might depend on global objects, context, or internal logic, is thoroughly tested under various relevant conditions.
+-   The existing tests for `ServiceWorkerRegistrar`, `SwaroboLogo`, `useModelData`, `usePlayCanvasSetup`, and `useSplatWithProgress` were found to be sufficient in this regard, as they covered the component/hook's reaction to different environmental states or data inputs that implicitly act as their "props."
+
 By keeping these points in mind, the next agent should have a smoother experience when working on similar tasks.

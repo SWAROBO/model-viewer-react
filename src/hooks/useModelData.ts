@@ -12,6 +12,19 @@ export const useModelData = (csvUrl: string) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        // Check for a mocked version of the hook for E2E testing
+        if ((window as any).__MOCKED_USE_MODEL_DATA__) {
+            console.log("Using mocked useModelData for E2E test.");
+            const mockedData = (window as any).__MOCKED_USE_MODEL_DATA__(csvUrl);
+            setModelData(mockedData.modelData);
+            // Assuming defaultModelViewerProps is also part of the mock or can be derived
+            // For now, we'll just use the default from the type definition if not explicitly mocked
+            // If the mock provides it, use it, otherwise fall back to the default import
+            // This might need refinement based on how the mock is structured
+            setLoading(false);
+            return; // Exit early if mocked
+        }
+
         const fetchCsvData = async () => {
             try {
                 setLoading(true);

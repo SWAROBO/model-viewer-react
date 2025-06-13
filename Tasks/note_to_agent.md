@@ -87,3 +87,10 @@ By keeping these points in mind, the next agent should have a smoother experienc
 -   **Robust E2E assertions for 3D viewers**: Instead of relying on `toBeVisible()` for the main container of a 3D viewer, it's more reliable to assert on the presence and dimensions of the `canvas` element that the 3D engine renders, with an increased timeout to account for initialization time.
 -   **Separating Vitest and Playwright test runs**: It's crucial to configure `vite.config.mts` to exclude Playwright test files (`*.spec.ts`) from Vitest runs (`npm run test`) and run Playwright tests separately using `npm run test:e2e`.
 -   **Installing Playwright browsers**: Remember to run `npx playwright install` if browser executables are not found.
+
+## 16. E2E Testing for Model Loading
+
+-   The existing `e2e/app-load.spec.ts` test can be adapted to test model loading by adding a `splatURL` query parameter to the `page.goto` call. This triggers the `useSplatWithProgress` hook and the `ModelLoadingProgress` component.
+-   Creating a dummy `.splat` file (e.g., `public/test.splat`) is necessary to simulate a model load without requiring a real, large model file.
+-   Assertions on the `model-loading-progress-container` to be hidden and the `canvas` element to be visible are sufficient to verify successful model loading in E2E tests.
+-   **Mocking `useModelData` in Playwright**: When mocking `useModelData` using `page.addInitScript` (e.g., `window.__MOCKED_USE_MODEL_DATA__`), ensure that the `useModelData` hook itself (`src/hooks/useModelData.ts`) explicitly checks for and uses this global mock. Without this check, the hook will attempt to fetch real data, bypassing the mock and leading to test failures, especially when trying to force error states. The fix involved modifying `src/hooks/useModelData.ts` to prioritize the `window.__MOCKED_USE_MODEL_DATA__` if it exists.

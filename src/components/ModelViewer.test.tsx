@@ -172,6 +172,6 @@ describe('ModelViewer', () => {
       loading: false,
     });
     rerender(<ModelViewer splatURL="test.splat" />); // Rerender to reflect state change
-    expect(screen.queryByTestId('model-loading-progress-container')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('model-loading-progress-container')).toHaveStyle('display: none');
   });
 });

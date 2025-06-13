@@ -27,13 +27,13 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         setDownloadProgress(progress);
     }, []);
 
-    const { asset: splat, loading } = useSplatWithProgress(splatURL, handleProgress);
+    const { asset: splat, loading, error } = useSplatWithProgress(splatURL, handleProgress); // Destructure error
 
     usePlayCanvasSetup(); // Use the custom hook for PlayCanvas setup
 
     return (
         <div data-testid="model-viewer-container">
-            <ModelLoadingProgress downloadProgress={downloadProgress} loading={loading} />
+            <ModelLoadingProgress downloadProgress={downloadProgress} loading={loading} error={error} /> {/* Pass error prop */}
             <ModelViewerCore
                 splat={splat}
                 fov={fov}

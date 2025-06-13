@@ -314,9 +314,10 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         -   [x] ii. Verify the main page loads, title is correct.
         -   [x] iii. Verify `ModelViewer` component is present.
     b.  **Load a Model:**
-        -   [ ] i. (If there's a file input or selection mechanism) Interact with it to load a model.
-        -   [ ] ii. (If a default model loads) Verify the model appears (e.g., canvas element is present and has some content, or a loading indicator disappears and a success message/state appears).
-        -   [ ] iii. Verify loading progress indicator works if applicable.
+        -   [x] i. (If there's a file input or selection mechanism) Interact with it to load a model.
+        -   [x] ii. (If a default model loads) Verify the model appears (e.g., canvas element is present and has some content, or a loading indicator disappears and a success message/state appears).
+        -   [x] iii. Verify loading progress indicator works if applicable.
+        -   [x] iv. **Fix Implemented**: Resolved issue where "should display an error message when a model fails to load" E2E test was failing due to `useModelData` mock not being applied correctly. Modified `src/hooks/useModelData.ts` to check for `window.__MOCKED_USE_MODEL_DATA__` for E2E testing. All unit and E2E tests now pass, and browser check confirms functionality.
     c.  **Interact with Auto-Rotate Control:**
         -   [ ] i. Find and click the auto-rotate button.
         -   [ ] ii. Visually (if possible via screenshot diffing, or by checking some state exposed to DOM) or programmatically verify rotation starts/stops.

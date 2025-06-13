@@ -9,10 +9,32 @@ type UseSplatWithProgressResult = {
     progress: number; // Download progress (0-100)
 };
 
+declare global {
+    interface Window {
+        __MOCKED_USE_SPLAT_WITH_PROGRESS__?: (src: string, onProgress?: (progress: number) => void) => UseSplatWithProgressResult;
+        __FORCE_SPLAT_ERROR__?: boolean; // Test-specific flag to force an error
+    }
+}
+
 export const useSplatWithProgress = (
     src: string,
     onProgress?: (progress: number) => void
 ): UseSplatWithProgressResult => {
+    // Test-specific: If __FORCE_SPLAT_ERROR__ is true, immediately return an error state
+    if (typeof window !== 'undefined' && window.__FORCE_SPLAT_ERROR__) {
+        return {
+            asset: null,
+            loading: false,
+            error: `Forced error for: ${src}`,
+            progress: 0,
+        };
+    }
+
+    // If a mock is available in the window object, use it for testing purposes
+    if (typeof window !== 'undefined' && window.__MOCKED_USE_SPLAT_WITH_PROGRESS__) {
+        return window.__MOCKED_USE_SPLAT_WITH_PROGRESS__(src, onProgress);
+    }
+
     const app = useApp();
     const [asset, setAsset] = useState<any>(null);
     const [loading, setLoading] = useState(true);

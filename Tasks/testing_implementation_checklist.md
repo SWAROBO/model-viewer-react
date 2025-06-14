@@ -344,12 +344,12 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
     2.  Assert on the value of this `data-` attribute in Playwright tests (e.g., `expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true')`). This provides a reliable way to verify the component's intended rendering state through an observable DOM property.
 
 2.  **For each E2E test scenario (in `e2e/*.spec.ts` files):**
-    -   [ ] a. Use Playwright's `test` and `expect` API.
-    -   [ ] b. Use locators (`page.getByRole`, `page.getByLabel`, `page.getByTestId`, etc.) to find elements.
-    -   [ ] c. Perform actions (`click`, `fill`, `dragTo`).
-    -   [ ] d. Make assertions (`expect(locator).toBeVisible()`, `expect(page).toHaveURL()`, `expect(locator).toHaveAttribute()`).
-    -   [ ] e. Consider using `page.waitForSelector` or auto-waiting locators for dynamic content.
-    -   [ ] f. Add `data-testid` attributes to key elements in your React components to make them easier to select in Playwright tests.
+    -   [x] a. Use Playwright's `test` and `expect` API.
+    -   [x] b. Use locators (`page.getByRole`, `page.getByLabel`, `page.getByTestId`, etc.) to find elements.
+    -   [x] c. Perform actions (`click`, `fill`, `dragTo`).
+    -   [x] d. Make assertions (`expect(locator).toBeVisible()`, `expect(page).toHaveURL()`, `expect(locator).toHaveAttribute()`).
+    -   [x] e. Consider using `page.waitForSelector` or auto-waiting locators for dynamic content.
+    -   [x] f. Add `data-testid` attributes to key elements in your React components to make them easier to select in Playwright tests.
     ```typescript
     // e2e/app-load.spec.ts
     import { test, expect } from '@playwright/test';

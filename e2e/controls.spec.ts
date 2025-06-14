@@ -140,3 +140,31 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
   // Also assert that min is less than max
   expect(updatedMinValue).toBeLessThan(updatedMaxValue);
 });
+
+test('should toggle grid visibility', async ({ page }) => {
+  // Navigate to the settings page to ensure controls are visible
+  await page.goto('/?settings=true');
+
+  // Locate the grid visibility toggle checkbox
+  const gridToggle = page.getByTestId('grid-visibility-toggle');
+  await expect(gridToggle).toBeVisible();
+
+  // Locate the settings panel to check the data-grid-visible attribute
+  const settingsPanel = page.getByTestId('model-viewer-settings-panel');
+
+  // Initially, the grid should be visible (checkbox is checked by default)
+  await expect(gridToggle).toBeChecked();
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
+
+  // Click the toggle to hide the grid
+  await gridToggle.click();
+  await page.waitForTimeout(500); // Give time for the state to update and re-render
+  await expect(gridToggle).not.toBeChecked();
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false');
+
+  // Click the toggle again to show the grid
+  await gridToggle.click();
+  await page.waitForTimeout(500); // Give time for the state to update and re-render
+  await expect(gridToggle).toBeChecked();
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
+});

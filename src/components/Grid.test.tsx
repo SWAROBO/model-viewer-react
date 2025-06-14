@@ -3,7 +3,7 @@ import Grid from './Grid';
 
 // Mock the entire @playcanvas/react module to prevent issues with PlayCanvas dependencies in JSDOM
 vi.mock('@playcanvas/react/components', () => ({
-  Script: vi.fn(({ script, ...props }) => <div data-testid="mock-playcanvas-script" data-script-name={script?.name} {...props}></div>),
+  Script: vi.fn(({ script, ...props }) => <div data-testid="grid-script-component" data-script-name={script?.name} {...props}></div>),
 }));
 
 vi.mock('@playcanvas/react/scripts', () => ({
@@ -13,7 +13,7 @@ vi.mock('@playcanvas/react/scripts', () => ({
 describe('Grid', () => {
   it('renders the PlayCanvas Script component with GridScript', () => {
     render(<Grid />);
-    const scriptComponent = screen.getByTestId('mock-playcanvas-script');
+    const scriptComponent = screen.getByTestId('grid-script-component');
     expect(scriptComponent).toBeInTheDocument();
     expect(scriptComponent).toHaveAttribute('data-script-name', 'GridScript');
   });
@@ -22,7 +22,7 @@ describe('Grid', () => {
     const testPropValue = 50;
     render(<Grid size={testPropValue} />);
 
-    const scriptComponent = screen.getByTestId('mock-playcanvas-script');
+    const scriptComponent = screen.getByTestId('grid-script-component');
     expect(scriptComponent).toHaveAttribute('size', testPropValue.toString());
   });
 });

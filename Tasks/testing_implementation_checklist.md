@@ -335,8 +335,13 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
         -   [x] ii. Change its min/max values.
         -   [x] iii. Verify the change. **Implemented**: Successfully interacted with `react-range-slider-input` components using Playwright's mouse drag actions and XPath locators. Direct `fill()` and `getByRole` were not effective due to the component's custom DOM structure. Assertions verify value changes and bounds.
     f.  **Grid Visibility Toggle:**
-        -   [ ] i. Find and click the grid toggle.
-        -   [ ] ii. Verify grid appears/disappears.
+        -   [x] i. Find and click the grid toggle.
+        -   [x] ii. Verify grid appears/disappears.
+
+    **Note on PlayCanvas Component E2E Testing:**
+    Directly asserting on the visibility or presence of PlayCanvas React components (like `Script` or `Entity`) in the DOM using Playwright's `toBeVisible()` or `toHaveCount()` can be unreliable, as these components primarily render within a WebGL canvas. To effectively test their conditional rendering or state changes, it's recommended to:
+    1.  Add a `data-` attribute (e.g., `data-grid-visible`) to a visible parent DOM element (e.g., the settings panel) that reflects the internal state controlling the PlayCanvas component's rendering.
+    2.  Assert on the value of this `data-` attribute in Playwright tests (e.g., `expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true')`). This provides a reliable way to verify the component's intended rendering state through an observable DOM property.
 
 2.  **For each E2E test scenario (in `e2e/*.spec.ts` files):**
     -   [ ] a. Use Playwright's `test` and `expect` API.

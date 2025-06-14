@@ -70,6 +70,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
 
     const [isSliderActive, setIsSliderActive] = useState(false);
+    const [showGrid, setShowGrid] = useState(true); // New state for grid visibility
 
     // The useEffects for syncing controlPosition and controlRotation are now handled by useSyncedState
     // Removed the useEffect that applied controlPosition/Rotation to entity transform
@@ -126,7 +127,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
 
     return (
         <Entity>
-            <Grid />
+            {showGrid && <Grid />} {/* Conditionally render Grid */}
             {!showSettings && (
                 <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
             )}
@@ -160,6 +161,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
 
             {showSettings && (
                 <div
+                    data-testid="model-viewer-settings-panel" // Add data-testid to the settings panel
+                    data-grid-visible={showGrid} // Add attribute to reflect grid visibility
                     style={{
                         position: "absolute",
                         top: "10px",
@@ -237,6 +240,24 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                             }
                         />
                     ))}
+
+                    <h3 style={{ marginTop: "20px" }}>Display Settings</h3>
+                    <label
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "10px",
+                        }}
+                    >
+                        <input
+                            type="checkbox"
+                            checked={showGrid}
+                            onChange={(e) => setShowGrid(e.target.checked)}
+                            data-testid="grid-visibility-toggle"
+                            style={{ marginRight: "8px" }}
+                        />
+                        Show Grid
+                    </label>
                 </div>
             )}
         </Entity>

@@ -327,13 +327,13 @@ This checklist outlines the steps to implement unit, integration, and end-to-end
             -   Assert that the `AutoRotate` script component (`data-testid="auto-rotate-indicator"`) is *not* present in the DOM.
         -   [x] iii. **Visual Verification (Confirmed)**: Visually verified that the model rotates when `AutoRotate` is present and stops when it's absent by comparing screenshots taken after a delay.
     d.  **Interact with Slider Controls (e.g., Camera FOV, Exposure):**
-        -   [ ] i. Find a slider control.
-        -   [ ] ii. Change its value.
-        -   [ ] iii. Verify the change is reflected (e.g., a visual change in the model, or an attribute on the canvas/viewer element if PlayCanvas updates one). This might be hard to verify precisely without deeper PlayCanvas integration or specific DOM attributes being updated by the viewer.
+        -   [x] i. Find a slider control.
+        -   [x] ii. Change its value.
+        -   [x] iii. Verify the change is reflected (e.g., a visual change in the model, or an attribute on the canvas/viewer element if PlayCanvas updates one). This might be hard to verify precisely without deeper PlayCanvas integration or specific DOM attributes being updated by the viewer.
     e.  **Interact with Dual Range Slider Controls (e.g., Clipping Planes):**
-        -   [ ] i. Find a dual range slider.
-        -   [ ] ii. Change its min/max values.
-        -   [ ] iii. Verify the change.
+        -   [x] i. Find a dual range slider.
+        -   [x] ii. Change its min/max values.
+        -   [x] iii. Verify the change. **Implemented**: Successfully interacted with `react-range-slider-input` components using Playwright's mouse drag actions and XPath locators. Direct `fill()` and `getByRole` were not effective due to the component's custom DOM structure. Assertions verify value changes and bounds.
     f.  **Grid Visibility Toggle:**
         -   [ ] i. Find and click the grid toggle.
         -   [ ] ii. Verify grid appears/disappears.

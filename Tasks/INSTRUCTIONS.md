@@ -17,6 +17,5 @@ Make sure by the end, check that all tests pass at the same time.
 
 4. Update the checklist.
 5. Update @/Tasks/note_to_agent.md with any learnings you have from this task which you think will be useful for the next agent.
-6. Generate the next task using new_task tool by copying the template from @/Tasks/instructions.md and updating the task number. The task should be exactly the same as the template. DO NOT ADD CONTEXTS or any other information.
 
 Task: Implement [TASK_NUMBER]

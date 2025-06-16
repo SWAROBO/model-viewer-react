@@ -1,7 +1,6 @@
 import React from 'react'; // Import React for JSX namespace
 import { render, screen } from '@testing-library/react';
-import { vi, MockInstance } from 'vitest';
-import type AutoRotateType from './AutoRotate'; // Import type for dynamic import
+import { vi } from 'vitest';
 
 // Define the mock function instance for the Script component
 const mockScriptComponent = vi.fn((props: { script?: { name?: string }, [key: string]: any }) => (
@@ -23,12 +22,12 @@ vi.doMock('@playcanvas/react/scripts', () => ({
 }));
 
 describe('AutoRotate Component', () => {
-  let AutoRotate: typeof AutoRotateType;
+  let AutoRotate: React.ComponentType<any>; // Use a more generic type or define props if needed
 
   beforeAll(async () => {
     // Dynamically import the component *after* mocks are set up
-    const module = await import('./AutoRotate');
-    AutoRotate = module.default;
+    const { default: AutoRotateComponent } = await import('./AutoRotate');
+    AutoRotate = AutoRotateComponent;
   });
 
   beforeEach(() => {

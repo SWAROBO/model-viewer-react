@@ -1,5 +1,6 @@
 /// <reference types="vitest/globals" />
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
+import { vi } from 'vitest'; // Explicitly import vi
 import { useModelData } from './useModelData';
 import Papa from 'papaparse';
 
@@ -105,7 +106,7 @@ model2,"10,20,30","1,2,3","2,2,2","https://example.com/model2.splat"`;
     // Mock Papa.parse implementation for this specific test
     papaParseSpy.mockImplementation((text: string, config: Papa.ParseConfig) => {
       if (config.error) {
-        config.error(mockParseError);
+        config.error(mockParseError, undefined); // Pass undefined for file and input
       }
     });
 

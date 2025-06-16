@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import SingleValueSliderControl from './SingleValueSliderControl';
-import RangeSlider from 'react-range-slider-input';
 
 // Mock the react-range-slider-input library
 vi.mock('react-range-slider-input', () => ({

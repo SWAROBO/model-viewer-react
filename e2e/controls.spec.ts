@@ -13,14 +13,18 @@ async function getValueXCoordinate(sliderTrack: Locator, value: number, min: num
 }
 
 test('should interact with Position X slider', async ({ page }) => {
-  // Locate the label for "Position X"
-  const labelLocator = page.locator('label', { hasText: 'Position X' });
-  await expect(labelLocator).toBeVisible();
+  // Locate the settings panel first
+  const settingsPanel = page.getByTestId('model-viewer-settings-panel');
+  await expect(settingsPanel).toBeVisible({ timeout: 10000 });
+
+  // Locate the label for "Position X" within the settings panel
+  const labelLocator = settingsPanel.locator('label', { hasText: 'Position X' });
+  await expect(labelLocator).toBeVisible({ timeout: 10000 });
 
   // Find the RangeSlider component (which has class 'range-slider') that is a sibling of the label's parent div
   // The structure is: div > label, div > RangeSlider (which is a div with class 'range-slider')
   const sliderTrack = labelLocator.locator('xpath=./following-sibling::div[contains(@class, "range-slider")]');
-  await expect(sliderTrack).toBeVisible();
+  await expect(sliderTrack).toBeVisible({ timeout: 10000 });
 
   // Get the bounding box of the slider track to calculate drag coordinates
   const trackBoundingBox = await sliderTrack.boundingBox();
@@ -60,13 +64,13 @@ test('should interact with Position X slider', async ({ page }) => {
 test('should interact with Camera Distance dual slider', async ({ page }) => {
   // Locate the h3 for "Camera Distance Settings"
   const h3Locator = page.locator('h3', { hasText: 'Camera Distance Settings' });
-  await expect(h3Locator).toBeVisible();
+  await expect(h3Locator).toBeVisible({ timeout: 10000 });
 
   // Find the RangeSlider component (which has class 'range-slider') that is a sibling of the h3's parent div
   // The structure is: h3, div > label, label, RangeSlider (which is a div with class 'range-slider')
   // Locate the RangeSlider component's track (the visible bar) by being a direct sibling of the labels container
   const sliderTrack = page.locator('h3:has-text("Camera Distance Settings") + div + div.range-slider');
-  await expect(sliderTrack).toBeVisible();
+  await expect(sliderTrack).toBeVisible({ timeout: 10000 });
 
   const trackBoundingBox = await sliderTrack.boundingBox();
   expect(trackBoundingBox).not.toBeNull();

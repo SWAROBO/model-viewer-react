@@ -8,10 +8,10 @@ const ServiceWorkerRegistrar = () => {
       // Register the service worker directly, not waiting for 'load'
       // Added window.self === window.top to prevent registration in iframes if any
       navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
+        .then(() => { // Removed 'registration'
           // console.log('Service Worker registered with scope:', registration.scope);
         })
-        .catch((error) => {
+        .catch(() => { // Removed 'error'
           // console.error('Service Worker registration failed:', error);
         });
     }

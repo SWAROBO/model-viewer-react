@@ -1,6 +1,5 @@
 import { render, screen, act } from '@testing-library/react';
 import { vi } from 'vitest';
-import type ModelViewerType from './ModelViewer'; // Import type for dynamic import
 import { ModelViewerProps, defaultModelViewerProps } from '../types/modelViewer'; // Import ModelViewerProps and default props
 import { ModelViewerCoreProps } from './ModelViewerCore'; // Import ModelViewerCoreProps
 
@@ -31,12 +30,12 @@ vi.doMock('../hooks/useSplatWithProgress', () => ({
 }));
 
 describe('ModelViewer', () => {
-  let ModelViewer: typeof ModelViewerType;
+  let ModelViewer: React.ComponentType<any>; // Use a more generic type or define props if needed
 
   beforeAll(async () => {
     // Dynamically import the component *after* mocks are set up
-    const module = await import('./ModelViewer');
-    ModelViewer = module.default;
+    const { default: ModelViewerComponent } = await import('./ModelViewer');
+    ModelViewer = ModelViewerComponent;
   });
 
   beforeEach(() => {

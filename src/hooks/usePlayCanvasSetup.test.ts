@@ -1,7 +1,7 @@
 /// <reference types="vitest/globals" />
 import { renderHook } from '@testing-library/react';
+import { vi } from 'vitest'; // Explicitly import vi
 import { usePlayCanvasSetup } from './usePlayCanvasSetup';
-import { CustomSplatHandler } from '../lib/playcanvas/CustomSplatHandler';
 
 // Mock @playcanvas/react/hooks
 const mockApp = {
@@ -17,7 +17,7 @@ const mockApp = {
 // Mock CustomSplatHandler
 // Create a mock class that can be instantiated and exported directly from the mock factory
 vi.mock('../lib/playcanvas/CustomSplatHandler', () => {
-  const MockCustomSplatHandler = vi.fn(function(this: any, app: any) {
+  const MockCustomSplatHandler = vi.fn(function(this: any) { // Removed 'app: any'
     // In a real scenario, you might set properties on 'this' based on 'app'
     // For now, just ensure 'this' is returned to satisfy 'expect.any(MockedCustomSplatHandler)'
     return this;

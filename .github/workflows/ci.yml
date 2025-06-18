@@ -44,7 +44,7 @@ jobs:
 
   e2e-tests:
     runs-on: ubuntu-latest
-    needs: lint-and-unit-tests # Run after unit tests pass
+    needs: lint-and-unit-tests
     strategy:
       matrix:
         node-version: [20.x]
@@ -59,10 +59,12 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Start Next.js app
-      run: npm run dev & # Run in background
-    - name: Wait for Next.js app to be ready
-      run: npx wait-on http://localhost:3000
+    - name: Build Next.js app
+      run: npm run build
+    - name: Run Playwright tests
+      # The webServer config in playwright.config.js will automatically
+      # start the server using `npm run start` before running tests.
+      run: npm run test:e2e
     - name: Run Playwright tests
       run: npm run test:e2e
     - name: Playwright Test Report

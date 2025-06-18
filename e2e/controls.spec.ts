@@ -2,6 +2,14 @@ import { test, expect, type Locator, type Page } from '@playwright/test'; // Imp
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/?settings=true'); // Navigate to settings page to show controls
+
+  // Wait for the loading progress indicator to disappear
+  const loadingProgress = page.getByTestId('model-loading-progress-container');
+  await expect(loadingProgress).toBeHidden({ timeout: 20000 });
+
+  // Check for the canvas element within the container, which indicates PlayCanvas has rendered.
+  const canvas = page.locator('canvas');
+  await expect(canvas).toBeVisible({ timeout: 20000 });
 });
 
 // Helper function to get the X coordinate on the slider track for a given value

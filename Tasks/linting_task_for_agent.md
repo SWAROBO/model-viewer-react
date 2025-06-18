@@ -82,8 +82,8 @@ import Image from 'next/image'; // Add this import
 *   `./src/hooks/useSplatWithProgress.ts`
 
 **Action Checklist:**
-- [ ] Review the conditional calls to `useApp`, `useState`, `useCallback`, and `useEffect`.
-- [ ] Restructure the code to ensure these hooks are always called in the same order on every render. This might involve moving conditional logic inside the hooks or using early returns before hook calls.
+- [x] Review the conditional calls to `useApp`, `useState`, `useCallback`, and `useEffect`.
+- [x] Restructure the code to ensure these hooks are always called in the same order on every render. This might involve moving conditional logic inside the hooks or using early returns before hook calls.
 
 **Example (Conceptual):**
 ```typescript
@@ -164,7 +164,6 @@ npm run test
 ```bash
 npm run test:e2e
 ```
-
 - Run the application to ensure it functions correctly without any runtime/console errors. The server is already running at 3000:
   - http://localhost:3000
   - http://localhost:3000/?settings=true

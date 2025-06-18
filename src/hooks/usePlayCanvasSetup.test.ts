@@ -17,6 +17,7 @@ const mockApp = {
 // Mock CustomSplatHandler
 // Create a mock class that can be instantiated and exported directly from the mock factory
 vi.mock('../lib/playcanvas/CustomSplatHandler', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const MockCustomSplatHandler = vi.fn(function(this: any) { // Removed 'app: any'
     // In a real scenario, you might set properties on 'this' based on 'app'
     // For now, just ensure 'this' is returned to satisfy 'expect.any(MockedCustomSplatHandler)'
@@ -46,6 +47,7 @@ describe('usePlayCanvasSetup', () => {
     renderHook(() => usePlayCanvasSetup());
 
     expect(mockApp.loader.getHandler).toHaveBeenCalledWith('gsplat');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(MockedCustomSplatHandler).toHaveBeenCalledWith(mockApp as any); // Cast mockApp to any
     expect(mockApp.loader.addHandler).toHaveBeenCalledWith('gsplat', expect.any(MockedCustomSplatHandler));
   });

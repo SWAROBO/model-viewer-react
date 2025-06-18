@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"; // Import the hook to mock it
 import { Entity } from "@playcanvas/react"; // Import Entity to use vi.mocked
 import { Camera, GSplat } from "@playcanvas/react/components"; // Import components for mocking
 import { OrbitControls } from "../lib/@playcanvas/react"; // Import OrbitControls for mocking
+import { Asset } from "playcanvas"; // Import Asset
 
 // Store onInput functions from mocked components
 const dualRangeOnInputs = new Map<string, (values: number[]) => void>();
@@ -105,6 +106,7 @@ describe("ModelViewerCore", () => {
         dualRangeOnInputs.clear();
         singleValueOnInputs.clear();
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "false";
@@ -126,6 +128,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("does not render AutoRotate when showSettings is true", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -139,6 +142,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("renders settings controls when showSettings is true", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -163,7 +167,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("renders GSplat and OrbitControls when splat prop is provided", () => {
-        const mockSplat = {};
+        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
         render(<ModelViewerCore splat={mockSplat} />);
         // Since GSplat is mocked to return null, we check if it was called
         const GSplatMock = vi.mocked(GSplat);
@@ -207,9 +211,10 @@ describe("ModelViewerCore", () => {
     });
 
     it("passes distance props to OrbitControls component", () => {
+        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
         render(
             <ModelViewerCore
-                splat={{}}
+                splat={mockSplat}
                 distanceMin={1}
                 distanceMax={10}
                 distance={5}
@@ -227,9 +232,10 @@ describe("ModelViewerCore", () => {
     });
 
     it("passes pitch angle props to OrbitControls component", () => {
+        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
         render(
             <ModelViewerCore
-                splat={{}}
+                splat={mockSplat}
                 pitchAngleMin={-45}
                 pitchAngleMax={45}
             />
@@ -246,7 +252,7 @@ describe("ModelViewerCore", () => {
 
     it("passes position prop to GSplat Entity", async () => {
         // Added async
-        const mockSplat = {};
+        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
         const testPosition: [number, number, number] = [1, 2, 3];
         await act(async () => {
             // Added await and async
@@ -263,7 +269,7 @@ describe("ModelViewerCore", () => {
 
     it("passes rotation prop to GSplat Entity", async () => {
         // Added async
-        const mockSplat = {};
+        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
         const testRotation: [number, number, number] = [90, 180, 270];
         await act(async () => {
             // Added await and async
@@ -280,7 +286,7 @@ describe("ModelViewerCore", () => {
 
     it("passes scale prop to GSplat Entity", async () => {
         // Added async
-        const mockSplat = {};
+        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
         const testScale: [number, number, number] = [2, 2, 2];
         await act(async () => {
             // Added await and async
@@ -294,6 +300,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes DualRangeSliderControl for camera distance with correct props when settings are true", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -317,6 +324,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes DualRangeSliderControl for camera pitch angle with correct props when settings are true", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -340,6 +348,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes SingleValueSliderControl for model position with correct props when settings are true", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -359,6 +368,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes SingleValueSliderControl for model rotation with correct props when settings are true", () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -378,6 +388,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates camera distance range and passes to OrbitControls when DualRangeSliderControl is interacted with", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -392,9 +403,10 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
+            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
             render(
                 <ModelViewerCore
-                    splat={{}}
+                    splat={mockSplat}
                     distanceMin={initialDistanceMin}
                     distanceMax={initialDistanceMax}
                 />
@@ -423,6 +435,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates camera pitch angle range and passes to OrbitControls when DualRangeSliderControl is interacted with", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -437,9 +450,10 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
+            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
             render(
                 <ModelViewerCore
-                    splat={{}}
+                    splat={mockSplat}
                     pitchAngleMin={initialPitchMin}
                     pitchAngleMax={initialPitchMax}
                 />
@@ -468,6 +482,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates model position and passes to GSplat Entity when SingleValueSliderControl is interacted with", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -482,7 +497,8 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
-            render(<ModelViewerCore splat={{}} position={initialPosition} />);
+            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+            render(<ModelViewerCore splat={mockSplat} position={initialPosition} />);
         });
 
         // Find the onInput for Position X
@@ -511,6 +527,7 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates model rotation and passes to GSplat Entity when SingleValueSliderControl is interacted with", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
                 if (param === "settings") return "true";
@@ -525,7 +542,8 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
-            render(<ModelViewerCore splat={{}} rotation={initialRotation} />);
+            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+            render(<ModelViewerCore splat={mockSplat} rotation={initialRotation} />);
         });
 
         // Find the onInput for Rotation X

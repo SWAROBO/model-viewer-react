@@ -3,7 +3,13 @@ import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 
 // Define the mock function instance for the Script component
-const mockScriptComponent = vi.fn((props: { script?: { name?: string }, [key: string]: any }) => (
+interface MockScriptProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  script?: { name?: string; new? (...args: any[]): any };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+const mockScriptComponent = vi.fn((props: MockScriptProps) => (
   <div data-testid="mock-script" data-script-name={props.script?.name} />
 ));
 
@@ -22,7 +28,7 @@ vi.doMock('@playcanvas/react/scripts', () => ({
 }));
 
 describe('AutoRotate Component', () => {
-  let AutoRotate: React.ComponentType<any>; // Use a more generic type or define props if needed
+  let AutoRotate: React.ComponentType<Record<string, unknown>>;
 
   beforeAll(async () => {
     // Dynamically import the component *after* mocks are set up

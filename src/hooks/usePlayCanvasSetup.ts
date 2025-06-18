@@ -13,6 +13,7 @@ export const usePlayCanvasSetup = () => {
                 app.loader.addHandler('gsplat', new CustomSplatHandler(app));
             }
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const handleError = (error: any) => {
                 console.error("PlayCanvas App Error:", error);
                 // Log more details if available

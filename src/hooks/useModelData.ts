@@ -13,8 +13,10 @@ export const useModelData = (csvUrl: string) => {
 
     useEffect(() => {
         // Check for a mocked version of the hook for E2E testing
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((window as any).__MOCKED_USE_MODEL_DATA__) {
             console.log("Using mocked useModelData for E2E test.");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const mockedData = (window as any).__MOCKED_USE_MODEL_DATA__(csvUrl);
             setModelData(mockedData.modelData);
             // Assuming defaultModelViewerProps is also part of the mock or can be derived
@@ -37,12 +39,12 @@ export const useModelData = (csvUrl: string) => {
                     header: true,
                     dynamicTyping: true,
                     skipEmptyLines: true,
-                    complete: (results: Papa.ParseResult<any>) => {
-                        const parsedData: CsvRow[] = results.data.map((row: any) => {
-                            const newRow: { [key: string]: any } = {};
+                    complete: (results: Papa.ParseResult<Record<string, string>>) => {
+                        const parsedData: CsvRow[] = results.data.map((row: Record<string, string>) => {
+                            const newRow: Partial<CsvRow> = {}; // Use Partial for initial construction
                             for (const key in row) {
                                 if (Object.prototype.hasOwnProperty.call(row, key)) {
-                                    let value = row[key];
+                                    let value: string | number | number[] | undefined = row[key];
                                     // Custom parsing for comma-separated numbers (e.g., rotation, position, scale)
                                     if (typeof value === 'string' && value.includes(',') && !isNaN(Number(value.split(',')[0].trim()))) {
                                         value = value.split(',').map((num: string) => Number(num.trim()));
@@ -59,20 +61,27 @@ export const useModelData = (csvUrl: string) => {
                                             value = defaultModelViewerProps[trimmedKey];
                                         }
                                     }
-                                    newRow[key.trim()] = value;
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    (newRow as Record<string, any>)[key.trim()] = value; // Cast to any for assignment
                                 }
+                            }
+                            // Ensure 'model' property is always present, even if empty string
+                            if (!newRow.model) {
+                                newRow.model = '';
                             }
                             return newRow as CsvRow;
                         });
                         setModelData(parsedData);
                         setLoading(false);
                     },
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     error: (err: any) => {
                         console.error("PapaParse Error:", err);
                         setError(err.message);
                         setLoading(false);
                     }
                 });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (err: any) {
                 console.error("Error fetching CSV:", err);
                 setError(err.message);

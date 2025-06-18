@@ -9,6 +9,7 @@ global.fetch = vi.fn();
 
 // Mock papaparse to allow spying on its parse method
 vi.mock('papaparse', async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const actual = (await importOriginal()) as Record<string, any>;
   return {
     ...actual,
@@ -41,8 +42,10 @@ model2,"10,20,30","1,2,3","2,2,2","https://example.com/model2.splat"`;
 
     // Mock Papa.parse implementation for this specific test
     papaParseSpy.mockImplementation((text: string, config: Papa.ParseConfig) => {
-      if (config.complete) {
-        config.complete({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((config as any).complete) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (config as any).complete({
           data: [
             { model: 'model1', rotation: '0,0,0', position: '0,0,0', scale: '1,1,1', splatURL: '"https://example.com/model1.splat"' },
             { model: 'model2', rotation: '10,20,30', position: '1,2,3', scale: '2,2,2', splatURL: '"https://example.com/model2.splat"' },
@@ -105,8 +108,10 @@ model2,"10,20,30","1,2,3","2,2,2","https://example.com/model2.splat"`;
 
     // Mock Papa.parse implementation for this specific test
     papaParseSpy.mockImplementation((text: string, config: Papa.ParseConfig) => {
-      if (config.error) {
-        config.error(mockParseError, undefined); // Pass undefined for file and input
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if ((config as any).error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (config as any).error(mockParseError, undefined); // Pass undefined for file and input
       }
     });
 

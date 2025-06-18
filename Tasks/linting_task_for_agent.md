@@ -118,9 +118,9 @@ if (condition) {
 *   `./src/lib/playcanvas/CustomSplatHandler.ts`
 
 **Action Checklist:**
-- [ ] For each instance of `any`, determine the correct type based on the context and expected data structure.
-- [ ] Define interfaces or types if complex objects are involved.
-- [ ] Replace `any` with the inferred or defined type.
+- [x] For each instance of `any`, determine the correct type based on the context and expected data structure.
+- [x] Define interfaces or types if complex objects are involved.
+- [x] Replace `any` with the inferred or defined type.
 
 **Example:**
 ```typescript
@@ -146,8 +146,8 @@ function processData(data: MyData) { /* ... */ }
 *   `./src/hooks/useSplatWithProgress.test.ts`
 
 **Action Checklist:**
-- [ ] **`@next/next/no-assign-module-variable`:** In `src/components/AutoRotate.test.tsx`, `src/components/DualRangeSliderControl.test.tsx`, and `src/components/ModelViewer.test.tsx`, remove or refactor any assignments to the `module` variable. This often occurs in test files when mocking modules.
-- [ ] **`@typescript-eslint/no-unsafe-function-type`:** In `src/hooks/useSplatWithProgress.test.ts`, replace the generic `Function` type with more specific function signatures (e.g., `() => void`, `(arg: string) => number`).
+- [x] **`@next/next/no-assign-module-variable`:** In `src/components/AutoRotate.test.tsx`, `src/components/DualRangeSliderControl.test.tsx`, and `src/components/ModelViewer.test.tsx`, remove or refactor any assignments to the `module` variable. This often occurs in test files when mocking modules.
+- [x] **`@typescript-eslint/no-unsafe-function-type`:** In `src/hooks/useSplatWithProgress.test.ts`, replace the generic `Function` type with more specific function signatures (e.g., `() => void`, `(arg: string) => number`).
 
 ## Verification
 

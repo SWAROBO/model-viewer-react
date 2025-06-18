@@ -3,7 +3,7 @@ import { useApp } from "@playcanvas/react/hooks";
 import { Asset } from "playcanvas";
 
 type UseSplatWithProgressResult = {
-    asset: any; // PlayCanvas Asset object
+    asset: Asset | null; // PlayCanvas Asset object
     loading: boolean;
     error: string | null;
     progress: number; // Download progress (0-100)
@@ -44,7 +44,7 @@ export const useSplatWithProgress = (
     })();
 
     const app = useApp();
-    const [asset, setAsset] = useState<any>(initialResult.asset);
+    const [asset, setAsset] = useState<Asset | null>(initialResult.asset);
     const [loading, setLoading] = useState(initialResult.loading);
     const [error, setError] = useState<string | null>(initialResult.error);
     const [progress, setProgress] = useState(initialResult.progress);
@@ -93,6 +93,7 @@ export const useSplatWithProgress = (
             }, 500); // 500ms delay
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleError = (err: any) => {
             console.error("useSplatWithProgress: Asset 'error' event fired. Full error object:", err);
             console.error("useSplatWithProgress: Asset 'error' message:", err?.message);

@@ -30,7 +30,7 @@ vi.doMock('../hooks/useSplatWithProgress', () => ({
 }));
 
 describe('ModelViewer', () => {
-  let ModelViewer: React.ComponentType<any>; // Use a more generic type or define props if needed
+  let ModelViewer: React.ComponentType<ModelViewerProps>; // Use ModelViewerProps
 
   beforeAll(async () => {
     // Dynamically import the component *after* mocks are set up
@@ -52,20 +52,20 @@ describe('ModelViewer', () => {
   });
 
   it('renders ModelViewerCore and ModelLoadingProgress', () => {
-    render(<ModelViewer />);
+    render(<ModelViewer model={undefined} />); // Add model prop
     expect(screen.getByTestId('mock-model-viewer-core')).toBeInTheDocument();
     // ModelLoadingProgress renders null if not loading, so it might not be in the document by default
     // We'll test its visibility based on loading state in a separate test.
   });
 
   it('calls usePlayCanvasSetup hook', () => {
-    render(<ModelViewer />);
+    render(<ModelViewer model={undefined} />); // Add model prop
     expect(MockUsePlayCanvasSetup).toHaveBeenCalledTimes(1);
   });
 
   it('calls useSplatWithProgress with splatURL and progress handler', () => {
     const testSplatURL = 'http://example.com/test.splat';
-    render(<ModelViewer splatURL={testSplatURL} />);
+    render(<ModelViewer splatURL={testSplatURL} model={undefined} />); // Add model prop
 
     expect(MockUseSplatWithProgress).toHaveBeenCalledTimes(1);
     expect(MockUseSplatWithProgress).toHaveBeenCalledWith(
@@ -86,6 +86,7 @@ describe('ModelViewer', () => {
       rotation: [0, 90, 0],
       position: [1, 2, 3],
       scale: [2, 2, 2],
+      model: 'test-model', // Added model property
     };
 
     const mockSplatAsset = { some: 'splat data' };
@@ -109,6 +110,7 @@ describe('ModelViewer', () => {
         rotation: customProps.rotation,
         position: customProps.position,
         scale: customProps.scale,
+        model: customProps.model, // Added model property
       }),
       undefined
     );
@@ -119,7 +121,7 @@ describe('ModelViewer', () => {
       asset: null,
       loading: false,
     });
-    render(<ModelViewer />);
+    render(<ModelViewer model={undefined} />); // Add model prop
 
     expect(MockModelViewerCore).toHaveBeenCalledTimes(1);
     expect(MockModelViewerCore).toHaveBeenCalledWith(
@@ -134,6 +136,7 @@ describe('ModelViewer', () => {
         rotation: defaultModelViewerProps.rotation,
         position: defaultModelViewerProps.position,
         scale: defaultModelViewerProps.scale,
+        model: defaultModelViewerProps.model, // Added model property
       }),
       undefined
     );
@@ -149,7 +152,7 @@ describe('ModelViewer', () => {
       };
     });
 
-    const { rerender } = render(<ModelViewer splatURL="test.splat" />);
+    const { rerender } = render(<ModelViewer splatURL="test.splat" model={undefined} />); // Add model prop
 
     // Initially loading, progress 0
     expect(screen.getByTestId('model-loading-progress-container')).toBeInTheDocument();

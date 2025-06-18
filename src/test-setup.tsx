@@ -78,6 +78,7 @@ vi.mock('next/navigation', () => ({
 // Mock next/image
 vi.mock('next/image', () => ({
   __esModule: true,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) => {
     // For testing, we can just return a regular img tag
     // The src will be the original path, not the Next.js optimized path

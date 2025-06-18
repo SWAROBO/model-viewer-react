@@ -49,13 +49,10 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    # If your Playwright config doesn't start the server, you need to build and start it.
-    # - name: Build Next.js app
-    #   run: npm run build
-    # - name: Start Next.js app
-    #   run: npm start & # Run in background
-    #   env:
-    #     PORT: 3000 # Ensure it matches Playwright baseURL
+    - name: Start Next.js app
+      run: npm run dev & # Run in background
+    - name: Wait for Next.js app to be ready
+      run: npx wait-on http://localhost:3000
     - name: Run Playwright tests
       run: npm run test:e2e
     - uses: actions/upload-artifact@v4

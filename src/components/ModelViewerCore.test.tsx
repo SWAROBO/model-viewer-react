@@ -3,7 +3,7 @@ import { vi } from "vitest";
 import ModelViewerCore from "./ModelViewerCore";
 import { useSearchParams } from "next/navigation"; // Import the hook to mock it directly
 import { Entity } from "@playcanvas/react"; // Import Entity to use vi.mocked
-import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components"; // Import components for mocking
+import { Camera, GSplat } from "@playcanvas/react/components"; // Import components for mocking
 import { OrbitControls } from "../lib/@playcanvas/react"; // Import OrbitControls for mocking
 
 // Store onInput functions from mocked components

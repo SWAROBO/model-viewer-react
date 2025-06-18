@@ -75,4 +75,15 @@ vi.mock('next/navigation', () => ({
   })),
 }));
 
+// Mock next/image
+vi.mock('next/image', () => ({
+  __esModule: true,
+  default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) => {
+    // For testing, we can just return a regular img tag
+    // The src will be the original path, not the Next.js optimized path
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img src={src} alt={alt} {...props} />;
+  },
+}));
+
 // Add any other global setup for tests here

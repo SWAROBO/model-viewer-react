@@ -1,10 +1,11 @@
 import React from 'react';
+import Image from 'next/image';
 
 const SwaroboLogo: React.FC = () => {
     return (
         <div className="logo-container">
             <a href="https://swarobo.ai/" target="_blank" rel="noopener noreferrer">
-                <img src="/logo-swarobo.png" alt="SWAROBO Logo" className="swarobo-logo" />
+                <Image src="/logo-swarobo.png" alt="SWAROBO Logo" className="swarobo-logo" width={100} height={50} />
             </a>
         </div>
     );

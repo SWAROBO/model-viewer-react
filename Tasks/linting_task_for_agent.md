@@ -37,8 +37,8 @@ The following steps should be taken to address the linting issues. Each step inc
 *   `./src/hooks/usePlayCanvasSetup.test.ts`
 
 **Action Checklist:**
-- [ ] For each file, identify variables, functions, or imports that are declared but not used.
-- [ ] Safely remove the unused declarations. Ensure that removing them does not break any existing functionality.
+- [x] For each file, identify variables, functions, or imports that are declared but not used.
+- [x] Safely remove the unused declarations. Ensure that removing them does not break any existing functionality.
 
 **Example:**
 ```typescript
@@ -59,9 +59,9 @@ const unusedVar = 10;
 *   `./src/components/SwaroboLogo.tsx`
 
 **Action Checklist:**
-- [ ] Import `Image` from `next/image`.
-- [ ] Replace the `<img>` tag with `<Image />`.
-- [ ] Ensure `width`, `height`, and `alt` props are correctly set on the `<Image />` component.
+- [x] Import `Image` from `next/image`.
+- [x] Replace the `<img>` tag with `<Image />`.
+- [x] Ensure `width`, `height`, and `alt` props are correctly set on the `<Image />` component.
 
 **Example:**
 ```typescript

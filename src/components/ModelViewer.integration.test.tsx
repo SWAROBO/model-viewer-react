@@ -16,7 +16,8 @@ vi.mock('../hooks/useModelData', () => ({
     loading: true,
     error: null,
     // Destructure splatURL from defaultModelViewerProps before returning
-    defaultModelViewerProps: (({ splatURL, ...rest }) => rest)(defaultModelViewerProps),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    defaultModelViewerProps: (({ splatURL: _splatURL, ...rest }) => rest)(defaultModelViewerProps),
   })),
 }));
 
@@ -102,6 +103,7 @@ describe('ModelViewer Integration', () => {
     });
 
     // Assert that ModelViewerCore was called with the correct splat prop and other default props
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { splatURL: _, ...restDefaultProps } = defaultModelViewerProps; // Exclude splatURL from default props
 
     const expectedPropsForCore = {

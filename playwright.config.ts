@@ -7,7 +7,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [['html', { open: 'never' }]],
+  reporter: [['json', { outputFile: 'playwright-report/results.json' }], ['html', { open: 'never' }]],
   timeout: 20000,
   use: {
     baseURL: 'http://localhost:3000', // Ensure your dev server runs on this port

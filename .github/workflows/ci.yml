@@ -67,6 +67,8 @@ jobs:
       run: npx playwright install --with-deps
     - name: Build Next.js app
       run: npm run build
+    - name: Run Playwright tests
+      run: npm run test:e2e
     - name: Playwright Test Report
       uses: sidharthv96/playwright-report-action@v2.0-rc.5
       if: always()

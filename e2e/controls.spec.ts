@@ -60,9 +60,6 @@ test('should interact with Position X slider', async ({ page }) => {
   await page.mouse.move(targetX, await startY, { steps: 10 }); // Smooth drag
   await page.mouse.up();
 
-  // Wait for the value to update in the UI
-  await page.waitForTimeout(200);
-
   // Assert that the value displayed in the label has changed
   const updatedLabelText = await labelLocator.textContent();
   const updatedValueMatch = updatedLabelText?.match(/Position X: (-?\d+\.\d+)/);
@@ -133,9 +130,6 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
   await page.mouse.move(maxTargetX, maxStartY, { steps: 2 });
   await page.mouse.up();
 
-  // Wait for the values to update in the UI
-  await page.waitForTimeout(200);
-
   // Assert that the values displayed in the labels have changed and are within bounds
   const updatedLabelText = await labelsContainer.textContent();
   const updatedMinMatch = updatedLabelText?.match(/Min Distance: (-?\d+\.\d+)/);
@@ -178,13 +172,11 @@ test('should toggle grid visibility', async ({ page }) => {
 
   // Click the toggle to hide the grid
   await gridToggle.click();
-  await page.waitForTimeout(500); // Give time for the state to update and re-render
   await expect(gridToggle).not.toBeChecked();
   await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false');
 
   // Click the toggle again to show the grid
   await gridToggle.click();
-  await page.waitForTimeout(500); // Give time for the state to update and re-render
   await expect(gridToggle).toBeChecked();
   await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
 });

@@ -69,9 +69,17 @@ jobs:
       run: npm run build
     - name: Run Playwright tests
       run: npm run test:e2e
-    - name: Playwright Test Report
-      uses: sidharthv96/playwright-report-action@v2.0-rc.5
-      if: always()
+    - name: ls
+      run: ls
+    - name: pwd
+      run: pwd
+    - name: move test-results folder to playwright-report
+      run: |
+        mkdir -p playwright-report
+        mv test-results playwright-report/test-results || true
+    # - name: Playwright Test Report
+    #   uses: sidharthv96/playwright-report-action@v2.0-rc.5
+    #   if: always()
     - uses: actions/upload-artifact@v4
       if: always() # Upload report even if tests fail
       with:

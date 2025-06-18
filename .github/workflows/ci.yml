@@ -19,30 +19,30 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    # - name: Install dependencies
-    #   run: npm ci
-    # - name: Run linter
-    #   run: npm run lint
-    # - name: Run unit and integration tests
-    #   run: npm test -- --coverage
-    # - name: Upload coverage report
-    #   uses: actions/upload-artifact@v4
-    #   if: always()
-    #   with:
-    #     name: coverage-report
-    #     path: coverage/
-    # - name: Code Coverage Report
-    #   uses: irongut/CodeCoverageSummary@v1.3.0
-    #   with:
-    #     filename: coverage/cobertura-coverage.xml
-    #     format: 'markdown'
-    #     output: 'file'
-    # - name: Add Coverage PR Comment
-    #   uses: marocchino/sticky-pull-request-comment@v2
-    #   if: github.event_name == 'pull_request'
-    #   with:
-    #     recreate: true
-    #     path: code-coverage-results.md
+    - name: Install dependencies
+      run: npm ci
+    - name: Run linter
+      run: npm run lint
+    - name: Run unit and integration tests
+      run: npm test -- --coverage
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-report
+        path: coverage/
+    - name: Code Coverage Report
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: coverage/cobertura-coverage.xml
+        format: 'markdown'
+        output: 'file'
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
 
   e2e-tests:
     runs-on: ubuntu-latest
@@ -69,20 +69,17 @@ jobs:
       run: npm run build
     - name: Run Playwright tests
       run: npm run test:e2e
-    - name: ls
-      if: always()
-      run: ls
-    - name: pwd
-      if: always()
-      run: pwd
     - name: move test-results folder to playwright-report
       if: always()
       run: |
         mkdir -p playwright-report
         mv test-results playwright-report/test-results || true
-    # - name: Playwright Test Report
-    #   uses: sidharthv96/playwright-report-action@v2.0-rc.5
-    #   if: always()
+    - name: Playwright Test Report
+      uses: sidharthv96/playwright-report-action@v2.0-rc.5
+      if: always()
+      with:
+        # Point the action to the JSON report inside the main report folder
+        test-results-path: playwright-report/results.json
     - uses: actions/upload-artifact@v4
       if: always() # Upload report even if tests fail
       with:

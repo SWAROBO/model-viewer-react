@@ -30,7 +30,7 @@ export default defineConfig({
     // },
   ],
     webServer: {
-    command: 'npm run start',
+    command: 'npx serve@latest out',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000, // Increase timeout for CI

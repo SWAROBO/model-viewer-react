@@ -41,9 +41,6 @@ test('should interact with Position X slider', async ({ page }) => {
   // Locate the thumb (handle) of the slider.
   const thumb = sliderTrack.locator('.range-slider__thumb').first();
   await expect(thumb).toBeVisible({ timeout: 10000 });
-  await thumb.waitFor({ state: 'attached' });
-  await thumb.waitFor({ state: 'visible' });
-
   // Get the current value from the label
   const labelText = await labelLocator.textContent();
   const currentValueMatch = labelText?.match(/Position X: (-?\d+\.\d+)/);
@@ -102,8 +99,6 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
 
   // Drag the min thumb slightly to the right
   const minThumb = thumbs.first();
-  await minThumb.waitFor({ state: 'attached' });
-  await minThumb.waitFor({ state: 'visible' });
   const minThumbBoundingBox = await minThumb.boundingBox();
   expect(minThumbBoundingBox).not.toBeNull();
   const minStartX = minThumbBoundingBox!.x + minThumbBoundingBox!.width / 2;
@@ -117,8 +112,6 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
 
   // Drag the max thumb slightly to the left
   const maxThumb = thumbs.last();
-  await maxThumb.waitFor({ state: 'attached' });
-  await maxThumb.waitFor({ state: 'visible' });
   const maxThumbBoundingBox = await maxThumb.boundingBox();
   expect(maxThumbBoundingBox).not.toBeNull();
   const maxStartX = maxThumbBoundingBox!.x + maxThumbBoundingBox!.width / 2;
@@ -160,8 +153,6 @@ test('should toggle grid visibility', async ({ page }) => {
   // Locate the grid visibility toggle checkbox
   const gridToggle = page.getByTestId('grid-visibility-toggle');
   await expect(gridToggle).toBeVisible({ timeout: 10000 });
-  await gridToggle.waitFor({ state: 'attached' });
-  await gridToggle.waitFor({ state: 'visible' });
 
   // Locate the settings panel to check the data-grid-visible attribute
   const settingsPanel = page.getByTestId('model-viewer-settings-panel');

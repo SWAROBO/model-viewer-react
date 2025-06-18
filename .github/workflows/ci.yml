@@ -70,10 +70,13 @@ jobs:
     - name: Run Playwright tests
       run: npm run test:e2e
     - name: ls
+      if: always()
       run: ls
     - name: pwd
+      if: always()
       run: pwd
     - name: move test-results folder to playwright-report
+      if: always()
       run: |
         mkdir -p playwright-report
         mv test-results playwright-report/test-results || true

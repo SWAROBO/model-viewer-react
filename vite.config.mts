@@ -12,5 +12,9 @@ export default defineConfig({
         css: true,
         include: ["**/*.test.{ts,tsx}"], // Only include files ending with .test.ts or .test.tsx
         exclude: ["**/node_modules/**", "**/dist/**", "**/e2e/**"], // Exclude e2e directory
+        coverage: {
+            provider: "v8", // or 'istanbul'
+            reporter: [["cobertura", { file: "cobertura-coverage.xml" }]],
+        },
     },
 });

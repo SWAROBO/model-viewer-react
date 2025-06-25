@@ -3,7 +3,7 @@ name: Manual E2E Tests
 on:
   workflow_dispatch:
   pull_request:
-    branches: [ with-browser-test ]
+    branches: [ main ]
 jobs:
   run-e2e-only:
     # This calls the same logic, but with no dependencies

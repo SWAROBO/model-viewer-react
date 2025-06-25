@@ -6,5 +6,9 @@ on:
     branches: [ main ]
 jobs:
   run-e2e-only:
+    permissions:
+      pull-requests: write
+      issues: write
+      checks: write
     # This calls the same logic, but with no dependencies
     uses: ./.github/workflows/e2e.yml

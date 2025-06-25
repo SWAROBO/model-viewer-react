@@ -2,7 +2,7 @@ name: Manual E2E Tests
 
 on:
   workflow_dispatch:
-
+  # Trigger re-index
 jobs:
   run-e2e-only:
     # This calls the same logic, but with no dependencies

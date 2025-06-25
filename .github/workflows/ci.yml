@@ -46,6 +46,10 @@ jobs:
 
   # This job now CALLS the reusable workflow
   e2e-tests:
+    permissions:
+      pull-requests: write
+      issues: write
+      checks: write
     needs: lint-and-unit-tests
     uses: ./.github/workflows/e2e.yml
 

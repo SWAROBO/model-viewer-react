@@ -24,17 +24,15 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps
       - run: npm run build
-      - run: npm run test:e2e
-      - name: move test-results folder to playwright-report
-        if: always()
-        run: |
-          mkdir -p playwright-report
-          mv test-results playwright-report/test-results || true
       - name: Playwright Test Report
         uses: sidharthv96/playwright-report-action@v2.0-rc.5
         if: always()
         with:
-          test-results-path: playwright-report/results.json
+          test-script: npm run test:e2e
+      - name: Move report.json
+        if: always()
+        run: |
+          mv report.json playwright-report/report.json || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:

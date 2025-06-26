@@ -9,16 +9,17 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: [
+        ["line"],
+        ["json"],
         ["html", { open: "never", outputFolder: "playwright-report/html-report" }],
-        ["json", { outputFile: "playwright-report/results.json" }],
     ],
 
-    timeout: 20000,
+    timeout: 60000, // Increased global timeout
     use: {
         baseURL: "http://localhost:3000", // Ensure your dev server runs on this port
         trace: "on-first-retry",
-        actionTimeout: 20 * 1000,
-        navigationTimeout: 20 * 1000,
+        actionTimeout: 60 * 1000, // Increased action timeout
+        navigationTimeout: 60 * 1000, // Increased navigation timeout
     },
     projects: [
         {

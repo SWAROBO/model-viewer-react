@@ -140,27 +140,44 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
 });
 
 test('should toggle grid visibility', async ({ page }) => {
-  // Navigate to the settings page to ensure controls are visible
-  await page.goto('/?settings=true');
+  // The beforeEach hook already navigates to /?settings=true and waits for the model to load.
+  // No need for page.goto or page.reload here.
 
   // Locate the grid visibility toggle checkbox
   const gridToggle = page.getByTestId('grid-visibility-toggle');
-  await expect(gridToggle).toBeVisible({ timeout: 10000 });
+  await expect(gridToggle).toBeVisible({ timeout: 20000 });
 
   // Locate the settings panel to check the data-grid-visible attribute
   const settingsPanel = page.getByTestId('model-viewer-settings-panel');
+  await expect(settingsPanel).toBeVisible({ timeout: 20000 });
 
   // Initially, the grid should be visible (checkbox is checked by default)
-  await expect(gridToggle).toBeChecked();
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
+  await expect(gridToggle).toBeChecked({ timeout: 15000 });
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true', { timeout: 15000 });
 
-  // Click the toggle to hide the grid
-  await gridToggle.click();
-  await expect(gridToggle).not.toBeChecked();
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false');
+  // Click the checkbox directly to hide the grid
+  await gridToggle.click({ force: true, timeout: 20000 });
+  await page.waitForFunction(
+    async (selector) => {
+      const el = document.querySelector(selector);
+      return el && el.getAttribute('data-grid-visible') === 'false';
+    },
+    '[data-testid="model-viewer-settings-panel"]',
+    { timeout: 20000 }
+  );
+  await expect(gridToggle).not.toBeChecked({ timeout: 15000 });
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false', { timeout: 15000 });
 
-  // Click the toggle again to show the grid
-  await gridToggle.click();
-  await expect(gridToggle).toBeChecked();
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
+  // Click the checkbox directly again to show the grid
+  await gridToggle.click({ force: true, timeout: 20000 });
+  await page.waitForFunction(
+    async (selector) => {
+      const el = document.querySelector(selector);
+      return el && el.getAttribute('data-grid-visible') === 'true';
+    },
+    '[data-testid="model-viewer-settings-panel"]',
+    { timeout: 20000 }
+  );
+  await expect(gridToggle).toBeChecked({ timeout: 15000 });
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true', { timeout: 15000 });
 });

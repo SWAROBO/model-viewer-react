@@ -1,4 +1,4 @@
-name: Reusable E2E Job
+name: E2E Job
 
 # This makes the workflow callable by other workflows
 on:

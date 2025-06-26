@@ -1,42 +1,73 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+/// <reference types="vitest/globals" />
+import { renderHook, act } from '@testing-library/react';
 import { useSplatWithProgress } from './useSplatWithProgress';
 import { useApp } from '@playcanvas/react/hooks';
-import { Asset } from 'playcanvas';
+import { Asset, AppBase } from 'playcanvas'; // Import Asset, AppBase
+import { vi } from 'vitest'; // Explicitly import vi for global namespace
 
 // Mock PlayCanvas dependencies
-vi.mock('playcanvas');
+vi.mock('playcanvas', async (importOriginal) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const actual = await importOriginal() as any;
+    return {
+        ...actual,
+        Asset: vi.fn(), // Mock the Asset class
+    };
+});
 vi.mock('@playcanvas/react/hooks', () => ({
     useApp: vi.fn(),
 }));
 
+// Define a minimal mock for the PlayCanvas Application
+interface MockApp extends Partial<AppBase> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    assets: any; // Use any for assets to simplify mocking complex AssetRegistry
+    on: vi.Mock;
+    off: vi.Mock;
+}
+
+// Define a mock for the PlayCanvas Asset that includes event methods
+interface MockAsset extends Asset {
+    on: vi.Mock;
+    once: vi.Mock;
+    off: vi.Mock;
+    emit: vi.Mock; // Custom emit for testing
+    destroy: vi.Mock;
+}
+
 describe('useSplatWithProgress', () => {
-    let mockApp: any;
-    let mockAsset: any;
+    let mockApp: MockApp;
+    let mockAsset: MockAsset; // Use MockAsset type
 
     beforeEach(() => {
         // Reset all mocks before each test
         vi.resetAllMocks();
 
         // This will store the actual callback functions passed to asset.on/once
-        const registeredListeners: { [key: string]: Function[] } = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const registeredListeners: { [key: string]: ((...args: any[]) => void)[] } = {
             progress: [],
             load: [],
             error: []
         };
 
         mockAsset = {
-            on: vi.fn((event: string, callback: Function) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            on: vi.fn((event: string, callback: (...args: any[]) => void) => {
                 registeredListeners[event]?.push(callback);
             }),
-            once: vi.fn((event: string, callback: Function) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            once: vi.fn((event: string, callback: (...args: any[]) => void) => {
                 registeredListeners[event]?.push(callback);
             }),
-            off: vi.fn((event: string, callback: Function) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            off: vi.fn((event: string, callback: (...args: any[]) => void) => {
                 if (registeredListeners[event]) {
                     registeredListeners[event] = registeredListeners[event].filter(cb => cb !== callback);
                 }
             }),
             // Custom emit function to trigger the stored callbacks
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             emit: vi.fn((event: string, ...args: any[]) => {
                 registeredListeners[event]?.forEach(cb => cb(...args));
                 // For 'once' events, remove them after emission
@@ -45,7 +76,7 @@ describe('useSplatWithProgress', () => {
                 }
             }),
             destroy: vi.fn()
-        };
+        } as MockAsset; // Cast to MockAsset
 
         // Mock the Asset constructor to return our mockAsset
         (Asset as vi.Mock).mockImplementation(() => mockAsset);
@@ -56,7 +87,9 @@ describe('useSplatWithProgress', () => {
                 add: vi.fn(),
                 load: vi.fn(),
                 remove: vi.fn()
-            }
+            },
+            on: vi.fn(), // Add on and off to mockApp
+            off: vi.fn()
         };
         (useApp as vi.Mock).mockReturnValue(mockApp);
 

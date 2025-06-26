@@ -2,7 +2,7 @@ import React from "react";
 import RangeSlider from "react-range-slider-input";
 import "react-range-slider-input/dist/style.css";
 
-type DualRangeSliderControlProps = {
+export type DualRangeSliderControlProps = {
     title: string;
     minLabel: string;
     maxLabel: string;

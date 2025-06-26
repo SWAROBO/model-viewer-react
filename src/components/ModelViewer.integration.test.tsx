@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ModelViewer from './ModelViewer';
 import { vi } from 'vitest'; // Import vi
 import { act } from '@testing-library/react'; // Import act for async updates
@@ -15,7 +15,9 @@ vi.mock('../hooks/useModelData', () => ({
     modelData: [],
     loading: true,
     error: null,
-    defaultModelViewerProps: defaultModelViewerProps, // Use the actual default props
+    // Destructure splatURL from defaultModelViewerProps before returning
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    defaultModelViewerProps: (({ splatURL: _splatURL, ...rest }) => rest)(defaultModelViewerProps),
   })),
 }));
 
@@ -101,16 +103,19 @@ describe('ModelViewer Integration', () => {
     });
 
     // Assert that ModelViewerCore was called with the correct splat prop and other default props
-    const { splatURL, ...restDefaultProps } = defaultModelViewerProps;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { splatURL: _, ...restDefaultProps } = defaultModelViewerProps; // Exclude splatURL from default props
+
+    const expectedPropsForCore = {
+      ...restDefaultProps,
+      splat: mockSplatAsset, // Add the expected splat object
+    };
 
     // Get the props that ModelViewerCore was called with
     const receivedProps = vi.mocked(ModelViewerCore).mock.calls[0][0];
 
-    // Assert on the splat property separately
-    expect(receivedProps.splat).toEqual(expect.objectContaining({ url: mockSplatUrl, type: 'gsplat' }));
-
-    // Assert on the rest of the default props
-    expect(receivedProps).toEqual(expect.objectContaining(restDefaultProps));
+    // Assert that receivedProps matches the expected structure
+    expect(receivedProps).toEqual(expect.objectContaining(expectedPropsForCore));
 
     // Optionally, verify the mock-model-viewer-core element reflects the the splat URL
     const mockCoreElement = screen.getByTestId('mock-model-viewer-core');

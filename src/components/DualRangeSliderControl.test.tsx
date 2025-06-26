@@ -1,9 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
-import type DualRangeSliderControlType from './DualRangeSliderControl'; // Import type for dynamic import
+
+interface MockRangeSliderProps {
+  min: number;
+  max: number;
+  step: number;
+  value: number[];
+  onInput?: (values: number[]) => void;
+}
 
 // Mock the react-range-slider-input library
-const MockRangeSlider = vi.fn((props) => {
+const MockRangeSlider = vi.fn((props: MockRangeSliderProps) => {
   // Render a simple div or input that reflects the props for testing purposes
   return (
     <div data-testid="mock-range-slider"
@@ -18,18 +25,20 @@ const MockRangeSlider = vi.fn((props) => {
   );
 });
 
+import { DualRangeSliderControlProps } from './DualRangeSliderControl'; // Import the actual props type
+
 vi.doMock('react-range-slider-input', () => ({
   __esModule: true,
   default: MockRangeSlider,
 }));
 
 describe('DualRangeSliderControl', () => {
-  let DualRangeSliderControl: typeof DualRangeSliderControlType;
+  let DualRangeSliderControl: React.ComponentType<DualRangeSliderControlProps>;
 
   beforeAll(async () => {
     // Dynamically import the component *after* mocks are set up
-    const module = await import('./DualRangeSliderControl');
-    DualRangeSliderControl = module.default;
+    const { default: DualRangeSliderControlComponent } = await import('./DualRangeSliderControl');
+    DualRangeSliderControl = DualRangeSliderControlComponent;
   });
 
   beforeEach(() => {

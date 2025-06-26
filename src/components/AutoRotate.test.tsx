@@ -1,10 +1,15 @@
 import React from 'react'; // Import React for JSX namespace
 import { render, screen } from '@testing-library/react';
-import { vi, MockInstance } from 'vitest';
-import type AutoRotateType from './AutoRotate'; // Import type for dynamic import
+import { vi } from 'vitest';
 
 // Define the mock function instance for the Script component
-const mockScriptComponent = vi.fn((props: { script?: { name?: string }, [key: string]: any }) => (
+interface MockScriptProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  script?: { name?: string; new? (...args: any[]): any };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+const mockScriptComponent = vi.fn((props: MockScriptProps) => (
   <div data-testid="mock-script" data-script-name={props.script?.name} />
 ));
 
@@ -23,12 +28,12 @@ vi.doMock('@playcanvas/react/scripts', () => ({
 }));
 
 describe('AutoRotate Component', () => {
-  let AutoRotate: typeof AutoRotateType;
+  let AutoRotate: React.ComponentType<Record<string, unknown>>;
 
   beforeAll(async () => {
     // Dynamically import the component *after* mocks are set up
-    const module = await import('./AutoRotate');
-    AutoRotate = module.default;
+    const { default: AutoRotateComponent } = await import('./AutoRotate');
+    AutoRotate = AutoRotateComponent;
   });
 
   beforeEach(() => {

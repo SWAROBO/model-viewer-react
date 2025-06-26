@@ -19,6 +19,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         rotation,
         position,
         scale,
+        model, // Destructure model prop
     } = { ...defaultModelViewerProps, ...props };
 
     const [downloadProgress, setDownloadProgress] = useState(0);
@@ -45,6 +46,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 rotation={rotation}
                 position={position}
                 scale={scale}
+                model={model} // Pass model prop
             />
         </div>
     );

@@ -18,12 +18,12 @@ const Page = () => {
 
     useEffect(() => {
         if (modelData.length > 0) {
-            const selectedModel = modelData.find((row: any) => row.model?.toLowerCase() === modelName?.toLowerCase());
+            const selectedModel = modelData.find((row: ModelViewerProps) => row.model?.toLowerCase() === modelName?.toLowerCase());
             if (selectedModel) {
-                const { model, ...rest } = selectedModel;
+                const { ...rest } = selectedModel; // Removed 'model'
                 setCurrentModelProps(rest);
             } else {
-                const { model, ...rest } = modelData[0];
+                const { ...rest } = modelData[0]; // Removed 'model'
                 setCurrentModelProps(modelData[0] ? rest : defaultModelViewerProps);
             }
         }

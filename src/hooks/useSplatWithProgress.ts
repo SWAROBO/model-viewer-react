@@ -3,7 +3,7 @@ import { useApp } from "@playcanvas/react/hooks";
 import { Asset } from "playcanvas";
 
 type UseSplatWithProgressResult = {
-    asset: any; // PlayCanvas Asset object
+    asset: Asset | null; // PlayCanvas Asset object
     loading: boolean;
     error: string | null;
     progress: number; // Download progress (0-100)
@@ -20,28 +20,43 @@ export const useSplatWithProgress = (
     src: string,
     onProgress?: (progress: number) => void
 ): UseSplatWithProgressResult => {
-    // Test-specific: If __FORCE_SPLAT_ERROR__ is true, immediately return an error state
-    if (typeof window !== 'undefined' && window.__FORCE_SPLAT_ERROR__) {
+    // Determine initial state based on global flags
+    const initialResult: UseSplatWithProgressResult = (() => {
+        if (typeof window !== 'undefined') {
+            if (window.__FORCE_SPLAT_ERROR__) {
+                return {
+                    asset: null,
+                    loading: false,
+                    error: `Forced error for: ${src}`,
+                    progress: 0,
+                };
+            }
+            if (window.__MOCKED_USE_SPLAT_WITH_PROGRESS__) {
+                return window.__MOCKED_USE_SPLAT_WITH_PROGRESS__(src, onProgress);
+            }
+        }
         return {
             asset: null,
-            loading: false,
-            error: `Forced error for: ${src}`,
+            loading: true,
+            error: null,
             progress: 0,
         };
-    }
-
-    // If a mock is available in the window object, use it for testing purposes
-    if (typeof window !== 'undefined' && window.__MOCKED_USE_SPLAT_WITH_PROGRESS__) {
-        return window.__MOCKED_USE_SPLAT_WITH_PROGRESS__(src, onProgress);
-    }
+    })();
 
     const app = useApp();
-    const [asset, setAsset] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [progress, setProgress] = useState(0);
+    const [asset, setAsset] = useState<Asset | null>(initialResult.asset);
+    const [loading, setLoading] = useState(initialResult.loading);
+    const [error, setError] = useState<string | null>(initialResult.error);
+    const [progress, setProgress] = useState(initialResult.progress);
+
+    // If a test condition was met, we don't need to run the actual fetch logic
+    const isTestConditionMet = initialResult.error !== null || initialResult.asset !== null;
 
     const fetchSplatData = useCallback(async () => {
+        if (isTestConditionMet) {
+            return; // Skip actual fetch if test condition already handled
+        }
+
         if (!src || !app) {
             setError("Source URL or PlayCanvas app not available.");
             setLoading(false);
@@ -78,6 +93,7 @@ export const useSplatWithProgress = (
             }, 500); // 500ms delay
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleError = (err: any) => {
             console.error("useSplatWithProgress: Asset 'error' event fired. Full error object:", err);
             console.error("useSplatWithProgress: Asset 'error' message:", err?.message);
@@ -102,13 +118,15 @@ export const useSplatWithProgress = (
             // app.assets.remove(newAsset);
         };
 
-    }, [src, app, onProgress]);
+    }, [src, app, onProgress, isTestConditionMet]); // isTestConditionMet is a dependency
 
     useEffect(() => {
         let cleanupFn: (() => void) | undefined;
 
         const setup = async () => {
-            cleanupFn = await fetchSplatData();
+            if (!isTestConditionMet) { // Only run if no test condition was met
+                cleanupFn = await fetchSplatData();
+            }
         };
 
         setup();
@@ -116,7 +134,7 @@ export const useSplatWithProgress = (
         return () => {
             cleanupFn?.();
         };
-    }, [fetchSplatData]);
+    }, [fetchSplatData, isTestConditionMet]); // isTestConditionMet is a dependency
 
     return { asset, loading, error, progress };
 };

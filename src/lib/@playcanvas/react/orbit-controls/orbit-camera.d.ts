@@ -1,3 +1,5 @@
+import { Script, Vec3, Quat, Vec2, Entity } from 'playcanvas'; // Import necessary PlayCanvas types
+
 export class OrbitCamera extends Script {
     static __name: string;
     static fromWorldPoint: Vec3;
@@ -31,18 +33,18 @@ export class OrbitCamera extends Script {
      * @title Pitch Angle Max (degrees)
      * @type {number}
      */
-    set pitchAngleMax(v: any);
-    get pitchAngleMax(): any;
-    _pitchAngleMax: any;
-    _pitch: any;
+    set pitchAngleMax(v: number);
+    get pitchAngleMax(): number;
+    _pitchAngleMax: number;
+    _pitch: number;
     /**
      * @attribute
      * @title Pitch Angle Min (degrees)
      * @type {number}
      */
-    set pitchAngleMin(v: any);
-    get pitchAngleMin(): any;
-    _pitchAngleMin: any;
+    set pitchAngleMin(v: number);
+    get pitchAngleMin(): number;
+    _pitchAngleMin: number;
     /**
      * Higher value means that the camera will continue moving after the user has stopped dragging. 0 is fully responsive.
      *
@@ -58,8 +60,8 @@ export class OrbitCamera extends Script {
      * @title Focus Entity
      * @type {Entity}
      */
-    set focusEntity(value: any);
-    get focusEntity(): any;
+    set focusEntity(value: Entity);
+    get focusEntity(): Entity;
     /** @private */
     private _focusEntity;
     /**
@@ -81,7 +83,7 @@ export class OrbitCamera extends Script {
      */
     set distance(value: number | undefined);
     get distance(): number | undefined;
-    _targetDistance: any;
+    _targetDistance: number;
     /**
      * Property to get and set the camera orthoHeight
      *
@@ -96,17 +98,17 @@ export class OrbitCamera extends Script {
      *
      * @type {number}
      */
-    set pitch(value: any);
-    get pitch(): any;
-    _targetPitch: any;
+    set pitch(value: number);
+    get pitch(): number;
+    _targetPitch: number;
     /**
      * Property to get and set the yaw of the camera around the pivot point (degrees)
      *
      * @type {number}
      */
-    set yaw(value: any);
-    get yaw(): any;
-    _targetYaw: any;
+    set yaw(value: number);
+    get yaw(): number;
+    _targetYaw: number;
     /**
      * Property to get and set the world position of the pivot point that the camera orbits around
      *
@@ -117,21 +119,21 @@ export class OrbitCamera extends Script {
     /** @private */
     private _modelsAabb;
     _pivotPoint: Vec3;
-    focus(focusEntity: any): void;
-    resetAndLookAtPoint(resetPoint: any, lookAtPoint: any): void;
-    resetAndLookAtEntity(resetPoint: any, entity: any): void;
-    reset(yaw: any, pitch: any, distance: any): void;
+    focus(focusEntity: Entity): void;
+    resetAndLookAtPoint(resetPoint: Vec3, lookAtPoint: Vec3): void;
+    resetAndLookAtEntity(resetPoint: Vec3, entity: Entity): void;
+    reset(yaw: number, pitch: number, distance: number): void;
     initialize(): void;
-    _yaw: any;
-    update(dt: any): void;
+    _yaw: number;
+    update(dt: number): void;
     _updatePosition(): void;
     _removeInertia(): void;
     _checkAspectRatio(): void;
-    _buildAabb(entity: any): void;
-    _calcYaw(quat: any): number;
-    _clampDistance(distance: any): number;
-    _clampPitchAngle(pitch: any): number;
-    _calcPitch(quat: any, yaw: any): number;
+    _buildAabb(entity: Entity): void;
+    _calcYaw(quat: Quat): number;
+    _clampDistance(distance: number): number;
+    _clampPitchAngle(pitch: number): number;
+    _calcPitch(quat: Quat, yaw: number): number;
 }
 export class OrbitCameraInputMouse extends Script {
     static __name: string;
@@ -153,15 +155,15 @@ export class OrbitCameraInputMouse extends Script {
      */
     distanceSensitivity: number;
     initialize(): void;
-    orbitCamera: any;
+    orbitCamera: OrbitCamera;
     lookButtonDown: boolean | undefined;
     panButtonDown: boolean | undefined;
     lastPoint: Vec2 | undefined;
-    pan(screenPoint: any): void;
-    onMouseDown(event: any): void;
-    onMouseUp(event: any): void;
-    onMouseMove(event: any): void;
-    onMouseWheel(event: any): void;
+    pan(screenPoint: Vec2): void;
+    onMouseDown(event: MouseEvent): void;
+    onMouseUp(event: MouseEvent): void;
+    onMouseMove(event: MouseEvent): void;
+    onMouseWheel(event: WheelEvent): void; // WheelEvent for mouse wheel
     onMouseOut(): void;
 }
 export class OrbitCameraInputTouch extends Script {
@@ -185,17 +187,13 @@ export class OrbitCameraInputTouch extends Script {
      */
     distanceSensitivity: number;
     initialize(): void;
-    orbitCamera: any;
+    orbitCamera: OrbitCamera;
     lastTouchPoint: Vec2 | undefined;
     lastPinchMidPoint: Vec2 | undefined;
     lastPinchDistance: number | undefined;
-    getPinchDistance(pointA: any, pointB: any): number;
-    calcMidPoint(pointA: any, pointB: any, result: any): void;
-    onTouchStartEndCancel(event: any): void;
-    pan(midPoint: any): void;
-    onTouchMove(event: any): void;
+    getPinchDistance(pointA: Vec2, pointB: Vec2): number;
+    calcMidPoint(pointA: Vec2, pointB: Vec2, result: Vec2): void;
+    onTouchStartEndCancel(event: TouchEvent): void;
+    pan(midPoint: Vec2): void;
+    onTouchMove(event: TouchEvent): void;
 }
-import { Script } from 'playcanvas';
-import { Vec3 } from 'playcanvas';
-import { Quat } from 'playcanvas';
-import { Vec2 } from 'playcanvas';

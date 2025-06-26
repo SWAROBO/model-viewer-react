@@ -14,6 +14,7 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
     }
 
     // The load method is responsible for fetching the asset data
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     load(url: string, callback: (err: string | null, asset: any) => void, asset: Asset) {
         // console.log("CustomSplatHandler: Loading asset:", url); // Removed log
 
@@ -73,6 +74,7 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
 
                 // Create a temporary asset for the default handler to load from the blobUrl
                 const tempAsset = new Asset(asset.name, asset.type, { url: blobUrl });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 this._defaultSplatHandler.load(blobUrl, (err: string | null, resource: any) => {
                     URL.revokeObjectURL(blobUrl); // Clean up the blob URL
                     if (err) {
@@ -93,6 +95,7 @@ export class CustomSplatHandler extends ResourceHandler { // Extend ResourceHand
     }
 
     // The open method is for synchronous processing (e.g., from cache)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     open(url: string, data: any, asset: Asset) {
         // This method is typically for assets loaded from cache or already available data.
         // For gsplat, it's unlikely to be used directly with raw data.

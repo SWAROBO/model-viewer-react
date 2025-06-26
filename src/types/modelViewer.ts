@@ -9,6 +9,7 @@ export type ModelViewerProps = {
     scale?: [number, number, number];
     pitchAngleMin?: number;
     pitchAngleMax?: number;
+    model: string | undefined;
 };
 
 export const defaultModelViewerProps: Required<ModelViewerProps> = {
@@ -23,4 +24,5 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     scale: [1, 1, 1],
     pitchAngleMin: 0, // Default value for pitchAngleMin
     pitchAngleMax: 90,  // Default value for pitchAngleMax
+    model: undefined,
 };

@@ -1,9 +1,7 @@
 import { render, screen, waitFor, act } from '@testing-library/react'; // Import act
 import Page from './page'; // Import the default export, which is DynamicPage
 import { useSearchParams } from 'next/navigation';
-import { Application } from '@playcanvas/react';
 import ModelViewer from '@/components/ModelViewer';
-import SwaroboLogo from '@/components/SwaroboLogo';
 import { useModelData } from '@/hooks/useModelData';
 
 // Mock Next.js navigation

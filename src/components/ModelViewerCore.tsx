@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas } from "@playcanvas/react/hooks";
+import { Asset } from "playcanvas"; // Import Asset
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
@@ -24,7 +25,7 @@ const EnvAtlasComponent = ({ src }: { src: string }) => {
 };
 
 export type ModelViewerCoreProps = { // Added export keyword
-    splat: any | null; // Using 'any' temporarily for PlayCanvas Asset type
+    splat: Asset | null; // PlayCanvas Asset type
     fov?: number;
     distanceMin?: number;
     distanceMax?: number;
@@ -34,6 +35,7 @@ export type ModelViewerCoreProps = { // Added export keyword
     scale?: [number, number, number];
     pitchAngleMin?: number;
     pitchAngleMax?: number;
+    model?: string; // Added model property
 };
 
 const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
@@ -47,6 +49,8 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     scale = [1, 1, 1],
     pitchAngleMin = 0,
     pitchAngleMax = 90,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    model, // Destructure model prop
 }) => {
     const searchParams = useSearchParams();
     const showSettings = searchParams.get("settings") === "true";

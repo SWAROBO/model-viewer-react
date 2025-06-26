@@ -9,7 +9,7 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: [
-        ["html", { open: "never", outputFolder: "playwright-report" }],
+        ["html", { open: "never", outputFolder: "playwright-report/html-report" }],
         ["json", { outputFile: "playwright-report/results.json" }],
     ],
 
@@ -35,7 +35,7 @@ export default defineConfig({
         // },
     ],
     webServer: {
-        command: "npx serve@latest out",
+        command: "npx http-server out -p 3000",
         url: "http://localhost:3000",
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000, // Increase timeout for CI

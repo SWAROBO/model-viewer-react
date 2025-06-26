@@ -1,6 +1,24 @@
 import { test, expect, type Locator, type Page } from '@playwright/test'; // Import Locator and Page
 
 test.beforeEach(async ({ page }) => {
+  // Inject CSS to disable animations and transitions
+  await page.addStyleTag({
+    content: `
+      * {
+        -webkit-transition: none !important;
+        -moz-transition: none !important;
+        -o-transition: none !important;
+        -ms-transition: none !important;
+        transition: none !important;
+        -webkit-animation: none !important;
+        -moz-animation: none !important;
+        -o-animation: none !important;
+        -ms-animation: none !important;
+        animation: none !important;
+      }
+    `,
+  });
+
   await page.goto('/?settings=true'); // Navigate to settings page to show controls
 
   // Wait for the loading progress indicator to disappear
@@ -30,32 +48,24 @@ test('should interact with Position X slider', async ({ page }) => {
   await expect(labelLocator).toBeVisible({ timeout: 10000 });
 
   // Find the RangeSlider component (which has class 'range-slider') that is a sibling of the label's parent div
-  // The structure is: div > label, div > RangeSlider (which is a div with class 'range-slider')
   const sliderTrack = labelLocator.locator('xpath=./following-sibling::div[contains(@class, "range-slider")]');
   await expect(sliderTrack).toBeVisible({ timeout: 10000 });
 
-  // Get the bounding box of the slider track to calculate drag coordinates
+  // Get the bounding box of the slider track to calculate click coordinates
   const trackBoundingBox = await sliderTrack.boundingBox();
   expect(trackBoundingBox).not.toBeNull();
 
-  // Locate the thumb (handle) of the slider.
-  const thumb = sliderTrack.locator('.range-slider__thumb').first();
-  await expect(thumb).toBeVisible({ timeout: 10000 });
   // Get the current value from the label
   const labelText = await labelLocator.textContent();
   const currentValueMatch = labelText?.match(/Position X: (-?\d+\.\d+)/);
   const initialValue = currentValueMatch ? parseFloat(currentValueMatch[1]) : 0;
 
-  // Calculate target X coordinate for the drag.
-  // Move the thumb to the right by a fixed pixel amount (e.g., 50 pixels)
-  const startX = thumb.boundingBox().then(box => box!.x + box!.width / 2);
-  const startY = thumb.boundingBox().then(box => box!.y + box!.height / 2);
-  const targetX = (await startX) + 50;
+  // Calculate a target X coordinate on the track to change the value
+  // Click slightly to the right of the current thumb position
+  const targetX = trackBoundingBox!.x + trackBoundingBox!.width * 0.75; // Click at 75% of the track
 
-  await page.mouse.move(await startX, await startY);
-  await page.mouse.down();
-  await page.mouse.move(targetX, await startY, { steps: 10 }); // Smooth drag
-  await page.mouse.up();
+  // Click on the slider track to change the value
+  await page.mouse.click(targetX, trackBoundingBox!.y + trackBoundingBox!.height / 2);
 
   // Assert that the value displayed in the label has changed
   const updatedLabelText = await labelLocator.textContent();
@@ -70,9 +80,7 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
   const h3Locator = page.locator('h3', { hasText: 'Camera Distance Settings' });
   await expect(h3Locator).toBeVisible({ timeout: 10000 });
 
-  // Find the RangeSlider component (which has class 'range-slider') that is a sibling of the h3's parent div
-  // The structure is: h3, div > label, label, RangeSlider (which is a div with class 'range-slider')
-  // Locate the RangeSlider component's track (the visible bar) by being a direct sibling of the labels container
+  // Find the RangeSlider component's track
   const sliderTrack = page.locator('h3:has-text("Camera Distance Settings") + div + div.range-slider');
   await expect(sliderTrack).toBeVisible({ timeout: 10000 });
 
@@ -83,7 +91,7 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
   const thumbs = sliderTrack.locator('.range-slider__thumb');
   await expect(thumbs).toHaveCount(2);
 
-  // Get current values from labels (these labels are siblings of the h3)
+  // Get current values from labels
   const labelsContainer = h3Locator.locator('xpath=./following-sibling::div[1]');
   const labelText = await labelsContainer.textContent();
   const minMatch = labelText?.match(/Min Distance: (-?\d+\.\d+)/);
@@ -97,31 +105,17 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
   const sliderMinRange = 3.00;
   const sliderMaxRange = 6.00;
 
-  // Drag the min thumb slightly to the right
+  // Interact with the min thumb using keyboard
   const minThumb = thumbs.first();
-  const minThumbBoundingBox = await minThumb.boundingBox();
-  expect(minThumbBoundingBox).not.toBeNull();
-  const minStartX = minThumbBoundingBox!.x + minThumbBoundingBox!.width / 2;
-  const minStartY = minThumbBoundingBox!.y + minThumbBoundingBox!.height / 2;
-  const minTargetX = minStartX + 5; // Move right by 5 pixels
+  await minThumb.focus();
+  await page.keyboard.press('ArrowRight'); // Move right
+  await page.waitForTimeout(200); // Small delay for UI update
 
-  await page.mouse.move(minStartX, minStartY);
-  await page.mouse.down();
-  await page.mouse.move(minTargetX, minStartY, { steps: 2 });
-  await page.mouse.up();
-
-  // Drag the max thumb slightly to the left
+  // Interact with the max thumb using keyboard
   const maxThumb = thumbs.last();
-  const maxThumbBoundingBox = await maxThumb.boundingBox();
-  expect(maxThumbBoundingBox).not.toBeNull();
-  const maxStartX = maxThumbBoundingBox!.x + maxThumbBoundingBox!.width / 2;
-  const maxStartY = maxThumbBoundingBox!.y + maxThumbBoundingBox!.height / 2;
-  const maxTargetX = maxStartX - 5; // Move left by 5 pixels
-
-  await page.mouse.move(maxStartX, maxStartY);
-  await page.mouse.down();
-  await page.mouse.move(maxTargetX, maxStartY, { steps: 2 });
-  await page.mouse.up();
+  await maxThumb.focus();
+  await page.keyboard.press('ArrowLeft'); // Move left
+  await page.waitForTimeout(200); // Small delay for UI update
 
   // Assert that the values displayed in the labels have changed and are within bounds
   const updatedLabelText = await labelsContainer.textContent();
@@ -133,7 +127,6 @@ test('should interact with Camera Distance dual slider', async ({ page }) => {
   console.log(`Updated Min Value: ${updatedMinValue}, Updated Max Value: ${updatedMaxValue}`);
 
   // Assert that values have changed from initial and are within the expected range
-  // We expect them to change, but not necessarily be strictly greater/less than initial if at extremes
   expect(updatedMinValue).not.toEqual(initialMinValue);
   expect(updatedMaxValue).not.toEqual(initialMaxValue);
 

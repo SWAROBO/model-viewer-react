@@ -9,7 +9,7 @@ import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
 import SingleValueSliderControl from "./SingleValueSliderControl";
-import { useSyncedState } from '../hooks/useSyncedState'; // New import
+import { useSyncedState } from "../hooks/useSyncedState"; // New import
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -24,7 +24,8 @@ const EnvAtlasComponent = ({ src }: { src: string }) => {
     );
 };
 
-export type ModelViewerCoreProps = { // Added export keyword
+export type ModelViewerCoreProps = {
+    // Added export keyword
     splat: Asset | null; // PlayCanvas Asset type
     fov?: number;
     distanceMin?: number;
@@ -35,6 +36,7 @@ export type ModelViewerCoreProps = { // Added export keyword
     scale?: [number, number, number];
     pitchAngleMin?: number;
     pitchAngleMax?: number;
+    pitchAngle?: number;
     model?: string; // Added model property
 };
 
@@ -49,6 +51,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     scale = [1, 1, 1],
     pitchAngleMin = 0,
     pitchAngleMax = 90,
+    pitchAngle = 10,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     model, // Destructure model prop
 }) => {
@@ -65,6 +68,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         pitchAngleMin,
         pitchAngleMax,
     ]);
+    const [currentPitchAngle] = useState(pitchAngle);
 
     // State for UI controls, now using useSyncedState
     const [controlPosition, setControlPosition] = useSyncedState(position);
@@ -138,18 +142,17 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             {/* Create a camera entity */}
             <Entity>
                 <Camera clearColor="#090707" fov={fov} />
-                {splat && (
-                    <OrbitControls
-                        distanceMin={distanceRange[0]}
-                        distanceMax={distanceRange[1]}
-                        inertiaFactor={0.1}
-                        distance={currentDistance}
-                        pitchAngleMin={pitchAngleRange[0]}
-                        pitchAngleMax={pitchAngleRange[1]}
-                        mouse={orbitControlSensitivity}
-                        touch={orbitControlSensitivity}
-                    />
-                )}
+                <OrbitControls
+                    distanceMin={distanceRange[0]}
+                    distanceMax={distanceRange[1]}
+                    inertiaFactor={0.1}
+                    distance={currentDistance}
+                    pitchAngle={currentPitchAngle}
+                    pitchAngleMin={pitchAngleRange[0]}
+                    pitchAngleMax={pitchAngleRange[1]}
+                    mouse={orbitControlSensitivity}
+                    touch={orbitControlSensitivity}
+                />
                 {!showSettings && (
                     <AutoRotate startDelay={1} startFadeInTime={2} />
                 )}
@@ -162,7 +165,6 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             >
                 {splat && <GSplat asset={splat} />}
             </Entity>
-
             {showSettings && (
                 <div
                     data-testid="model-viewer-settings-panel" // Add data-testid to the settings panel

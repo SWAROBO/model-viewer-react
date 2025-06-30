@@ -124,6 +124,10 @@ export class OrbitCamera extends Script {
      */
     set pitch(value) {
         this._targetPitch = this._clampPitchAngle(value);
+        if (!this._initialPitchSet && value !== undefined) {
+            this._pitch = this._targetPitch;
+            this._initialPitchSet = true;
+        }
     }
     get pitch() {
         return this._targetPitch;
@@ -177,6 +181,7 @@ export class OrbitCamera extends Script {
     /** @private */
     _modelsAabb = new BoundingBox();
     _pivotPoint = new Vec3();
+    _initialPitchSet = false;
     static fromWorldPoint = new Vec3();
     static toWorldPoint = new Vec3();
     static worldDiff = new Vec3();

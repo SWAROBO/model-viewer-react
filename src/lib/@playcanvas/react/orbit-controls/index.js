@@ -20,6 +20,7 @@ export const OrbitControls = ({
     pivotPoint = new Vec3(),
     frameOnStart = true,
     distance = 0,
+    pitchAngle = 0,
     mouse = { orbitSensitivity: 0.3, distanceSensitivity: 0.15 },
     touch = { orbitSensitivity: 0.4, distanceSensitivity: 0.2 },
 }) => {
@@ -33,6 +34,7 @@ export const OrbitControls = ({
         pivotPoint,
         frameOnStart,
         distance,
+        pitch: pitchAngle,
     };
     return _jsxs(_Fragment, {
         children: [

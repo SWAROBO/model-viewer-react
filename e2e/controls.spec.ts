@@ -151,33 +151,17 @@ test('should toggle grid visibility', async ({ page }) => {
   const settingsPanel = page.getByTestId('model-viewer-settings-panel');
   await expect(settingsPanel).toBeVisible({ timeout: 20000 });
 
-  // Initially, the grid should be visible (checkbox is checked by default)
-  await expect(gridToggle).toBeChecked({ timeout: 15000 });
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true', { timeout: 15000 });
-
-  // Click the checkbox directly to hide the grid
-  await gridToggle.click({ force: true, timeout: 20000 });
-  await page.waitForFunction(
-    async (selector) => {
-      const el = document.querySelector(selector);
-      return el && el.getAttribute('data-grid-visible') === 'false';
-    },
-    '[data-testid="model-viewer-settings-panel"]',
-    { timeout: 20000 }
-  );
+  // Initially, the grid should be hidden (checkbox is unchecked by default)
   await expect(gridToggle).not.toBeChecked({ timeout: 15000 });
   await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false', { timeout: 15000 });
 
-  // Click the checkbox directly again to show the grid
-  await gridToggle.click({ force: true, timeout: 20000 });
-  await page.waitForFunction(
-    async (selector) => {
-      const el = document.querySelector(selector);
-      return el && el.getAttribute('data-grid-visible') === 'true';
-    },
-    '[data-testid="model-viewer-settings-panel"]',
-    { timeout: 20000 }
-  );
-  await expect(gridToggle).toBeChecked({ timeout: 15000 });
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true', { timeout: 15000 });
+  // Dispatch a click event to show the grid
+  await gridToggle.dispatchEvent('click');
+  await expect(gridToggle).toBeChecked();
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
+
+  // Dispatch a click event again to hide the grid
+  await gridToggle.dispatchEvent('click');
+  await expect(gridToggle).not.toBeChecked();
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false');
 });

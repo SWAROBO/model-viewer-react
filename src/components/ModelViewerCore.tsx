@@ -4,12 +4,18 @@ import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas } from "@playcanvas/react/hooks";
-import { Asset } from "playcanvas"; // Import Asset
+import { Asset, Entity as PcEntity, ScriptComponent } from "playcanvas"; // Import Asset and pc.Entity
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
 import SingleValueSliderControl from "./SingleValueSliderControl";
 import { useSyncedState } from "../hooks/useSyncedState"; // New import
+import { OrbitCamera } from "../lib/@playcanvas/react/orbit-controls/orbit-camera";
+
+// Define an interface for the script component that includes the orbitCamera property
+interface OrbitCameraScript extends ScriptComponent {
+    orbitCamera: OrbitCamera;
+}
 
 // Load the environment atlas asset
 const EnvAtlasComponent = ({ src }: { src: string }) => {
@@ -62,8 +68,6 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         distanceMin,
         distanceMax,
     ]);
-    const [currentDistance, setCurrentDistance] = useState(distance);
-
     const [pitchAngleRange, setPitchAngleRange] = useState<[number, number]>([
         pitchAngleMin,
         pitchAngleMax,
@@ -71,8 +75,39 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [currentPitchAngle] = useState(pitchAngle);
 
     // State for UI controls, now using useSyncedState
+    const [currentDistance, setCurrentDistance] = useSyncedState(distance);
     const [controlPosition, setControlPosition] = useSyncedState(position);
     const [controlRotation, setControlRotation] = useSyncedState(rotation);
+
+    const cameraEntityRef = React.useRef<PcEntity>(null); // Ref for the camera entity
+
+    // Set initial distance and min/max immediately on mount
+    React.useEffect(() => {
+        const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+        if (script?.orbitCamera) {
+            script.orbitCamera.setDistanceImmediate(currentDistance);
+            // Also set initial min/max distances
+            script.orbitCamera.distanceMin = distanceRange[0];
+            script.orbitCamera.distanceMax = distanceRange[1];
+        }
+    }, [currentDistance, distanceRange]); // Add missing dependencies
+
+    // Effect to update orbitCamera's distanceMin and distanceMax when distanceRange changes
+    React.useEffect(() => {
+        const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+        if (script?.orbitCamera) {
+            script.orbitCamera.distanceMin = distanceRange[0];
+            script.orbitCamera.distanceMax = distanceRange[1];
+        }
+    }, [distanceRange]); // Re-run when distanceRange changes
+
+    // Effect to update orbitCamera's distance when currentDistance changes
+    React.useEffect(() => {
+        const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+        if (script?.orbitCamera) {
+            script.orbitCamera.distance = currentDistance;
+        }
+    }, [currentDistance]);
 
     // Removed gSplatEntityPosition and gSplatEntityRotation states
     // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
@@ -90,15 +125,32 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         newMin = Math.min(newMin, newMax);
         if (newMin !== distanceRange[0] || newMax !== distanceRange[1]) {
             setDistanceRange([newMin, newMax]);
-            // Optionally, adjust currentDistance if it falls outside the new range
-            // For now, we'll keep its update logic separate or tied to min change
+
+            let updatedCurrentDistance = currentDistance;
+
+            // If newMin has changed, set currentDistance to newMin
             if (newMin !== distanceRange[0]) {
-                setCurrentDistance(newMin);
-            } else if (
-                newMax !== distanceRange[1] &&
-                currentDistance > newMax
-            ) {
-                setCurrentDistance(newMax);
+                updatedCurrentDistance = newMin;
+            }
+            // If newMax has changed, set currentDistance to newMax
+            else if (newMax !== distanceRange[1]) {
+                updatedCurrentDistance = newMax;
+            }
+
+            // Ensure currentDistance is within the new range [newMin, newMax]
+            updatedCurrentDistance = Math.max(
+                newMin,
+                Math.min(updatedCurrentDistance, newMax)
+            );
+
+            if (updatedCurrentDistance !== currentDistance) {
+                setCurrentDistance(updatedCurrentDistance);
+                // Use the inertial setter for smooth movement
+                const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+                if (script?.orbitCamera) {
+                    script.orbitCamera.distance =
+                        updatedCurrentDistance;
+                }
             }
         }
     };
@@ -140,13 +192,12 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                 <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
             )}
             {/* Create a camera entity */}
-            <Entity>
+            <Entity ref={cameraEntityRef}>
                 <Camera clearColor="#090707" fov={fov} />
                 <OrbitControls
-                    distanceMin={distanceRange[0]}
-                    distanceMax={distanceRange[1]}
-                    inertiaFactor={0.1}
-                    distance={currentDistance}
+                    // distanceMin and distanceMax are now updated imperatively
+                    inertiaFactor={0.1} // Revert inertiaFactor to 0.1 for smooth movement
+                    // Removed distance prop to prevent re-evaluation based on currentDistance
                     pitchAngle={currentPitchAngle}
                     pitchAngleMin={pitchAngleRange[0]}
                     pitchAngleMax={pitchAngleRange[1]}
@@ -196,6 +247,22 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         step={0.1}
                         onInput={(value: number[]) => {
                             updateDistanceRangeInternal([value[0], value[1]]);
+                        }}
+                    />
+
+                    <SingleValueSliderControl
+                        label="Distance"
+                        value={currentDistance}
+                        sliderMin={distanceRange[0]}
+                        sliderMax={distanceRange[1]}
+                        step={0.1}
+                        onInput={(value: number) => {
+                            setCurrentDistance(value);
+                            const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+                            if (script?.orbitCamera) {
+                                script.orbitCamera.distance =
+                                    value; // Use inertial setter for smooth movement
+                            }
                         }}
                     />
 

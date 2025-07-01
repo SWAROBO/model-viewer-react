@@ -11,8 +11,7 @@ import {
     OrbitCameraInputTouch,
 } from "./orbit-camera";
 export const OrbitControls = ({
-    distanceMax = 20,
-    distanceMin = 18,
+    // Removed distanceMax and distanceMin from props to prevent re-application
     pitchAngleMax = 90,
     pitchAngleMin = 0,
     inertiaFactor = 0.0,
@@ -25,8 +24,7 @@ export const OrbitControls = ({
     touch = { orbitSensitivity: 0.4, distanceSensitivity: 0.2 },
 }) => {
     const orbitCameraProps = {
-        distanceMax,
-        distanceMin,
+        // Removed distanceMax and distanceMin from orbitCameraProps
         pitchAngleMax,
         pitchAngleMin,
         inertiaFactor,

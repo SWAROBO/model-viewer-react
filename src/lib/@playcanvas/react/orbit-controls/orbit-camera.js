@@ -8,7 +8,7 @@ export class OrbitCamera extends Script {
      */
     set distanceMax(v) {
         this._distanceMax = v;
-        this._distance = this._clampDistance(this._distance);
+        // Removed implicit clamping here, as ModelViewerCore will handle distance updates
     }
     get distanceMax() {
         return this._distanceMax;
@@ -20,7 +20,7 @@ export class OrbitCamera extends Script {
      */
     set distanceMin(v) {
         this._distanceMin = v;
-        this._distance = this._clampDistance(this._distance);
+        // Removed implicit clamping here, as ModelViewerCore will handle distance updates
     }
     get distanceMin() {
         return this._distanceMin;
@@ -103,6 +103,18 @@ export class OrbitCamera extends Script {
     }
     get distance() {
         return this._targetDistance;
+    }
+
+    /**
+     * Property to immediately set the distance between the pivot point and camera, bypassing inertia.
+     * Clamped between this.distanceMin and this.distanceMax
+     *
+     * @param {number} value
+     */
+    setDistanceImmediate(value) {
+        const clampedValue = this._clampDistance(value);
+        this._targetDistance = clampedValue;
+        this._distance = clampedValue;
     }
     /**
      * Property to get and set the camera orthoHeight

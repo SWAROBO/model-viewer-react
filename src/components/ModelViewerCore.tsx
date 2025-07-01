@@ -124,7 +124,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
 
     const [isSliderActive, setIsSliderActive] = useState(false);
-    const [showGrid, setShowGrid] = useState(true); // New state for grid visibility
+    const [showGrid, setShowGrid] = useState(false); // New state for grid visibility
 
     // The useEffects for syncing controlPosition and controlRotation are now handled by useSyncedState
     // Removed the useEffect that applied controlPosition/Rotation to entity transform

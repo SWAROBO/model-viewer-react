@@ -151,17 +151,17 @@ test('should toggle grid visibility', async ({ page }) => {
   const settingsPanel = page.getByTestId('model-viewer-settings-panel');
   await expect(settingsPanel).toBeVisible({ timeout: 20000 });
 
-  // Initially, the grid should be visible (checkbox is checked by default)
-  await expect(gridToggle).toBeChecked({ timeout: 15000 });
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true', { timeout: 15000 });
+  // Initially, the grid should be hidden (checkbox is unchecked by default)
+  await expect(gridToggle).not.toBeChecked({ timeout: 15000 });
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false', { timeout: 15000 });
 
-  // Dispatch a click event to hide the grid
-  await gridToggle.dispatchEvent('click');
-  await expect(gridToggle).not.toBeChecked();
-  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false');
-
-  // Dispatch a click event again to show the grid
+  // Dispatch a click event to show the grid
   await gridToggle.dispatchEvent('click');
   await expect(gridToggle).toBeChecked();
   await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'true');
+
+  // Dispatch a click event again to hide the grid
+  await gridToggle.dispatchEvent('click');
+  await expect(gridToggle).not.toBeChecked();
+  await expect(settingsPanel).toHaveAttribute('data-grid-visible', 'false');
 });

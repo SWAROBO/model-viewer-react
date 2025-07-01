@@ -135,7 +135,7 @@ describe("ModelViewerCore", () => {
 
     it("renders without crashing", () => {
         render(<ModelViewerCore splat={null} />);
-        expect(screen.getByTestId("mock-grid")).toBeInTheDocument();
+        expect(screen.queryByTestId("mock-grid")).not.toBeInTheDocument();
     });
 
     // Removed tests that rely on `toHaveBeenCalled` for PlayCanvas components or check for their DOM presence when they render null.

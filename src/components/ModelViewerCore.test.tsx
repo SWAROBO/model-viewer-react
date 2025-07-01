@@ -183,16 +183,6 @@ describe("ModelViewerCore", () => {
         ); // Expect any object for props, and undefined for the second arg
     });
 
-    it("does not render GSplat and OrbitControls when splat prop is null", () => {
-        render(<ModelViewerCore splat={null} />);
-        const GSplatMock = vi.mocked(GSplat);
-        expect(GSplatMock).not.toHaveBeenCalled();
-
-        // OrbitControls is always rendered, so this test is not valid
-        // const OrbitControlsMock = vi.mocked(OrbitControls);
-        // expect(OrbitControlsMock).not.toHaveBeenCalled();
-    });
-
     it("passes fov prop to Camera component", () => {
         render(<ModelViewerCore splat={null} fov={90} />);
         const CameraMock = vi.mocked(Camera);

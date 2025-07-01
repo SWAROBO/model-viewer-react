@@ -72,7 +72,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         pitchAngleMin,
         pitchAngleMax,
     ]);
-    const [currentPitchAngle] = useState(pitchAngle);
+    const [currentPitchAngle, setCurrentPitchAngle] = useSyncedState(pitchAngle);
 
     // State for UI controls, now using useSyncedState
     const [currentDistance, setCurrentDistance] = useSyncedState(distance);
@@ -89,8 +89,11 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             // Also set initial min/max distances
             script.orbitCamera.distanceMin = distanceRange[0];
             script.orbitCamera.distanceMax = distanceRange[1];
+            // Set initial pitch angle min/max
+            script.orbitCamera.pitchAngleMin = pitchAngleRange[0];
+            script.orbitCamera.pitchAngleMax = pitchAngleRange[1];
         }
-    }, [currentDistance, distanceRange]); // Add missing dependencies
+    }, [currentDistance, distanceRange, pitchAngleRange]); // Add missing dependencies
 
     // Effect to update orbitCamera's distanceMin and distanceMax when distanceRange changes
     React.useEffect(() => {
@@ -108,6 +111,14 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             script.orbitCamera.distance = currentDistance;
         }
     }, [currentDistance]);
+
+    // Effect to update orbitCamera's pitch when currentPitchAngle changes
+    React.useEffect(() => {
+        const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+        if (script?.orbitCamera) {
+            script.orbitCamera.pitch = -currentPitchAngle;
+        }
+    }, [currentPitchAngle]);
 
     // Removed gSplatEntityPosition and gSplatEntityRotation states
     // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
@@ -162,6 +173,34 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         newMin = Math.min(newMin, newMax);
         if (newMin !== pitchAngleRange[0] || newMax !== pitchAngleRange[1]) {
             setPitchAngleRange([newMin, newMax]);
+
+            let updatedCurrentPitchAngle = currentPitchAngle;
+
+            // If newMin has changed, set currentPitchAngle to newMin
+            if (newMin !== pitchAngleRange[0]) {
+                updatedCurrentPitchAngle = newMin;
+            }
+            // If newMax has changed, set currentPitchAngle to newMax
+            else if (newMax !== pitchAngleRange[1]) {
+                updatedCurrentPitchAngle = newMax;
+            }
+
+            // Ensure currentPitchAngle is within the new range [newMin, newMax]
+            updatedCurrentPitchAngle = Math.max(
+                newMin,
+                Math.min(updatedCurrentPitchAngle, newMax)
+            );
+
+            if (updatedCurrentPitchAngle !== currentPitchAngle) {
+                setCurrentPitchAngle(updatedCurrentPitchAngle);
+                // Use the immediate setter for instant snapping
+                const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+                if (script?.orbitCamera) {
+                    script.orbitCamera.setPitchImmediate(
+                        -updatedCurrentPitchAngle
+                    );
+                }
+            }
         }
     };
 
@@ -199,8 +238,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     inertiaFactor={0.1} // Revert inertiaFactor to 0.1 for smooth movement
                     // Removed distance prop to prevent re-evaluation based on currentDistance
                     pitchAngle={currentPitchAngle}
-                    pitchAngleMin={pitchAngleRange[0]}
-                    pitchAngleMax={pitchAngleRange[1]}
+                    // pitchAngleMin and pitchAngleMax are now updated imperatively
                     mouse={orbitControlSensitivity}
                     touch={orbitControlSensitivity}
                 />
@@ -277,6 +315,22 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         step={1}
                         onInput={(value: number[]) => {
                             updatePitchAngleRangeInternal([value[0], value[1]]);
+                        }}
+                    />
+
+                    <SingleValueSliderControl
+                        label="Pitch Angle"
+                        value={currentPitchAngle}
+                        sliderMin={pitchAngleRange[0]}
+                        sliderMax={pitchAngleRange[1]}
+                        step={1}
+                        onInput={(value: number) => {
+                            setCurrentPitchAngle(value);
+                            const script = cameraEntityRef.current?.script as OrbitCameraScript | undefined;
+                            if (script?.orbitCamera) {
+                                script.orbitCamera.pitch =
+                                    -value; // Use inertial setter for smooth movement
+                            }
                         }}
                     />
 

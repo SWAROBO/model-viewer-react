@@ -32,7 +32,7 @@ export class OrbitCamera extends Script {
      */
     set pitchAngleMax(v) {
         this._pitchAngleMax = v;
-        this._pitch = this._clampPitchAngle(this._pitch);
+        // Removed implicit clamping here, as ModelViewerCore will handle pitch updates
     }
     get pitchAngleMax() {
         return this._pitchAngleMax;
@@ -44,7 +44,7 @@ export class OrbitCamera extends Script {
      */
     set pitchAngleMin(v) {
         this._pitchAngleMin = v;
-        this._pitch = this._clampPitchAngle(this._pitchAngleMin);
+        // Removed implicit clamping here, as ModelViewerCore will handle pitch updates
     }
     get pitchAngleMin() {
         return this._pitchAngleMin;
@@ -115,6 +115,18 @@ export class OrbitCamera extends Script {
         const clampedValue = this._clampDistance(value);
         this._targetDistance = clampedValue;
         this._distance = clampedValue;
+    }
+
+    /**
+     * Property to immediately set the pitch of the camera around the pivot point, bypassing inertia.
+     * Clamped between this.pitchAngleMin and this.pitchAngleMax.
+     *
+     * @param {number} value
+     */
+    setPitchImmediate(value) {
+        const clampedValue = this._clampPitchAngle(value);
+        this._targetPitch = clampedValue;
+        this._pitch = clampedValue;
     }
     /**
      * Property to get and set the camera orthoHeight

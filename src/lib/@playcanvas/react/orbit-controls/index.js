@@ -12,8 +12,7 @@ import {
 } from "./orbit-camera";
 export const OrbitControls = ({
     // Removed distanceMax and distanceMin from props to prevent re-application
-    pitchAngleMax = 90,
-    pitchAngleMin = 0,
+    // Removed pitchAngleMax and pitchAngleMin from props
     inertiaFactor = 0.0,
     focusEntity = null,
     pivotPoint = new Vec3(),
@@ -25,8 +24,7 @@ export const OrbitControls = ({
 }) => {
     const orbitCameraProps = {
         // Removed distanceMax and distanceMin from orbitCameraProps
-        pitchAngleMax,
-        pitchAngleMin,
+        // Removed pitchAngleMax and pitchAngleMin from orbitCameraProps
         inertiaFactor,
         focusEntity,
         pivotPoint,

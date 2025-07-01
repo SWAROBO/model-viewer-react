@@ -118,6 +118,10 @@ describe("ModelViewerCore", () => {
             distanceMax: 0,
             distance: 0,
             setDistanceImmediate: vi.fn(),
+            pitch: 0,
+            pitchAngleMin: 0,
+            pitchAngleMax: 0,
+            setPitchImmediate: vi.fn(),
         } as unknown as OrbitCamera; // Cast to OrbitCamera
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,7 +170,7 @@ describe("ModelViewerCore", () => {
         render(<ModelViewerCore splat={null} />);
         expect(screen.getAllByTestId("mock-dual-range-slider").length).toBe(2);
         expect(screen.getAllByTestId("mock-single-value-slider").length).toBe(
-            7
+            8
         );
     });
 
@@ -253,10 +257,11 @@ describe("ModelViewerCore", () => {
             />
         );
         const OrbitControlsMock = vi.mocked(OrbitControls);
+        // pitchAngleMin and pitchAngleMax are now updated imperatively
         expect(OrbitControlsMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                pitchAngleMin: -45,
-                pitchAngleMax: 45,
+            expect.not.objectContaining({
+                pitchAngleMin: expect.any(Number),
+                pitchAngleMax: expect.any(Number),
             }),
             undefined
         );
@@ -379,7 +384,7 @@ describe("ModelViewerCore", () => {
         });
         const positionSliders = screen
             .getAllByTestId("mock-single-value-slider")
-            .slice(1, 4); // Skip the new distance slider
+            .slice(2, 5); // Skip distance and pitch sliders
         expect(positionSliders[0]).toHaveAttribute("data-value", "1.1");
         expect(positionSliders[1]).toHaveAttribute("data-value", "2.2");
         expect(positionSliders[2]).toHaveAttribute("data-value", "3.3");
@@ -399,7 +404,7 @@ describe("ModelViewerCore", () => {
         });
         const rotationSliders = screen
             .getAllByTestId("mock-single-value-slider")
-            .slice(4, 7); // Skip the new distance slider
+            .slice(5, 8); // Skip distance and pitch sliders
         expect(rotationSliders[0]).toHaveAttribute("data-value", "10");
         expect(rotationSliders[1]).toHaveAttribute("data-value", "20");
         expect(rotationSliders[2]).toHaveAttribute("data-value", "30");
@@ -486,15 +491,44 @@ describe("ModelViewerCore", () => {
             onInputPitchAngle!([newPitchMin, newPitchMax]);
         });
 
-        // Verify OrbitControls received the updated pitch angle range
-        const OrbitControlsMock = vi.mocked(OrbitControls);
-        expect(OrbitControlsMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                pitchAngleMin: newPitchMin,
-                pitchAngleMax: newPitchMax,
+        // Verify orbitCamera script received the updated pitch angle range
+        expect(mockOrbitCamera.pitchAngleMin).toBe(newPitchMin);
+        expect(mockOrbitCamera.pitchAngleMax).toBe(newPitchMax);
+    });
+
+    it("updates camera pitch angle and passes to OrbitControls when SingleValueSliderControl is interacted with", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (useSearchParams as any).mockReturnValue({
+            get: vi.fn((param) => {
+                if (param === "settings") return "true";
+                return null;
             }),
-            undefined
-        );
+        });
+
+        const initialPitchAngle = 10;
+        const newPitchAngle = 45;
+
+        await act(async () => {
+            const mockSplat = new Asset("mockSplat", "gsplat", {
+                url: "mock.splat",
+            });
+            render(
+                <ModelViewerCore
+                    splat={mockSplat}
+                    pitchAngle={initialPitchAngle}
+                />
+            );
+        });
+
+        const onInputPitchAngle = singleValueOnInputs.get("Pitch Angle");
+        expect(onInputPitchAngle).toBeDefined();
+
+        await act(async () => {
+            onInputPitchAngle!(newPitchAngle);
+        });
+
+        // Verify orbitCamera script received the updated pitch angle
+        expect(mockOrbitCamera.pitch).toBe(-newPitchAngle);
     });
 
     it("updates model position and passes to GSplat Entity when SingleValueSliderControl is interacted with", async () => {

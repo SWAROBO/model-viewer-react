@@ -85,6 +85,7 @@ export class OrbitCamera extends Script {
     get distance(): number | undefined;
     setDistanceImmediate(value: number): void;
     _targetDistance: number;
+    setPitchImmediate(value: number): void;
     /**
      * Property to get and set the camera orthoHeight
      *

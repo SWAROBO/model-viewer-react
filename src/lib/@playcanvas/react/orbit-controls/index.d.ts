@@ -8,6 +8,7 @@ type OrbitCameraProps = {
     focusEntity?: Entity | null;
     frameOnStart?: boolean;
     distance?: number;
+    pitchAngle?: number;
     pivotPoint?: Vec3 | null;
 };
 type OrbitCameraInputProps = {
@@ -18,5 +19,5 @@ type OrbitControls = OrbitCameraProps & {
     mouse?: OrbitCameraInputProps;
     touch?: OrbitCameraInputProps;
 };
-export declare const OrbitControls: ({ distanceMax, distanceMin, pitchAngleMax, pitchAngleMin, inertiaFactor, focusEntity, pivotPoint, frameOnStart, distance, mouse, touch, }: OrbitControls) => import("react/jsx-runtime").JSX.Element;
+export declare const OrbitControls: ({ distanceMax, distanceMin, pitchAngleMax, pitchAngleMin, inertiaFactor, focusEntity, pivotPoint, frameOnStart, distance, pitchAngle, mouse, touch, }: OrbitControls) => import("react/jsx-runtime").JSX.Element;
 export {};

@@ -11,28 +11,26 @@ import {
     OrbitCameraInputTouch,
 } from "./orbit-camera";
 export const OrbitControls = ({
-    distanceMax = 20,
-    distanceMin = 18,
-    pitchAngleMax = 90,
-    pitchAngleMin = 0,
+    // Removed distanceMax and distanceMin from props to prevent re-application
+    // Removed pitchAngleMax and pitchAngleMin from props
     inertiaFactor = 0.0,
     focusEntity = null,
     pivotPoint = new Vec3(),
     frameOnStart = true,
     distance = 0,
+    pitchAngle = 0,
     mouse = { orbitSensitivity: 0.3, distanceSensitivity: 0.15 },
     touch = { orbitSensitivity: 0.4, distanceSensitivity: 0.2 },
 }) => {
     const orbitCameraProps = {
-        distanceMax,
-        distanceMin,
-        pitchAngleMax,
-        pitchAngleMin,
+        // Removed distanceMax and distanceMin from orbitCameraProps
+        // Removed pitchAngleMax and pitchAngleMin from orbitCameraProps
         inertiaFactor,
         focusEntity,
         pivotPoint,
         frameOnStart,
         distance,
+        pitch: pitchAngle,
     };
     return _jsxs(_Fragment, {
         children: [

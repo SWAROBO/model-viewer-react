@@ -6,6 +6,7 @@ import { Entity } from "@playcanvas/react"; // Import Entity to use vi.mocked
 import { Camera, GSplat } from "@playcanvas/react/components"; // Import components for mocking
 import { OrbitControls } from "../lib/@playcanvas/react"; // Import OrbitControls for mocking
 import { Asset } from "playcanvas"; // Import Asset
+import { OrbitCamera } from "../lib/@playcanvas/react/orbit-controls/orbit-camera"; // Import OrbitCamera
 
 // Store onInput functions from mocked components
 const dualRangeOnInputs = new Map<string, (values: number[]) => void>();
@@ -13,30 +14,35 @@ const singleValueOnInputs = new Map<string, (value: number) => void>();
 
 // Mock PlayCanvas components and hooks
 // Mock the main @playcanvas/react package for Entity
+// This mock needs to be outside describe/beforeEach due to hoisting
+let mockOrbitCamera: OrbitCamera; // Declare mockOrbitCamera at the top level
+
 vi.mock("@playcanvas/react", () => ({
-    Entity: vi.fn(
-        ({
-            children,
-            /* eslint-disable @typescript-eslint/no-unused-vars */ position,
-            rotation,
-            scale /* eslint-enable @typescript-eslint/no-unused-vars */,
-        }) => <>{children}</>
-    ), // Added eslint-disable comments
+    Entity: vi.fn(({ children, ref, ...props }) => {
+        // Simulate the ref being set to an object with a script property
+        if (ref) {
+            ref.current = {
+                script: {
+                    orbitCamera: mockOrbitCamera, // Use the top-level mockOrbitCamera
+                },
+            };
+        }
+        return <div {...props}>{children}</div>;
+    }),
+    // Keep other exports if needed by other tests or components
+    Application: vi.fn(({ children }) => <div>{children}</div>),
 }));
 
-// Mock @playcanvas/react/components
 vi.mock("@playcanvas/react/components", () => ({
     Camera: vi.fn(() => null),
     GSplat: vi.fn(() => null),
     EnvAtlas: vi.fn(() => null),
 }));
 
-// Mock @playcanvas/react/hooks
 vi.mock("@playcanvas/react/hooks", () => ({
     useEnvAtlas: vi.fn(() => ({ asset: {} })),
 }));
 
-// Mock ../lib/@playcanvas/react (for OrbitControls)
 vi.mock("../lib/@playcanvas/react", () => ({
     OrbitControls: vi.fn(() => null),
 }));
@@ -106,6 +112,18 @@ describe("ModelViewerCore", () => {
         dualRangeOnInputs.clear();
         singleValueOnInputs.clear();
 
+        // Reset and mock the orbitCamera properties and methods for each test
+        mockOrbitCamera = {
+            distanceMin: 0,
+            distanceMax: 0,
+            distance: 0,
+            setDistanceImmediate: vi.fn(),
+            pitch: 0,
+            pitchAngleMin: 0,
+            pitchAngleMax: 0,
+            setPitchImmediate: vi.fn(),
+        } as unknown as OrbitCamera; // Cast to OrbitCamera
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (useSearchParams as any).mockReturnValue({
             get: vi.fn((param) => {
@@ -117,7 +135,7 @@ describe("ModelViewerCore", () => {
 
     it("renders without crashing", () => {
         render(<ModelViewerCore splat={null} />);
-        expect(screen.getByTestId("mock-grid")).toBeInTheDocument();
+        expect(screen.queryByTestId("mock-grid")).not.toBeInTheDocument();
     });
 
     // Removed tests that rely on `toHaveBeenCalled` for PlayCanvas components or check for their DOM presence when they render null.
@@ -152,7 +170,7 @@ describe("ModelViewerCore", () => {
         render(<ModelViewerCore splat={null} />);
         expect(screen.getAllByTestId("mock-dual-range-slider").length).toBe(2);
         expect(screen.getAllByTestId("mock-single-value-slider").length).toBe(
-            6
+            8
         );
     });
 
@@ -167,7 +185,9 @@ describe("ModelViewerCore", () => {
     });
 
     it("renders GSplat and OrbitControls when splat prop is provided", () => {
-        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+        const mockSplat = new Asset("mockSplat", "gsplat", {
+            url: "mock.splat",
+        }); // Mock Asset object
         render(<ModelViewerCore splat={mockSplat} />);
         // Since GSplat is mocked to return null, we check if it was called
         const GSplatMock = vi.mocked(GSplat);
@@ -202,7 +222,9 @@ describe("ModelViewerCore", () => {
     });
 
     it("passes distance props to OrbitControls component", () => {
-        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+        const mockSplat = new Asset("mockSplat", "gsplat", {
+            url: "mock.splat",
+        }); // Mock Asset object
         render(
             <ModelViewerCore
                 splat={mockSplat}
@@ -212,18 +234,21 @@ describe("ModelViewerCore", () => {
             />
         );
         const OrbitControlsMock = vi.mocked(OrbitControls);
+        // distanceMin, distanceMax, and distance are now updated imperatively
         expect(OrbitControlsMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                distanceMin: 1,
-                distanceMax: 10,
-                distance: 5,
+            expect.not.objectContaining({
+                distanceMin: expect.any(Number),
+                distanceMax: expect.any(Number),
+                distance: expect.any(Number),
             }),
             undefined
         );
     });
 
     it("passes pitch angle props to OrbitControls component", () => {
-        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+        const mockSplat = new Asset("mockSplat", "gsplat", {
+            url: "mock.splat",
+        }); // Mock Asset object
         render(
             <ModelViewerCore
                 splat={mockSplat}
@@ -232,10 +257,11 @@ describe("ModelViewerCore", () => {
             />
         );
         const OrbitControlsMock = vi.mocked(OrbitControls);
+        // pitchAngleMin and pitchAngleMax are now updated imperatively
         expect(OrbitControlsMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                pitchAngleMin: -45,
-                pitchAngleMax: 45,
+            expect.not.objectContaining({
+                pitchAngleMin: expect.any(Number),
+                pitchAngleMax: expect.any(Number),
             }),
             undefined
         );
@@ -243,7 +269,9 @@ describe("ModelViewerCore", () => {
 
     it("passes position prop to GSplat Entity", async () => {
         // Added async
-        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+        const mockSplat = new Asset("mockSplat", "gsplat", {
+            url: "mock.splat",
+        }); // Mock Asset object
         const testPosition: [number, number, number] = [1, 2, 3];
         await act(async () => {
             // Added await and async
@@ -260,7 +288,9 @@ describe("ModelViewerCore", () => {
 
     it("passes rotation prop to GSplat Entity", async () => {
         // Added async
-        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+        const mockSplat = new Asset("mockSplat", "gsplat", {
+            url: "mock.splat",
+        }); // Mock Asset object
         const testRotation: [number, number, number] = [90, 180, 270];
         await act(async () => {
             // Added await and async
@@ -277,7 +307,9 @@ describe("ModelViewerCore", () => {
 
     it("passes scale prop to GSplat Entity", async () => {
         // Added async
-        const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+        const mockSplat = new Asset("mockSplat", "gsplat", {
+            url: "mock.splat",
+        }); // Mock Asset object
         const testScale: [number, number, number] = [2, 2, 2];
         await act(async () => {
             // Added await and async
@@ -352,7 +384,7 @@ describe("ModelViewerCore", () => {
         });
         const positionSliders = screen
             .getAllByTestId("mock-single-value-slider")
-            .slice(0, 3);
+            .slice(2, 5); // Skip distance and pitch sliders
         expect(positionSliders[0]).toHaveAttribute("data-value", "1.1");
         expect(positionSliders[1]).toHaveAttribute("data-value", "2.2");
         expect(positionSliders[2]).toHaveAttribute("data-value", "3.3");
@@ -372,7 +404,7 @@ describe("ModelViewerCore", () => {
         });
         const rotationSliders = screen
             .getAllByTestId("mock-single-value-slider")
-            .slice(3, 6);
+            .slice(5, 8); // Skip distance and pitch sliders
         expect(rotationSliders[0]).toHaveAttribute("data-value", "10");
         expect(rotationSliders[1]).toHaveAttribute("data-value", "20");
         expect(rotationSliders[2]).toHaveAttribute("data-value", "30");
@@ -394,7 +426,9 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
-            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+            const mockSplat = new Asset("mockSplat", "gsplat", {
+                url: "mock.splat",
+            }); // Mock Asset object
             render(
                 <ModelViewerCore
                     splat={mockSplat}
@@ -414,15 +448,9 @@ describe("ModelViewerCore", () => {
             onInputDistance!([newDistanceMin, newDistanceMax]);
         });
 
-        // Verify OrbitControls received the updated distance range
-        const OrbitControlsMock = vi.mocked(OrbitControls);
-        expect(OrbitControlsMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                distanceMin: newDistanceMin,
-                distanceMax: newDistanceMax,
-            }),
-            undefined
-        );
+        // Verify orbitCamera script received the updated distance range
+        expect(mockOrbitCamera.distanceMin).toBe(newDistanceMin);
+        expect(mockOrbitCamera.distanceMax).toBe(newDistanceMax);
     });
 
     it("updates camera pitch angle range and passes to OrbitControls when DualRangeSliderControl is interacted with", async () => {
@@ -441,7 +469,9 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
-            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
+            const mockSplat = new Asset("mockSplat", "gsplat", {
+                url: "mock.splat",
+            }); // Mock Asset object
             render(
                 <ModelViewerCore
                     splat={mockSplat}
@@ -461,15 +491,44 @@ describe("ModelViewerCore", () => {
             onInputPitchAngle!([newPitchMin, newPitchMax]);
         });
 
-        // Verify OrbitControls received the updated pitch angle range
-        const OrbitControlsMock = vi.mocked(OrbitControls);
-        expect(OrbitControlsMock).toHaveBeenCalledWith(
-            expect.objectContaining({
-                pitchAngleMin: newPitchMin,
-                pitchAngleMax: newPitchMax,
+        // Verify orbitCamera script received the updated pitch angle range
+        expect(mockOrbitCamera.pitchAngleMin).toBe(newPitchMin);
+        expect(mockOrbitCamera.pitchAngleMax).toBe(newPitchMax);
+    });
+
+    it("updates camera pitch angle and passes to OrbitControls when SingleValueSliderControl is interacted with", async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (useSearchParams as any).mockReturnValue({
+            get: vi.fn((param) => {
+                if (param === "settings") return "true";
+                return null;
             }),
-            undefined
-        );
+        });
+
+        const initialPitchAngle = 10;
+        const newPitchAngle = 45;
+
+        await act(async () => {
+            const mockSplat = new Asset("mockSplat", "gsplat", {
+                url: "mock.splat",
+            });
+            render(
+                <ModelViewerCore
+                    splat={mockSplat}
+                    pitchAngle={initialPitchAngle}
+                />
+            );
+        });
+
+        const onInputPitchAngle = singleValueOnInputs.get("Pitch Angle");
+        expect(onInputPitchAngle).toBeDefined();
+
+        await act(async () => {
+            onInputPitchAngle!(newPitchAngle);
+        });
+
+        // Verify orbitCamera script received the updated pitch angle
+        expect(mockOrbitCamera.pitch).toBe(-newPitchAngle);
     });
 
     it("updates model position and passes to GSplat Entity when SingleValueSliderControl is interacted with", async () => {
@@ -488,8 +547,12 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
-            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
-            render(<ModelViewerCore splat={mockSplat} position={initialPosition} />);
+            const mockSplat = new Asset("mockSplat", "gsplat", {
+                url: "mock.splat",
+            }); // Mock Asset object
+            render(
+                <ModelViewerCore splat={mockSplat} position={initialPosition} />
+            );
         });
 
         // Find the onInput for Position X
@@ -533,8 +596,12 @@ describe("ModelViewerCore", () => {
 
         await act(async () => {
             // Wrap render in act
-            const mockSplat = new Asset('mockSplat', 'gsplat', { url: 'mock.splat' }); // Mock Asset object
-            render(<ModelViewerCore splat={mockSplat} rotation={initialRotation} />);
+            const mockSplat = new Asset("mockSplat", "gsplat", {
+                url: "mock.splat",
+            }); // Mock Asset object
+            render(
+                <ModelViewerCore splat={mockSplat} rotation={initialRotation} />
+            );
         });
 
         // Find the onInput for Rotation X

@@ -45,3 +45,8 @@ next-env.d.ts
 
 # Folders
 model-viewer-main/
+
+# amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*

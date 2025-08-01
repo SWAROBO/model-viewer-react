@@ -58,7 +58,10 @@ export const useModelData = (csvUrl: string) => {
                                     if (value === null || value === undefined) {
                                         const trimmedKey = key.trim() as keyof ModelViewerProps;
                                         if (defaultModelViewerProps.hasOwnProperty(trimmedKey)) {
-                                            value = defaultModelViewerProps[trimmedKey];
+                                            const defaultValue = defaultModelViewerProps[trimmedKey];
+                                            if (typeof defaultValue === 'string' || typeof defaultValue === 'number' || Array.isArray(defaultValue)) {
+                                                value = defaultValue;
+                                            }
                                         }
                                     }
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

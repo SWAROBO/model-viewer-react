@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { Application } from "@playcanvas/react";
-import { FILLMODE_FILL_WINDOW } from "playcanvas";
 import { useApp } from "@playcanvas/react/hooks";
 import * as pc from "playcanvas";
 import SwaroboLogo from "@/components/SwaroboLogo";
@@ -50,7 +49,6 @@ const Page = () => {
 
     return (
         <Application
-            fillMode={FILLMODE_FILL_WINDOW}
             resolutionMode={pc.RESOLUTION_AUTO} // Start with AUTO to ensure proper canvas initialization
         >
             <ResolutionHandler

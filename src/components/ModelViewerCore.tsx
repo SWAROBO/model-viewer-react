@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
-import { Asset, Entity as PcEntity, ScriptComponent, Mat4 } from "playcanvas"; // Import Asset and pc.Entity
+import { Asset, Entity as PcEntity, ScriptComponent, Mat4, EVENT_MOUSEDOWN, EVENT_TOUCHSTART } from "playcanvas"; // Import Asset, pc.Entity, and event constants
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
@@ -192,11 +192,51 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         }
     }, [currentPitchAngle]);
 
-    // Removed gSplatEntityPosition and gSplatEntityRotation states
-    // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
-
     const [isSliderActive, setIsSliderActive] = useState(false);
     const [showGrid, setShowGrid] = useState(false); // New state for grid visibility
+    const [isInteracting, setIsInteracting] = useState(false);
+
+    const handleInteractionStart = useCallback(() => setIsInteracting(true), []);
+    const handleInteractionEnd = useCallback(() => setIsInteracting(false), []);
+
+    // Effect to handle user interaction with OrbitControls
+    React.useEffect(() => {
+        if (app) {
+            // Listen for mouse down on the app's canvas
+            if (app.mouse) {
+                app.mouse.on(EVENT_MOUSEDOWN, handleInteractionStart);
+            }
+
+            // Listen for mouse up globally
+            window.addEventListener("mouseup", handleInteractionEnd);
+
+            // Listen for touch start on the app's canvas
+            if (app.touch) {
+                app.touch.on(EVENT_TOUCHSTART, handleInteractionStart);
+            }
+
+            // Listen for touch end/cancel globally
+            window.addEventListener("touchend", handleInteractionEnd);
+            window.addEventListener("touchcancel", handleInteractionEnd);
+
+            return () => {
+                // Clean up event listeners
+                if (app.mouse) {
+                    app.mouse.off(EVENT_MOUSEDOWN, handleInteractionStart);
+                }
+                window.removeEventListener("mouseup", handleInteractionEnd);
+
+                if (app.touch) {
+                    app.touch.off(EVENT_TOUCHSTART, handleInteractionStart);
+                }
+                window.removeEventListener("touchend", handleInteractionEnd);
+                window.removeEventListener("touchcancel", handleInteractionEnd);
+            };
+        }
+    }, [app, handleInteractionStart, handleInteractionEnd]); // Depend on app and memoized handlers
+
+    // Removed gSplatEntityPosition and gSplatEntityRotation states
+    // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
 
     // The useEffects for syncing controlPosition and controlRotation are now handled by useSyncedState
     // Removed the useEffect that applied controlPosition/Rotation to entity transform
@@ -314,7 +354,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     mouse={orbitControlSensitivity}
                     touch={orbitControlSensitivity}
                 />
-                {!showSettings && frameRate > targetFps && (
+                {!showSettings && frameRate > targetFps && !isInteracting && (
                     <AutoRotate startDelay={1} startFadeInTime={2} />
                 )}
             </Entity>

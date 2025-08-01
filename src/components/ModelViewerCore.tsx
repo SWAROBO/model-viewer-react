@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
-import { useEnvAtlas } from "@playcanvas/react/hooks";
-import { Asset, Entity as PcEntity, ScriptComponent } from "playcanvas"; // Import Asset and pc.Entity
+import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
+import { Asset, Entity as PcEntity, ScriptComponent, Mat4, EVENT_MOUSEDOWN, EVENT_TOUCHSTART } from "playcanvas"; // Import Asset, pc.Entity, and event constants
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
@@ -44,6 +44,14 @@ export type ModelViewerCoreProps = {
     pitchAngleMax?: number;
     pitchAngle?: number;
     model?: string; // Added model property
+    resolutionPercentage?: number;
+    setResolutionPercentage?: React.Dispatch<React.SetStateAction<number>>;
+    showSettings?: boolean;
+    dynamicResolution?: boolean;
+    targetFps?: number;
+    lowResScale?: number;
+    movementDebounce?: number;
+    disableDynamicResolution?: boolean;
 };
 
 const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
@@ -60,9 +68,24 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     pitchAngle = 10,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     model, // Destructure model prop
+    resolutionPercentage = 100,
+    setResolutionPercentage = () => {},
+    showSettings = false,
+    dynamicResolution = false,
+    targetFps = 30,
+    lowResScale = 10,
+    movementDebounce = 500,
+    disableDynamicResolution: initialDisableDynamicResolution = false,
 }) => {
+    const [disableDynamicResolution, setDisableDynamicResolution] = useState(initialDisableDynamicResolution);
     const searchParams = useSearchParams();
-    const showSettings = searchParams.get("settings") === "true";
+    // The showSettings prop is now passed from the parent, so we don't need to derive it from searchParams here.
+    // However, the original code had a local showSettings state derived from searchParams.
+    // To maintain the original behavior where showSettings is also controlled by the URL parameter,
+    // we will keep the useSearchParams and update the local showSettings state if the prop is not provided.
+    // If the prop is provided, it will override the URL parameter.
+    const urlShowSettings = searchParams.get("settings") === "true";
+    const effectiveShowSettings = showSettings || urlShowSettings;
 
     const [distanceRange, setDistanceRange] = useState<[number, number]>([
         distanceMin,
@@ -78,8 +101,60 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [currentDistance, setCurrentDistance] = useSyncedState(distance);
     const [controlPosition, setControlPosition] = useSyncedState(position);
     const [controlRotation, setControlRotation] = useSyncedState(rotation);
-
+    const [frameRate, setFrameRate] = useState(60);
+    const app = useApp();
+    const lastMoveTimeRef = React.useRef(0);
+    const lastCameraMatrix = React.useRef(new Mat4());
     const cameraEntityRef = React.useRef<PcEntity>(null); // Ref for the camera entity
+
+    const resolutionPercentageRef = React.useRef(resolutionPercentage);
+    const setResolutionPercentageRef = React.useRef(setResolutionPercentage);
+    
+    // Update refs when props change
+    React.useEffect(() => {
+        resolutionPercentageRef.current = resolutionPercentage;
+        setResolutionPercentageRef.current = setResolutionPercentage;
+    }, [resolutionPercentage, setResolutionPercentage]);
+
+    useEffect(() => {
+        let animationFrameId: number;
+        
+        const updateFrameRate = () => {
+            if (app) {
+                setFrameRate(Math.round(app.stats.frame.fps));
+
+                if (dynamicResolution && !disableDynamicResolution && cameraEntityRef.current) {
+                    const camera = cameraEntityRef.current.camera;
+                    if (camera) {
+                        const currentMatrix = camera.viewMatrix;
+                        if (!currentMatrix.equals(lastCameraMatrix.current)) {
+                            lastMoveTimeRef.current = Date.now();
+                            lastCameraMatrix.current.copy(currentMatrix);
+                        }
+
+                        const isMoving = (Date.now() - lastMoveTimeRef.current) < movementDebounce;
+
+                        if (isMoving && app.stats.frame.fps < targetFps) {
+                            if (resolutionPercentageRef.current !== lowResScale) {
+                                setResolutionPercentageRef.current(lowResScale);
+                            }
+                        } else if (!isMoving) {
+                            if (resolutionPercentageRef.current !== 100) {
+                                setResolutionPercentageRef.current(100);
+                            }
+                        }
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(updateFrameRate);
+        };
+
+        animationFrameId = requestAnimationFrame(updateFrameRate);
+
+        return () => {
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, [app, dynamicResolution, targetFps, lowResScale, movementDebounce, disableDynamicResolution]);
 
     // Set initial distance and min/max immediately on mount
     React.useEffect(() => {
@@ -120,11 +195,51 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         }
     }, [currentPitchAngle]);
 
-    // Removed gSplatEntityPosition and gSplatEntityRotation states
-    // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
-
     const [isSliderActive, setIsSliderActive] = useState(false);
     const [showGrid, setShowGrid] = useState(false); // New state for grid visibility
+    const [isInteracting, setIsInteracting] = useState(false);
+
+    const handleInteractionStart = useCallback(() => setIsInteracting(true), []);
+    const handleInteractionEnd = useCallback(() => setIsInteracting(false), []);
+
+    // Effect to handle user interaction with OrbitControls
+    React.useEffect(() => {
+        if (app) {
+            // Listen for mouse down on the app's canvas
+            if (app.mouse) {
+                app.mouse.on(EVENT_MOUSEDOWN, handleInteractionStart);
+            }
+
+            // Listen for mouse up globally
+            window.addEventListener("mouseup", handleInteractionEnd);
+
+            // Listen for touch start on the app's canvas
+            if (app.touch) {
+                app.touch.on(EVENT_TOUCHSTART, handleInteractionStart);
+            }
+
+            // Listen for touch end/cancel globally
+            window.addEventListener("touchend", handleInteractionEnd);
+            window.addEventListener("touchcancel", handleInteractionEnd);
+
+            return () => {
+                // Clean up event listeners
+                if (app.mouse) {
+                    app.mouse.off(EVENT_MOUSEDOWN, handleInteractionStart);
+                }
+                window.removeEventListener("mouseup", handleInteractionEnd);
+
+                if (app.touch) {
+                    app.touch.off(EVENT_TOUCHSTART, handleInteractionStart);
+                }
+                window.removeEventListener("touchend", handleInteractionEnd);
+                window.removeEventListener("touchcancel", handleInteractionEnd);
+            };
+        }
+    }, [app, handleInteractionStart, handleInteractionEnd]); // Depend on app and memoized handlers
+
+    // Removed gSplatEntityPosition and gSplatEntityRotation states
+    // Removed useEffect that updated gSplatEntityPosition and gSplatEntityRotation
 
     // The useEffects for syncing controlPosition and controlRotation are now handled by useSyncedState
     // Removed the useEffect that applied controlPosition/Rotation to entity transform
@@ -242,7 +357,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     mouse={orbitControlSensitivity}
                     touch={orbitControlSensitivity}
                 />
-                {!showSettings && (
+                {!showSettings && frameRate > targetFps && !isInteracting && (
                     <AutoRotate startDelay={1} startFadeInTime={2} />
                 )}
             </Entity>
@@ -385,6 +500,38 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         />
                         Show Grid
                     </label>
+
+                    <label
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "10px",
+                        }}
+                    >
+                        <input
+                            type="checkbox"
+                            checked={disableDynamicResolution}
+                            onChange={(e) => setDisableDynamicResolution(e.target.checked)}
+                            style={{ marginRight: "8px" }}
+                        />
+                        Turn off dynamic resolution
+                    </label>
+
+                    {effectiveShowSettings && (
+                        <SingleValueSliderControl
+                            label="Resolution"
+                            value={resolutionPercentage}
+                            sliderMin={1}
+                            sliderMax={100}
+                            step={1}
+                            onInput={(value: number) => {
+                                setResolutionPercentage(value);
+                            }}
+                        />
+                    )}
+                    <div style={{ marginTop: "10px" }}>
+                        <span>Frame Rate: {frameRate} FPS</span>
+                    </div>
                 </div>
             )}
         </Entity>

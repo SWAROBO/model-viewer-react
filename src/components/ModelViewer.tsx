@@ -21,6 +21,14 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         position,
         scale,
         model, // Destructure model prop
+        resolutionPercentage,
+        setResolutionPercentage,
+        showSettings,
+        dynamicResolution,
+        targetFps,
+        lowResScale,
+        movementDebounce,
+        disableDynamicResolution,
     } = { ...defaultModelViewerProps, ...props };
 
     const [downloadProgress, setDownloadProgress] = useState(0);
@@ -49,6 +57,14 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 position={position}
                 scale={scale}
                 model={model} // Pass model prop
+                resolutionPercentage={resolutionPercentage}
+                setResolutionPercentage={setResolutionPercentage}
+                showSettings={showSettings}
+                dynamicResolution={dynamicResolution}
+                targetFps={targetFps}
+                lowResScale={lowResScale}
+                movementDebounce={movementDebounce}
+                disableDynamicResolution={disableDynamicResolution}
             />
         </div>
     );

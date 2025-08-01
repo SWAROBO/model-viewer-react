@@ -1,4 +1,5 @@
 import { render, screen, waitFor, act } from '@testing-library/react'; // Import act
+import { vi } from 'vitest';
 import Page from './page'; // Import the default export, which is DynamicPage
 import { useSearchParams } from 'next/navigation';
 import ModelViewer from '@/components/ModelViewer';
@@ -12,6 +13,12 @@ vi.mock('next/navigation', () => ({
 // Mock PlayCanvas Application component
 vi.mock('@playcanvas/react', () => ({
     Application: vi.fn(({ children }) => <div data-testid="playcanvas-application">{children}</div>),
+}));
+
+vi.mock('@playcanvas/react/hooks', () => ({
+    useApp: vi.fn(() => ({
+        setCanvasResolution: vi.fn(),
+    })),
 }));
 
 // Mock ModelViewer component

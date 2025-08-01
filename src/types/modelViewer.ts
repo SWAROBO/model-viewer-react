@@ -11,6 +11,14 @@ export type ModelViewerProps = {
     pitchAngleMax?: number;
     pitchAngle?: number;
     model: string | undefined;
+    resolutionPercentage?: number;
+    setResolutionPercentage?: React.Dispatch<React.SetStateAction<number>>;
+    showSettings?: boolean;
+    dynamicResolution?: boolean;
+    targetFps?: number;
+    lowResScale?: number;
+    movementDebounce?: number;
+    disableDynamicResolution?: boolean;
 };
 
 export const defaultModelViewerProps: Required<ModelViewerProps> = {
@@ -27,4 +35,12 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     pitchAngleMax: 90,  // Default value for pitchAngleMax
     pitchAngle: 10, // Default value for pitchAngle
     model: undefined,
+    resolutionPercentage: 100,
+    setResolutionPercentage: () => {},
+    showSettings: false,
+    dynamicResolution: false,
+    targetFps: 30,
+    lowResScale: 70,
+    movementDebounce: 500,
+    disableDynamicResolution: false,
 };

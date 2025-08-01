@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { Application } from "@playcanvas/react";
-import { FILLMODE_FILL_WINDOW, RESOLUTION_FIXED } from "playcanvas";
+import { FILLMODE_FILL_WINDOW } from "playcanvas";
 import { useApp } from "@playcanvas/react/hooks";
 import * as pc from "playcanvas";
 import SwaroboLogo from "@/components/SwaroboLogo";

@@ -41,6 +41,9 @@ vi.mock("@playcanvas/react/components", () => ({
 
 vi.mock("@playcanvas/react/hooks", () => ({
     useEnvAtlas: vi.fn(() => ({ asset: {} })),
+    useApp: vi.fn(() => ({
+        setCanvasResolution: vi.fn(),
+    })),
 }));
 
 vi.mock("../lib/@playcanvas/react", () => ({
@@ -146,31 +149,17 @@ describe("ModelViewerCore", () => {
     });
 
     it("does not render AutoRotate when showSettings is true", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-        render(<ModelViewerCore splat={null} />);
+        render(<ModelViewerCore splat={null} showSettings={true} />);
         expect(
             screen.queryByTestId("mock-auto-rotate")
         ).not.toBeInTheDocument();
     });
 
     it("renders settings controls when showSettings is true", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-        render(<ModelViewerCore splat={null} />);
+        render(<ModelViewerCore splat={null} showSettings={true} />);
         expect(screen.getAllByTestId("mock-dual-range-slider").length).toBe(2);
         expect(screen.getAllByTestId("mock-single-value-slider").length).toBe(
-            8
+            9
         );
     });
 
@@ -323,19 +312,13 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes DualRangeSliderControl for camera distance with correct props when settings are true", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
         act(() => {
             render(
                 <ModelViewerCore
                     splat={null}
                     distanceMin={0.5}
                     distanceMax={15}
+                    showSettings={true}
                 />
             );
         });
@@ -347,19 +330,13 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes DualRangeSliderControl for camera pitch angle with correct props when settings are true", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
         act(() => {
             render(
                 <ModelViewerCore
                     splat={null}
                     pitchAngleMin={-30}
                     pitchAngleMax={60}
+                    showSettings={true}
                 />
             );
         });
@@ -371,16 +348,15 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes SingleValueSliderControl for model position with correct props when settings are true", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
         const testPosition: [number, number, number] = [1.1, 2.2, 3.3];
         act(() => {
-            render(<ModelViewerCore splat={null} position={testPosition} />);
+            render(
+                <ModelViewerCore
+                    splat={null}
+                    position={testPosition}
+                    showSettings={true}
+                />
+            );
         });
         const positionSliders = screen
             .getAllByTestId("mock-single-value-slider")
@@ -391,16 +367,15 @@ describe("ModelViewerCore", () => {
     });
 
     it("initializes SingleValueSliderControl for model rotation with correct props when settings are true", () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
         const testRotation: [number, number, number] = [10, 20, 30];
         act(() => {
-            render(<ModelViewerCore splat={null} rotation={testRotation} />);
+            render(
+                <ModelViewerCore
+                    splat={null}
+                    rotation={testRotation}
+                    showSettings={true}
+                />
+            );
         });
         const rotationSliders = screen
             .getAllByTestId("mock-single-value-slider")
@@ -411,14 +386,6 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates camera distance range and passes to OrbitControls when DualRangeSliderControl is interacted with", async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-
         const initialDistanceMin = 0.1;
         const initialDistanceMax = 30;
         const newDistanceMin = 5;
@@ -434,6 +401,7 @@ describe("ModelViewerCore", () => {
                     splat={mockSplat}
                     distanceMin={initialDistanceMin}
                     distanceMax={initialDistanceMax}
+                    showSettings={true}
                 />
             );
         });
@@ -454,14 +422,6 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates camera pitch angle range and passes to OrbitControls when DualRangeSliderControl is interacted with", async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-
         const initialPitchMin = -90;
         const initialPitchMax = 90;
         const newPitchMin = -45;
@@ -477,6 +437,7 @@ describe("ModelViewerCore", () => {
                     splat={mockSplat}
                     pitchAngleMin={initialPitchMin}
                     pitchAngleMax={initialPitchMax}
+                    showSettings={true}
                 />
             );
         });
@@ -497,14 +458,6 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates camera pitch angle and passes to OrbitControls when SingleValueSliderControl is interacted with", async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-
         const initialPitchAngle = 10;
         const newPitchAngle = 45;
 
@@ -516,6 +469,7 @@ describe("ModelViewerCore", () => {
                 <ModelViewerCore
                     splat={mockSplat}
                     pitchAngle={initialPitchAngle}
+                    showSettings={true}
                 />
             );
         });
@@ -532,14 +486,6 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates model position and passes to GSplat Entity when SingleValueSliderControl is interacted with", async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-
         const initialPosition: [number, number, number] = [0, 0, 0];
         const newX = 1.5;
         const newY = -0.5;
@@ -551,7 +497,11 @@ describe("ModelViewerCore", () => {
                 url: "mock.splat",
             }); // Mock Asset object
             render(
-                <ModelViewerCore splat={mockSplat} position={initialPosition} />
+                <ModelViewerCore
+                    splat={mockSplat}
+                    position={initialPosition}
+                    showSettings={true}
+                />
             );
         });
 
@@ -581,14 +531,6 @@ describe("ModelViewerCore", () => {
     });
 
     it("updates model rotation and passes to GSplat Entity when SingleValueSliderControl is interacted with", async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (useSearchParams as any).mockReturnValue({
-            get: vi.fn((param) => {
-                if (param === "settings") return "true";
-                return null;
-            }),
-        });
-
         const initialRotation: [number, number, number] = [0, 0, 0];
         const newX = 45;
         const newY = 90;
@@ -600,7 +542,11 @@ describe("ModelViewerCore", () => {
                 url: "mock.splat",
             }); // Mock Asset object
             render(
-                <ModelViewerCore splat={mockSplat} rotation={initialRotation} />
+                <ModelViewerCore
+                    splat={mockSplat}
+                    rotation={initialRotation}
+                    showSettings={true}
+                />
             );
         });
 
@@ -627,5 +573,31 @@ describe("ModelViewerCore", () => {
         // Check the last call to Entity to get the most recent props
         const splatEntityCall = mockedEntity.mock.lastCall;
         expect(splatEntityCall?.[0].rotation).toEqual([newX, newY, newZ]);
+    });
+
+    it("updates resolution percentage when resolution slider is changed", async () => {
+        const setResolutionPercentage = vi.fn();
+        const initialResolution = 100;
+        const newResolution = 50;
+
+        await act(async () => {
+            render(
+                <ModelViewerCore
+                    splat={null}
+                    resolutionPercentage={initialResolution}
+                    setResolutionPercentage={setResolutionPercentage}
+                    showSettings={true}
+                />
+            );
+        });
+
+        const onInputResolution = singleValueOnInputs.get("Resolution");
+        expect(onInputResolution).toBeDefined();
+
+        await act(async () => {
+            onInputResolution!(newResolution);
+        });
+
+        expect(setResolutionPercentage).toHaveBeenCalledWith(newResolution);
     });
 });

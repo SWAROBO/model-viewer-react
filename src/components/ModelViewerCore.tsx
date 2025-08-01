@@ -98,7 +98,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [currentDistance, setCurrentDistance] = useSyncedState(distance);
     const [controlPosition, setControlPosition] = useSyncedState(position);
     const [controlRotation, setControlRotation] = useSyncedState(rotation);
-    const [frameRate, setFrameRate] = useState(0);
+    const [frameRate, setFrameRate] = useState(60);
     const app = useApp();
     const lastMoveTimeRef = React.useRef(0);
     const lastCameraMatrix = React.useRef(new Mat4());
@@ -314,7 +314,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     mouse={orbitControlSensitivity}
                     touch={orbitControlSensitivity}
                 />
-                {!showSettings && (
+                {!showSettings && frameRate > targetFps && (
                     <AutoRotate startDelay={1} startFadeInTime={2} />
                 )}
             </Entity>

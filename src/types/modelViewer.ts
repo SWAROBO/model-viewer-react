@@ -11,6 +11,9 @@ export type ModelViewerProps = {
     pitchAngleMax?: number;
     pitchAngle?: number;
     model: string | undefined;
+    resolutionPercentage?: number;
+    setResolutionPercentage?: React.Dispatch<React.SetStateAction<number>>;
+    showSettings?: boolean;
 };
 
 export const defaultModelViewerProps: Required<ModelViewerProps> = {
@@ -27,4 +30,7 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     pitchAngleMax: 90,  // Default value for pitchAngleMax
     pitchAngle: 10, // Default value for pitchAngle
     model: undefined,
+    resolutionPercentage: 100,
+    setResolutionPercentage: () => {},
+    showSettings: false,
 };

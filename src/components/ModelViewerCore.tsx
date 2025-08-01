@@ -44,6 +44,9 @@ export type ModelViewerCoreProps = {
     pitchAngleMax?: number;
     pitchAngle?: number;
     model?: string; // Added model property
+    resolutionPercentage?: number;
+    setResolutionPercentage?: React.Dispatch<React.SetStateAction<number>>;
+    showSettings?: boolean;
 };
 
 const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
@@ -60,9 +63,18 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     pitchAngle = 10,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     model, // Destructure model prop
+    resolutionPercentage = 100,
+    setResolutionPercentage = () => {},
+    showSettings = false,
 }) => {
     const searchParams = useSearchParams();
-    const showSettings = searchParams.get("settings") === "true";
+    // The showSettings prop is now passed from the parent, so we don't need to derive it from searchParams here.
+    // However, the original code had a local showSettings state derived from searchParams.
+    // To maintain the original behavior where showSettings is also controlled by the URL parameter,
+    // we will keep the useSearchParams and update the local showSettings state if the prop is not provided.
+    // If the prop is provided, it will override the URL parameter.
+    const urlShowSettings = searchParams.get("settings") === "true";
+    const effectiveShowSettings = showSettings || urlShowSettings;
 
     const [distanceRange, setDistanceRange] = useState<[number, number]>([
         distanceMin,
@@ -385,6 +397,19 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                         />
                         Show Grid
                     </label>
+
+                    {effectiveShowSettings && (
+                        <SingleValueSliderControl
+                            label="Resolution"
+                            value={resolutionPercentage}
+                            sliderMin={1}
+                            sliderMax={100}
+                            step={1}
+                            onInput={(value: number) => {
+                                setResolutionPercentage(value);
+                            }}
+                        />
+                    )}
                 </div>
             )}
         </Entity>

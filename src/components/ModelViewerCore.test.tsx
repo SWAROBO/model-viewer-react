@@ -1,4 +1,4 @@
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, act, fireEvent } from "@testing-library/react";
 import { vi } from "vitest";
 import ModelViewerCore from "./ModelViewerCore";
 import { useSearchParams } from "next/navigation"; // Import the hook to mock it directly
@@ -615,5 +615,54 @@ describe("ModelViewerCore", () => {
 
         addEventListenerSpy.mockRestore();
         removeEventListenerSpy.mockRestore();
+    });
+
+    it("disables dynamic resolution when the checkbox is checked", async () => {
+        const setResolutionPercentage = vi.fn();
+        const mockApp = {
+            setCanvasResolution: vi.fn(),
+            stats: {
+                frame: {
+                    fps: 20, // Low FPS to trigger dynamic resolution
+                },
+            },
+            mouse: {
+                on: vi.fn(),
+                off: vi.fn(),
+            },
+            touch: {
+                on: vi.fn(),
+                off: vi.fn(),
+            },
+        };
+        vi.mocked(useApp).mockReturnValue(mockApp as any);
+
+        await act(async () => {
+            render(
+                <ModelViewerCore
+                    splat={null}
+                    showSettings={true}
+                    dynamicResolution={true}
+                    disableDynamicResolution={false}
+                    setResolutionPercentage={setResolutionPercentage}
+                    targetFps={30}
+                    lowResScale={50}
+                />
+            );
+        });
+
+        // Find the checkbox and check it
+        const checkbox = screen.getByLabelText("Turn off dynamic resolution");
+        await act(async () => {
+            fireEvent.click(checkbox);
+        });
+
+        // Wait for the next frame
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        // With dynamic resolution disabled, setResolutionPercentage should not be called
+        expect(setResolutionPercentage).not.toHaveBeenCalled();
     });
 });

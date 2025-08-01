@@ -51,6 +51,7 @@ export type ModelViewerCoreProps = {
     targetFps?: number;
     lowResScale?: number;
     movementDebounce?: number;
+    disableDynamicResolution?: boolean;
 };
 
 const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
@@ -74,7 +75,9 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     targetFps = 30,
     lowResScale = 10,
     movementDebounce = 500,
+    disableDynamicResolution: initialDisableDynamicResolution = false,
 }) => {
+    const [disableDynamicResolution, setDisableDynamicResolution] = useState(initialDisableDynamicResolution);
     const searchParams = useSearchParams();
     // The showSettings prop is now passed from the parent, so we don't need to derive it from searchParams here.
     // However, the original code had a local showSettings state derived from searchParams.
@@ -120,7 +123,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
             if (app) {
                 setFrameRate(Math.round(app.stats.frame.fps));
 
-                if (dynamicResolution && cameraEntityRef.current) {
+                if (dynamicResolution && !disableDynamicResolution && cameraEntityRef.current) {
                     const camera = cameraEntityRef.current.camera;
                     if (camera) {
                         const currentMatrix = camera.viewMatrix;
@@ -151,7 +154,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         return () => {
             cancelAnimationFrame(animationFrameId);
         };
-    }, [app, dynamicResolution, targetFps, lowResScale, movementDebounce]);
+    }, [app, dynamicResolution, targetFps, lowResScale, movementDebounce, disableDynamicResolution]);
 
     // Set initial distance and min/max immediately on mount
     React.useEffect(() => {
@@ -496,6 +499,22 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                             style={{ marginRight: "8px" }}
                         />
                         Show Grid
+                    </label>
+
+                    <label
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginBottom: "10px",
+                        }}
+                    >
+                        <input
+                            type="checkbox"
+                            checked={disableDynamicResolution}
+                            onChange={(e) => setDisableDynamicResolution(e.target.checked)}
+                            style={{ marginRight: "8px" }}
+                        />
+                        Turn off dynamic resolution
                     </label>
 
                     {effectiveShowSettings && (

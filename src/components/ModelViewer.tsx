@@ -28,6 +28,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         targetFps,
         lowResScale,
         movementDebounce,
+        disableDynamicResolution,
     } = { ...defaultModelViewerProps, ...props };
 
     const [downloadProgress, setDownloadProgress] = useState(0);
@@ -63,6 +64,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 targetFps={targetFps}
                 lowResScale={lowResScale}
                 movementDebounce={movementDebounce}
+                disableDynamicResolution={disableDynamicResolution}
             />
         </div>
     );

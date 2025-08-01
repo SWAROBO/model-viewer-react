@@ -18,6 +18,7 @@ export type ModelViewerProps = {
     targetFps?: number;
     lowResScale?: number;
     movementDebounce?: number;
+    disableDynamicResolution?: boolean;
 };
 
 export const defaultModelViewerProps: Required<ModelViewerProps> = {
@@ -41,4 +42,5 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     targetFps: 30,
     lowResScale: 70,
     movementDebounce: 500,
+    disableDynamicResolution: false,
 };

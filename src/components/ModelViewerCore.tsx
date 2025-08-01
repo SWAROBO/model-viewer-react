@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
-import { useEnvAtlas } from "@playcanvas/react/hooks";
+import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
 import { Asset, Entity as PcEntity, ScriptComponent } from "playcanvas"; // Import Asset and pc.Entity
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
@@ -90,6 +90,20 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [currentDistance, setCurrentDistance] = useSyncedState(distance);
     const [controlPosition, setControlPosition] = useSyncedState(position);
     const [controlRotation, setControlRotation] = useSyncedState(rotation);
+    const [frameRate, setFrameRate] = useState(0);
+    const app = useApp();
+
+    useEffect(() => {
+        const updateFrameRate = () => {
+            setFrameRate(Math.round(app.stats.frame.fps));
+        };
+
+        const animationFrameId = requestAnimationFrame(updateFrameRate);
+
+        return () => {
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, [app, app.stats.frame.fps]);
 
     const cameraEntityRef = React.useRef<PcEntity>(null); // Ref for the camera entity
 
@@ -410,6 +424,9 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                             }}
                         />
                     )}
+                    <div style={{ marginTop: "10px" }}>
+                        <span>Frame Rate: {frameRate} FPS</span>
+                    </div>
                 </div>
             )}
         </Entity>

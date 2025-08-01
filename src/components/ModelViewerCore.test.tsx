@@ -43,6 +43,11 @@ vi.mock("@playcanvas/react/hooks", () => ({
     useEnvAtlas: vi.fn(() => ({ asset: {} })),
     useApp: vi.fn(() => ({
         setCanvasResolution: vi.fn(),
+        stats: {
+            frame: {
+                fps: 60,
+            },
+        },
     })),
 }));
 
@@ -599,5 +604,28 @@ describe("ModelViewerCore", () => {
         });
 
         expect(setResolutionPercentage).toHaveBeenCalledWith(newResolution);
+    });
+
+    it("displays the frame rate when showSettings is true", async () => {
+        const raf = vi
+            .spyOn(window, "requestAnimationFrame")
+            .mockImplementation((cb: FrameRequestCallback) => {
+                // Only call the callback once to avoid an infinite loop
+                cb(0);
+                return 0;
+            });
+
+        await act(async () => {
+            render(<ModelViewerCore splat={null} showSettings={true} />);
+        });
+
+        // Since the update is now wrapped in requestAnimationFrame, we need to wait for the next frame
+        await act(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+        });
+
+        expect(screen.getByText(/Frame Rate: \d+ FPS/)).toBeInTheDocument();
+
+        raf.mockRestore();
     });
 });

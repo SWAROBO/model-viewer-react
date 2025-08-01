@@ -607,11 +607,15 @@ describe("ModelViewerCore", () => {
     });
 
     it("displays the frame rate when showSettings is true", async () => {
+        let callCount = 0;
         const raf = vi
             .spyOn(window, "requestAnimationFrame")
             .mockImplementation((cb: FrameRequestCallback) => {
                 // Only call the callback once to avoid an infinite loop
-                cb(0);
+                if (callCount === 0) {
+                    callCount++;
+                    cb(0);
+                }
                 return 0;
             });
 

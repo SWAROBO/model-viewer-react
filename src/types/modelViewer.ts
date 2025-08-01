@@ -14,6 +14,10 @@ export type ModelViewerProps = {
     resolutionPercentage?: number;
     setResolutionPercentage?: React.Dispatch<React.SetStateAction<number>>;
     showSettings?: boolean;
+    dynamicResolution?: boolean;
+    targetFps?: number;
+    lowResScale?: number;
+    movementDebounce?: number;
 };
 
 export const defaultModelViewerProps: Required<ModelViewerProps> = {
@@ -33,4 +37,8 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     resolutionPercentage: 100,
     setResolutionPercentage: () => {},
     showSettings: false,
+    dynamicResolution: false,
+    targetFps: 30,
+    lowResScale: 70,
+    movementDebounce: 500,
 };

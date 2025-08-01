@@ -4,7 +4,7 @@ import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
 import { OrbitControls } from "../lib/@playcanvas/react";
 import { useEnvAtlas, useApp } from "@playcanvas/react/hooks";
-import { Asset, Entity as PcEntity, ScriptComponent } from "playcanvas"; // Import Asset and pc.Entity
+import { Asset, Entity as PcEntity, ScriptComponent, Mat4 } from "playcanvas"; // Import Asset and pc.Entity
 import AutoRotate from "./AutoRotate";
 import Grid from "./Grid";
 import DualRangeSliderControl from "./DualRangeSliderControl";
@@ -47,6 +47,10 @@ export type ModelViewerCoreProps = {
     resolutionPercentage?: number;
     setResolutionPercentage?: React.Dispatch<React.SetStateAction<number>>;
     showSettings?: boolean;
+    dynamicResolution?: boolean;
+    targetFps?: number;
+    lowResScale?: number;
+    movementDebounce?: number;
 };
 
 const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
@@ -66,6 +70,10 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     resolutionPercentage = 100,
     setResolutionPercentage = () => {},
     showSettings = false,
+    dynamicResolution = false,
+    targetFps = 30,
+    lowResScale = 10,
+    movementDebounce = 500,
 }) => {
     const searchParams = useSearchParams();
     // The showSettings prop is now passed from the parent, so we don't need to derive it from searchParams here.
@@ -92,20 +100,58 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     const [controlRotation, setControlRotation] = useSyncedState(rotation);
     const [frameRate, setFrameRate] = useState(0);
     const app = useApp();
+    const lastMoveTimeRef = React.useRef(0);
+    const lastCameraMatrix = React.useRef(new Mat4());
+    const cameraEntityRef = React.useRef<PcEntity>(null); // Ref for the camera entity
+
+    const resolutionPercentageRef = React.useRef(resolutionPercentage);
+    const setResolutionPercentageRef = React.useRef(setResolutionPercentage);
+    
+    // Update refs when props change
+    React.useEffect(() => {
+        resolutionPercentageRef.current = resolutionPercentage;
+        setResolutionPercentageRef.current = setResolutionPercentage;
+    }, [resolutionPercentage, setResolutionPercentage]);
 
     useEffect(() => {
+        let animationFrameId: number;
+        
         const updateFrameRate = () => {
-            setFrameRate(Math.round(app.stats.frame.fps));
+            if (app) {
+                setFrameRate(Math.round(app.stats.frame.fps));
+
+                if (dynamicResolution && cameraEntityRef.current) {
+                    const camera = cameraEntityRef.current.camera;
+                    if (camera) {
+                        const currentMatrix = camera.viewMatrix;
+                        if (!currentMatrix.equals(lastCameraMatrix.current)) {
+                            lastMoveTimeRef.current = Date.now();
+                            lastCameraMatrix.current.copy(currentMatrix);
+                        }
+
+                        const isMoving = (Date.now() - lastMoveTimeRef.current) < movementDebounce;
+
+                        if (isMoving && app.stats.frame.fps < targetFps) {
+                            if (resolutionPercentageRef.current !== lowResScale) {
+                                setResolutionPercentageRef.current(lowResScale);
+                            }
+                        } else if (!isMoving) {
+                            if (resolutionPercentageRef.current !== 100) {
+                                setResolutionPercentageRef.current(100);
+                            }
+                        }
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(updateFrameRate);
         };
 
-        const animationFrameId = requestAnimationFrame(updateFrameRate);
+        animationFrameId = requestAnimationFrame(updateFrameRate);
 
         return () => {
             cancelAnimationFrame(animationFrameId);
         };
-    }, [app, app.stats.frame.fps]);
-
-    const cameraEntityRef = React.useRef<PcEntity>(null); // Ref for the camera entity
+    }, [app, dynamicResolution, targetFps, lowResScale, movementDebounce]);
 
     // Set initial distance and min/max immediately on mount
     React.useEffect(() => {

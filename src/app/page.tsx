@@ -56,7 +56,7 @@ const Page = () => {
                 canvasWidth={canvasWidth}
                 canvasHeight={canvasHeight}
             />
-            {currentModelProps && <ModelViewer {...currentModelProps} resolutionPercentage={resolutionPercentage} setResolutionPercentage={setResolutionPercentage} showSettings={showSettings} dynamicResolution={true} targetFps={30} lowResScale={20} movementDebounce={500} />}
+            {currentModelProps && <ModelViewer {...currentModelProps} resolutionPercentage={resolutionPercentage} setResolutionPercentage={setResolutionPercentage} showSettings={showSettings} dynamicResolution={false} targetFps={30} lowResScale={20} movementDebounce={500} />}
             <SwaroboLogo />
         </Application>
     );

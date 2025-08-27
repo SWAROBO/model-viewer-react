@@ -29,6 +29,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
         lowResScale,
         movementDebounce,
         disableDynamicResolution,
+        backgroundColor,
     } = { ...defaultModelViewerProps, ...props };
 
     const [downloadProgress, setDownloadProgress] = useState(0);
@@ -65,6 +66,7 @@ const ModelViewer = (props: ModelViewerProps = defaultModelViewerProps) => {
                 lowResScale={lowResScale}
                 movementDebounce={movementDebounce}
                 disableDynamicResolution={disableDynamicResolution}
+                backgroundColor={backgroundColor}
             />
         </div>
     );

@@ -87,6 +87,7 @@ describe('ModelViewer', () => {
       position: [1, 2, 3],
       scale: [2, 2, 2],
       model: 'test-model', // Added model property
+      backgroundColor: '#ff0000',
     };
 
     const mockSplatAsset = { some: 'splat data' };
@@ -111,6 +112,7 @@ describe('ModelViewer', () => {
         position: customProps.position,
         scale: customProps.scale,
         model: customProps.model, // Added model property
+        backgroundColor: customProps.backgroundColor,
       }),
       undefined
     );
@@ -162,7 +164,7 @@ describe('ModelViewer', () => {
     await act(async () => {
       capturedProgressHandler(50);
     });
-    rerender(<ModelViewer splatURL="test.splat" />); // Rerender to reflect state change
+    rerender(<ModelViewer splatURL="test.splat" model={undefined} />); // Rerender to reflect state change
     expect(screen.getByText('50%')).toBeInTheDocument();
 
     // Simulate completion
@@ -173,7 +175,7 @@ describe('ModelViewer', () => {
       asset: { some: 'splat data' },
       loading: false,
     });
-    rerender(<ModelViewer splatURL="test.splat" />); // Rerender to reflect state change
+    rerender(<ModelViewer splatURL="test.splat" model={undefined} />); // Rerender to reflect state change
     expect(screen.queryByTestId('model-loading-progress-container')).toHaveStyle('display: none');
   });
 });

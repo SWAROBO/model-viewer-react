@@ -53,6 +53,10 @@ export const useModelData = (csvUrl: string) => {
                                     if (key.trim() === 'splatURL' && typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
                                         value = value.substring(1, value.length - 1);
                                     }
+                                    // Remove extra quotes from backgroundColor if present
+                                    if (key.trim() === 'backgroundColor' && typeof value === 'string' && value.startsWith('"') && value.endsWith('"')) {
+                                        value = value.substring(1, value.length - 1);
+                                    }
 
                                     // Replace null or undefined values with defaults from defaultModelViewerProps
                                     if (value === null || value === undefined) {

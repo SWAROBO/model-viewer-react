@@ -19,6 +19,7 @@ export type ModelViewerProps = {
     lowResScale?: number;
     movementDebounce?: number;
     disableDynamicResolution?: boolean;
+    backgroundColor?: string;
 };
 
 export const defaultModelViewerProps: Required<ModelViewerProps> = {
@@ -43,4 +44,5 @@ export const defaultModelViewerProps: Required<ModelViewerProps> = {
     lowResScale: 70,
     movementDebounce: 500,
     disableDynamicResolution: false,
+    backgroundColor: "",
 };

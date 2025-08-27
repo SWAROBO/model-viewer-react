@@ -52,6 +52,7 @@ export type ModelViewerCoreProps = {
     lowResScale?: number;
     movementDebounce?: number;
     disableDynamicResolution?: boolean;
+    backgroundColor?: string;
 };
 
 const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
@@ -76,6 +77,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     lowResScale = 10,
     movementDebounce = 500,
     disableDynamicResolution: initialDisableDynamicResolution = false,
+    backgroundColor = "",
 }) => {
     const [disableDynamicResolution, setDisableDynamicResolution] = useState(initialDisableDynamicResolution);
     const searchParams = useSearchParams();
@@ -342,12 +344,15 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     return (
         <Entity>
             {showGrid && <Grid />} {/* Conditionally render Grid */}
-            {!showSettings && (
+            {!showSettings && !backgroundColor && (
                 <EnvAtlasComponent src="/autumn_field_puresky_16k-envAtlas.png" />
             )}
             {/* Create a camera entity */}
             <Entity ref={cameraEntityRef}>
-                <Camera clearColor="#090707" fov={fov} />
+                <Camera
+                    clearColor={backgroundColor ? backgroundColor : "#090707"}
+                    fov={fov}
+                />
                 <OrbitControls
                     // distanceMin and distanceMax are now updated imperatively
                     inertiaFactor={0.1} // Revert inertiaFactor to 0.1 for smooth movement

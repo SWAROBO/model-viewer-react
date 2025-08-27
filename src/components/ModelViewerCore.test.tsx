@@ -3,7 +3,7 @@ import { vi } from "vitest";
 import ModelViewerCore from "./ModelViewerCore";
 import { useSearchParams } from "next/navigation"; // Import the hook to mock it directly
 import { Entity } from "@playcanvas/react"; // Import Entity to use vi.mocked
-import { Camera, GSplat } from "@playcanvas/react/components"; // Import components for mocking
+import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components"; // Import components for mocking
 import { OrbitControls } from "../lib/@playcanvas/react"; // Import OrbitControls for mocking
 import { useApp } from "@playcanvas/react/hooks"; // Import useApp to use vi.mocked
 import { Asset } from "playcanvas"; // Import Asset
@@ -664,5 +664,24 @@ describe("ModelViewerCore", () => {
 
         // With dynamic resolution disabled, setResolutionPercentage should not be called
         expect(setResolutionPercentage).not.toHaveBeenCalled();
+    });
+
+    it("does not render EnvAtlas when backgroundColor is provided", () => {
+        render(
+            <ModelViewerCore splat={null} backgroundColor="#ff0000" />
+        );
+        const EnvAtlasMock = vi.mocked(EnvAtlas);
+        expect(EnvAtlasMock).not.toHaveBeenCalled();
+    });
+
+    it("passes backgroundColor prop to Camera component", () => {
+        render(
+            <ModelViewerCore splat={null} backgroundColor="#ff0000" />
+        );
+        const CameraMock = vi.mocked(Camera);
+        expect(CameraMock).toHaveBeenCalledWith(
+            expect.objectContaining({ clearColor: "#ff0000" }),
+            undefined
+        );
     });
 });

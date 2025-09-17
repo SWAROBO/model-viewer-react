@@ -15,10 +15,10 @@
         "workflow": "gh workflow run manual-e2e.yml --ref with-browser-test"
     },
     "dependencies": {
-        "@playcanvas/react": "^0.4.0",
+        "@playcanvas/react": "^0.9.1",
         "next": "15.3.3",
         "papaparse": "^5.5.3",
-        "playcanvas": "^2.7.7",
+        "playcanvas": "^2.11.8",
         "react": "^19.0.0",
         "react-circular-progressbar": "^2.2.0",
         "react-dom": "^19.0.0",

@@ -102,7 +102,7 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
     // State for UI controls, now using useSyncedState
     const [currentDistance, setCurrentDistance] = useSyncedState(distance);
     const [controlPosition, setControlPosition] = useSyncedState(position);
-    const [controlRotation, setControlRotation] = useSyncedState(rotation);
+    const [controlRotation, setControlRotation] = useSyncedState([rotation[0] + 180, rotation[1] + 180, rotation[2]] as [number, number, number]);
     const [frameRate, setFrameRate] = useState(60);
     const app = useApp();
     const lastMoveTimeRef = React.useRef(0);

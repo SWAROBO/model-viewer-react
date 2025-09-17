@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Entity } from "@playcanvas/react";
 import { Camera, GSplat, EnvAtlas } from "@playcanvas/react/components";
@@ -341,6 +341,13 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
         ? { distanceSensitivity: 0, orbitSensitivity: 0 }
         : { distanceSensitivity: 0.05, orbitSensitivity: 0.2 };
 
+    const MemoizedGSplat = useMemo(() => {
+        // Memoize GSplat to prevent re-renders from triggering the warning
+        const Memoized = React.memo(({ asset }: { asset: Asset }) => <GSplat asset={asset} />);
+        Memoized.displayName = "MemoizedGSplat";
+        return Memoized;
+    }, []);
+
     return (
         <Entity>
             {showGrid && <Grid />} {/* Conditionally render Grid */}
@@ -362,18 +369,21 @@ const ModelViewerCore: React.FC<ModelViewerCoreProps> = ({
                     mouse={orbitControlSensitivity}
                     touch={orbitControlSensitivity}
                 />
-                {!showSettings && frameRate > targetFps && !isInteracting && (
+                {!showSettings && !isInteracting && (
                     <AutoRotate startDelay={1} startFadeInTime={2} />
                 )}
             </Entity>
             {/* Create the splat entity - now directly uses props */}
-            <Entity
-                position={controlPosition} // Use controlPosition state
-                rotation={controlRotation} // Use controlRotation state
-                scale={scale}
-            >
-                {splat && <GSplat asset={splat} />}
-            </Entity>
+            {splat && (
+                <Entity
+                    key={splat.id}
+                    position={controlPosition} // Use controlPosition state
+                    rotation={controlRotation} // Use controlRotation state
+                    scale={scale}
+                >
+                    <MemoizedGSplat asset={splat} />
+                </Entity>
+            )}
             {showSettings && (
                 <div
                     data-testid="model-viewer-settings-panel" // Add data-testid to the settings panel

@@ -297,7 +297,11 @@ describe("ModelViewerCore", () => {
         const splatEntityCall = mockedEntity.mock.calls.find(
             (call) => call[0].position && call[0].rotation && call[0].scale
         );
-        expect(splatEntityCall?.[0].rotation).toEqual(testRotation);
+        expect(splatEntityCall?.[0].rotation).toEqual([
+            testRotation[0] + 180,
+            testRotation[1] + 180,
+            testRotation[2],
+        ]);
     });
 
     it("passes scale prop to GSplat Entity", async () => {
@@ -386,8 +390,8 @@ describe("ModelViewerCore", () => {
         const rotationSliders = screen
             .getAllByTestId("mock-single-value-slider")
             .slice(5, 8); // Skip distance and pitch sliders
-        expect(rotationSliders[0]).toHaveAttribute("data-value", "10");
-        expect(rotationSliders[1]).toHaveAttribute("data-value", "20");
+        expect(rotationSliders[0]).toHaveAttribute("data-value", "190");
+        expect(rotationSliders[1]).toHaveAttribute("data-value", "200");
         expect(rotationSliders[2]).toHaveAttribute("data-value", "30");
     });
 
